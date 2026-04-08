@@ -1,0 +1,122 @@
+<footer>
+    <div class="container">
+        <div class="footer-main">
+            <div class="footer-column">
+                <a href="/" class="footer-logo">
+                    <% if (settings.logo_white) { %>
+                        <img src="<%= settings.logo_white %>" alt="ARQUÊΔ" style="max-height: 40px;">
+                    <% } else if (settings.logo) { %>
+                        <img src="<%= settings.logo %>" alt="ARQUÊΔ" style="max-height: 40px;">
+                    <% } else { %>
+                        ARQUÊΔ
+                    <% } %>
+                </a>
+                <p style="opacity: 0.5; font-size: 0.85rem; margin-top: 1rem; max-width: 280px; line-height: 1.6;">
+                    <%= settings.footer_short_text || 'Liderando a transformação estratégica através do capital humano e performance operacional de alto nível.' %>
+                </p>
+                <% if (settings.footer_secure_link) { %>
+                    <a href="<%= settings.footer_secure_link %>" target="_blank" class="safe-site-badge" style="text-decoration: none; color: inherit;">
+                        <i class="ri-shield-check-line"></i> SITE 100% SEGURO
+                    </a>
+                <% } else { %>
+                    <div class="safe-site-badge">
+                        <i class="ri-shield-check-line"></i> SITE 100% SEGURO
+                    </div>
+                <% } %>
+            </div>
+
+            <div class="footer-column footer-links">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/sobre">Sobre</a></li>
+                    <li><a href="/servicos">Serviços</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                    <li><a href="/contato">Contato</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column footer-links">
+                <h4>Jurídico</h4>
+                <ul>
+                    <li><a href="/politica-de-privacidade">Política de Privacidade</a></li>
+                    <li><a href="/termos-e-condicoes">Termos e Condições</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Redes Sociais</h4>
+                <div class="social-links" style="display: flex; gap: 15px;">
+                    <% 
+                        const socialIconsMapFooter = {
+                            instagram: 'ri-instagram-line', facebook: 'ri-facebook-fill', linkedin: 'ri-linkedin-fill', 
+                            youtube: 'ri-youtube-fill', tiktok: 'ri-tiktok-fill', twitter: 'ri-twitter-x-fill', 
+                            pinterest: 'ri-pinterest-fill', google: 'ri-google-fill'
+                        };
+                        let socialLinksFooter = [];
+                        try { socialLinksFooter = JSON.parse(settings.social_links || '[]'); } catch(e) { socialLinksFooter = []; }
+                    %>
+                    <% socialLinksFooter.forEach(item => { %>
+                        <% if (item.network && item.url && socialIconsMapFooter[item.network]) { %>
+                            <a href="<%= item.url %>" target="_blank"><i class="<%= socialIconsMapFooter[item.network] %>"></i></a>
+                        <% } %>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>
+                <% if (settings.cnpj) { %>CNPJ: <%= settings.cnpj %> | <% } %>
+                <%= settings.site_name || 'ARQUÊ GESTÃO' %> <%= new Date().getFullYear() %> | <%= settings.footer_text || 'Todos os direitos reservados.' %>
+            </div>
+            <div>FEITO PELA <a href="https://agenciaetodavia.com.br" target="_blank" style="color: inherit; text-decoration: none;">E-TODAVIA AGÊNCIA CRIATIVA</a></div>
+        </div>
+    </div>
+</footer>
+
+<!-- Barra LGPD -->
+<div id="lgpd-bar" class="lgpd-bar">
+    <div class="lgpd-text">
+        Utilizamos cookies e tecnologias semelhantes para melhorar sua experiência em nosso site. Ao continuar navegando, você concorda com nossa <a href="/politica-de-privacidade" style="color: var(--navy-blue); font-weight: 700;">Política de Privacidade</a>.
+    </div>
+    <button class="lgpd-btn" onclick="acceptLGPD()">ACEITAR</button>
+</div>
+
+<!-- NAVEGAÇÃO FLUTUANTE BOTTOM (MOBILE/TABLET) -->
+<div class="m-floating-nav">
+    <a href="/servicos" class="m-nav-item <%= (locals.currentPage === 'servicos') ? 'active' : '' %>">
+        <i class="ri-briefcase-4-fill"></i>
+        <span>Serviços</span>
+    </a>
+    <a href="/blog" class="m-nav-item <%= (locals.currentPage === 'blog') ? 'active' : '' %>">
+        <i class="ri-article-fill"></i>
+        <span>Blog</span>
+    </a>
+    <a href="/contato" class="m-nav-item <%= (locals.currentPage === 'contato') ? 'active' : '' %>">
+        <i class="ri-chat-3-fill"></i>
+        <span>Contato</span>
+    </a>
+</div>
+
+<!-- BOTÃO WHATSAPP FLUTUANTE -->
+<a href="https://wa.me/<%= settings.whatsapp %>?text=Olá%2C%20estive%20no%20site%20e%20gostaria%20de%20agendar%20uma%20consulta." 
+   class="whatsapp-float-btn" target="_blank" aria-label="Fale conosco no WhatsApp">
+    <i class="ri-whatsapp-line"></i>
+</a>
+
+<script>
+    function acceptLGPD() {
+        localStorage.setItem('lgpd_accepted', 'true');
+        document.getElementById('lgpd-bar').classList.remove('show');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (!localStorage.getItem('lgpd_accepted')) {
+            setTimeout(() => {
+                const bar = document.getElementById('lgpd-bar');
+                if(bar) bar.classList.add('show');
+            }, 1000);
+        }
+    });
+</script>

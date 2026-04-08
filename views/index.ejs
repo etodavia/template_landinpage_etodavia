@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <%- include('partials/head-tags') %>
+    <% 
+        const oColor = settings.hero_overlay_color || '#0A1128';
+        const oOpacity = settings.hero_overlay_opacity || 0.4;
+        function hexToRgb(hex) {
+            hex = hex.replace('#', '');
+            const r = parseInt(hex.length === 3 ? hex[0]+hex[0] : hex.substring(0, 2), 16);
+            const g = parseInt(hex.length === 3 ? hex[1]+hex[1] : hex.substring(2, 4), 16);
+            const b = parseInt(hex.length === 3 ? hex[2]+hex[2] : hex.substring(4, 6), 16);
+            return `${r}, ${g}, ${b}`;
+        }
+        const overlayStyle = `linear-gradient(rgba(${hexToRgb(oColor)}, ${oOpacity}), rgba(${hexToRgb(oColor)}, ${oOpacity}))`;
+    %>
+    <style>
+        .hero { 
+            height: 85vh; 
+            background: <%= overlayStyle %>, url('<%= settings.hero_image || "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1600" %>') center/cover no-repeat;
+            margin-top: 0 !important;
+            border-top: none !important;
+        }
+    </style>
+</head>
+<body style="background: white; padding-top: 0 !important;">
+    <%- settings.custom_body_code || '' %>
+    <%- include('partials/header') %>
+
+    <main>
+        <!-- HERO IMPACTO -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 data-reveal>
+                    <%- settings.home_hero_title || 'Lidere Negócios com Confiança.' %>
+                </h1>
+                <p data-reveal>
+                    <%- settings.home_hero_description || 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.' %>
+                </p>
+                <div data-reveal style="display: flex; justify-content: flex-start;">
+                    <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-pill-large" style="width: auto !important; min-width: 200px; padding: 18px 30px;">
+                        Agendar Consultoria <div class="icon-blue-circle" style="background: var(--accent-red); color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                    </a>
+                </div>
+            </div>
+            <div class="floating-card" data-reveal style="bottom: 30px;">
+                <h4><%- settings.home_hero_card_title || 'Sua empresa em <em>Crescimento</em>.' %></h4>
+                <a href="/servicos"><%= settings.home_hero_card_subtitle || 'Experiência Estratégica' %> <i class="ri-arrow-right-line"></i></a>
+            </div>
+        </section>
+
+        <!-- SOBRE (DINÂMICO) -->
+        <section style="background: var(--bg-sand); padding: 100px 0;">
+            <div class="container">
+                <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+                    <div data-reveal="left">
+                        <span class="section-label">NOSSA ESSÊNCIA</span>
+                        <h2 style="font-size: 3.5rem; line-height: 1; letter-spacing: -3px; margin-bottom: 25px; color: var(--navy-blue);">
+                            <%- settings.about_title || 'Sinergia Pura entre Pessoas e Resultados.' %>
+                        </h2>
+                        <p style="font-size: 1.2rem; color: #555; margin-bottom: 40px; line-height: 1.6;">
+                            <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação. Nossa abordagem sistêmica conecta os pontos invisíveis que transformam ambientes de trabalho em centros de excelência.' %>
+                        </p>
+                        <a href="/sobre" class="btn-pill-large" style="background: var(--navy-blue); color: white;">
+                            <%= settings.home_about_button_text || 'Conhecer a ARQUÊΔ' %> <div class="icon-blue-circle" style="background: white; color: var(--navy-blue);"><i class="ri-arrow-right-line"></i></div>
+                        </a>
+                    </div>
+                    <div data-reveal="right" class="about-image-wrapper">
+                        <img src="<%= settings.about_image || 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=800' %>" 
+                             style="width: 100%; height: 550px; object-fit: cover; border-radius: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.1);">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVIÇOS -->
+        <section id="servicos" style="background: #FAFAFA; padding: 60px 0;">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+                    <div data-reveal="left">
+                        <span class="section-label">Especialidades</span>
+                        <h2 style="font-size: 2.8rem; color: var(--navy-blue);">
+                            <%- settings.services_section_title || 'Conheça nossos <em>Serviços</em>' %>
+                        </h2>
+                        <p style="color: #666; max-width: 500px;"><%= settings.services_section_text %></p>
+                    </div>
+                    <a href="/servicos" data-reveal="right" class="btn-cta-header" style="background: var(--navy-blue); padding: 16px 30px; border-radius: 12px; font-size: 0.9rem;">
+                        <%= settings.home_services_button_text || 'Ver todos os serviços' %>
+                    </a>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px;">
+                    <% if (locals.services) { %>
+                        <% locals.services.slice(0,3).forEach(s => { %>
+                            <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);" data-reveal="up">
+                                <div style="width: 55px; height: 55px; background: #f0f4f8; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                    <i class="<%= s.icone %>" style="font-size: 1.8rem; color: var(--navy-blue);"></i>
+                                </div>
+                                <h3 style="font-size: 1.4rem; margin-bottom: 15px; color: var(--navy-blue);"><%= s.titulo %></h3>
+                                <p style="color: #666; font-size: 0.9rem; line-height: 1.6;"><%= s.resumo %></p>
+                            </div>
+                        <% }) %>
+                    <% } %>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIFERENCIAIS E BENEFÍCIOS (HUB MODULAR) -->
+        <% 
+            let bItems = [];
+            try { bItems = JSON.parse(settings.benefits_items || '[]'); } catch(e) { bItems = []; }
+            const activeTemplate = settings.benefits_template || 'style-glass';
+        %>
+        <section id="diferenciais" style="padding: 100px 0; background: <%= activeTemplate === 'style-navy' ? 'var(--navy-blue)' : 'white' %>; overflow: hidden;">
+            <div class="container">
+                <div class="benefits-header-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 60px;">
+                    <div data-reveal="left">
+                        <span class="section-label" style="<%= activeTemplate === 'style-navy' ? 'color: white; opacity: 0.6;' : '' %>">Vantagens Competitivas</span>
+                        <h2 style="font-size: 3.2rem; color: <%= activeTemplate === 'style-navy' ? 'white' : 'var(--navy-blue)' %>;">
+                            <%- settings.benefits_title || 'Nossos <em>Diferenciais</em>' %>
+                        </h2>
+                    </div>
+                    <div data-reveal="right">
+                        <p style="<%= activeTemplate === 'style-navy' ? 'color: white; opacity: 0.8;' : 'color: #555;' %> font-size: 1.1rem; line-height: 1.6;">
+                            <%= settings.benefits_text || 'Entregamos soluções que transcendem o convencional, focando na sustentabilidade do crescimento e na valorização real do capital humano.' %>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Carousel Hub (Swiper) -->
+                <div class="swiper benefitsSwiper" style="padding: 20px 5px 60px; overflow: visible;">
+                    <div class="swiper-wrapper">
+                        <% bItems.forEach((b, idx) => { %>
+                            <% if (b.title || b.text) { %>
+                                <div class="swiper-slide">
+                                    <div class="benefit-card <%= activeTemplate %>" data-reveal="up" style="height: 100%;">
+                                        <div class="benefit-icon-box">
+                                            <i class="<%= b.icon || 'ri-check-double-line' %>"></i>
+                                        </div>
+                                        <h3 class="benefit-card-title"><%= b.title %></h3>
+                                        <p class="benefit-card-text"><%= b.text %></p>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% }) %>
+                    </div>
+                    <!-- Paginação ativa no Mobile/Tablet -->
+                    <div class="swiper-pagination beneficios-pagination" style="bottom: 0;"></div>
+                </div>
+            </div>
+
+            <style>
+                .benefit-card {
+                    padding: 45px 35px;
+                    border-radius: 35px;
+                    background: white;
+                    border: 1px solid #F1F5F9;
+                    box-shadow: 0 40px 100px rgba(0,0,0,0.03);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+                }
+
+                .benefit-icon-box {
+                    width: 65px;
+                    height: 65px;
+                    border-radius: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 2rem;
+                }
+
+                .benefit-card-title { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; color: var(--navy-blue); }
+                .benefit-card-text { font-size: 0.95rem; line-height: 1.6; color: #666; margin: 0; }
+
+                /* TEMPLATE: GLASSMORPHISM */
+                .style-glass {
+                    background: rgba(255, 255, 255, 0.4);
+                    backdrop-filter: blur(25px);
+                    -webkit-backdrop-filter: blur(25px);
+                    border: 1px solid rgba(255, 255, 255, 0.5);
+                }
+                .style-glass .benefit-icon-box { background: white; color: <%= settings.benefits_color || 'var(--accent-red)' %>; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+                /* TEMPLATE: INDUSTRIAL */
+                .style-industrial {
+                    border-left: 6px solid var(--navy-blue);
+                    border-radius: 12px;
+                    box-shadow: 20px 20px 0px #F1F5F9;
+                }
+                .style-industrial .benefit-icon-box { background: var(--navy-blue); color: white; border-radius: 12px; }
+                .style-industrial:hover { transform: translate(-8px, -8px); box-shadow: 28px 28px 0px <%= settings.benefits_color || 'var(--accent-red)' %>; border-left-color: <%= settings.benefits_color || 'var(--accent-red)' %>; }
+
+                /* TEMPLATE: CLEAN MINIMALIST */
+                .style-clean {
+                    background: transparent;
+                    box-shadow: none;
+                    border: none;
+                    padding-left: 0;
+                }
+                .style-clean .benefit-icon-box { background: #F8FAFC; color: <%= settings.benefits_color || 'var(--navy-blue)' %>; }
+                .style-clean .benefit-card-title { position: relative; padding-bottom: 20px; }
+                .style-clean .benefit-card-title::after { content: ''; position: absolute; left: 0; bottom: 0; width: 40px; height: 4px; background: <%= settings.benefits_color || 'var(--accent-red)' %>; }
+
+                /* TEMPLATE: DARK NAVY */
+                .style-navy {
+                    background: rgba(255,255,255,0.05);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    color: white;
+                }
+                .style-navy .benefit-card-title { color: white; }
+                .style-navy .benefit-card-text { color: rgba(255,255,255,0.7); }
+                .style-navy .benefit-icon-box { background: <%= settings.benefits_color || 'var(--accent-red)' %>; color: white; }
+                .style-navy:hover { background: rgba(255,255,255,0.1); border-color: <%= settings.benefits_color || 'var(--accent-red)' %>; }
+
+                /* Swiper Optimization: Mobile First */
+                .benefitsSwiper { pointer-events: all; }
+                
+                @media (min-width: 1024px) {
+                    .benefitsSwiper .swiper-wrapper {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 40px;
+                    }
+                    <% if (bItems.length > 2) { %>
+                        .benefitsSwiper .swiper-wrapper { grid-template-columns: repeat(4, 1fr); }
+                    <% } %>
+                    .benefitsSwiper .swiper-slide { width: auto !important; height: auto !important; }
+                    .beneficios-pagination { display: none; }
+                    .benefitsSwiper { overflow: visible; }
+                }
+            </style>
+        </section>
+
+        <!-- BLOG -->
+        <section id="blog" style="background: var(--navy-blue); color: white; padding: 60px 0;">
+            <div class="container">
+                <div style="margin-bottom: 40px;" data-reveal="left">
+                    <span class="section-label" style="color: white; opacity: 0.6;">Insights</span>
+                    <h2 style="font-size: 2.6rem; color: white;">
+                        <%- settings.blog_section_title || 'Últimos <em>Artigos</em>' %>
+                    </h2>
+                    <p style="opacity: 0.6; color: white; margin-top: 10px;"><%= settings.blog_section_text %></p>
+                </div>
+                <!-- ... resto do blog ... -->
+                <% if (posts && posts.length > 0) { %>
+                    <!-- Post em Destaque -->
+                    <div style="background: white; color: var(--navy-blue); border-radius: 20px; display: grid; grid-template-columns: 1fr 1.5fr; overflow: hidden; margin-bottom: 30px;" data-reveal="right">
+                        <div style="height: 280px;">
+                            <img src="<%= posts[0].imagem %>" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div style="padding: 40px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 0.75rem; letter-spacing: 1px; color: #888; margin-bottom: 12px;"><%= posts[0].categoria.toUpperCase() %> • <%= posts[0].data %></div>
+                            <h3 style="font-size: 1.8rem; margin-bottom: 15px; line-height: 1.2;"><%= posts[0].titulo %></h3>
+                            <p style="font-size: 0.9rem; color: #555; margin-bottom: 20px;"><%= posts[0].resumo %></p>
+                            <a href="/blog/<%= posts[0].slug %>" style="text-decoration: none; color: #008080; font-weight: 700; font-size: 0.9rem;">Saiba mais <i class="ri-arrow-right-line"></i></a>
+                        </div>
+                    </div>
+                    <!-- Blog Grid Dinâmico (Restantes) -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                        <% posts.slice(1,4).forEach(post => { %>
+                            <div style="background: white; color: var(--navy-blue); padding: 20px; border-radius: 18px;" data-reveal="up">
+                                <img src="<%= post.imagem %>" style="width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 15px;">
+                                <h4 style="font-size: 1.1rem; line-height: 1.3; margin-bottom: 8px;"><%= post.titulo %></h4>
+                                <p style="font-size: 0.8rem; color: #777;"><%= post.resumo %></p>
+                                <a href="/blog/<%= post.slug %>" style="text-decoration: none; color: var(--navy-blue); font-weight: 800; font-size: 0.8rem; margin-top: 10px; display: inline-block;">LER MAIS</a>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+        </section>
+
+        <!-- DEPOIMENTOS (EXPANDIDO - 4 COLUNAS COM FOTOS) -->
+        <!-- DEPOIMENTOS (CARROSSEL SWIPER PREMIUM) -->
+        <section style="background: white; padding: 100px 0; overflow: hidden;">
+            <div class="container">
+                <div style="text-align: center; margin-bottom: 60px;" data-reveal>
+                    <span class="section-label">Cases de Sucesso</span>
+                    <h2 style="font-size: 3.2rem; color: var(--navy-blue);">
+                        <%- settings.testimonial_section_title || 'O que dizem os <em>Clientes</em>' %>
+                    </h2>
+                </div>
+                
+                <div class="swiper testimonialsSwiper">
+                    <div class="swiper-wrapper">
+                        <% if (testimonials && testimonials.length > 0) { %>
+                            <% testimonials.forEach(t => { %>
+                                <div class="swiper-slide">
+                                    <div style="background: #FAFAFA; border-radius: 24px; padding: 35px; min-height: 250px; display: flex; flex-direction: column; justify-content: space-between;">
+                                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                                            <img src="<%= t.foto || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=80&w=100' %>" 
+                                                 style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                                            <div>
+                                                <div style="font-weight: 800; color: var(--navy-blue); font-size: 0.95rem;"><%= t.nome %></div>
+                                                <div style="font-size: 0.75rem; color: #888;"><%= t.cargo %>, <%= t.empresa %></div>
+                                            </div>
+                                        </div>
+                                        <p style="font-size: 0.95rem; line-height: 1.6; color: #555;">"<%= t.texto %>"</p>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <!-- Fallback Placeholder -->
+                            <div class="swiper-slide">
+                                <div style="background: #FAFAFA; border-radius: 24px; padding: 35px; min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                                    <p style="color: #999;">Nenhum depoimento cadastrado.</p>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                    <!-- Paginação Customizada -->
+                    <div class="swiper-pagination" style="position: relative; margin-top: 40px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEWSLETTER -->
+        <section style="padding: 60px 0; background: var(--bg-sand);">
+            <div class="container">
+                <div style="background: var(--navy-blue); color: white; padding: 3rem; border-radius: 30px; text-align: center;">
+                    <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">
+                        <%- settings.newsletter_section_title || 'Atualize sua <em>Inteligência</em> de RH.' %>
+                    </h2>
+                    <p style="opacity: 0.7; margin-bottom: 1.5rem;"><%= settings.newsletter_section_text %></p>
+                    <form style="max-width: 450px; margin: 0 auto; display: flex; gap: 8px; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 50px;">
+                        <input type="email" placeholder="Seu e-mail" style="flex: 1; border: none; background: transparent; color: white; padding-left: 15px; outline: none; font-size: 0.9rem;">
+                        <button style="background: var(--accent-red); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 0.85rem;">Assinar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <!-- Scripts: GSAP + Swiper -->
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray("[data-reveal]").forEach(el => {
+            let config = {
+                scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none none" },
+                opacity: 0, duration: 1.4, ease: "power4.out"
+            };
+            const direction = el.getAttribute('data-reveal');
+            if (direction === 'left') config.x = -60;
+            else if (direction === 'right') config.x = 60;
+            else config.y = 40;
+            gsap.from(el, config);
+        });
+
+        // Testimonials Swiper
+        const swiper = new Swiper('.testimonialsSwiper', {
+            slidesPerView: 1,
+            spaceBetween: 25,
+            grabCursor: true,
+            pagination: { el: ".swiper-pagination", clickable: true },
+            breakpoints: {
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+                1280: { slidesPerView: 4 }
+            }
+        });
+
+        // Benefits Swiper
+        const benefitsSwiper = new Swiper('.benefitsSwiper', {
+            slidesPerView: 1.2,
+            spaceBetween: 20,
+            centeredSlides: true,
+            loop: true,
+            pagination: { el: ".beneficios-pagination", clickable: true },
+            breakpoints: {
+                768: { slidesPerView: 2.2, centeredSlides: false },
+                1024: { enabled: false } // Desativar carrossel no desktop (usar grid)
+            }
+        });
+    </script>
+</body>
+</html>

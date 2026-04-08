@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <%- include('partials/head-tags') %>
+</head>
+<body style="background: var(--bg-sand);">
+    <%- include('partials/header') %>
+
+    <main>
+        <!-- CABEÇALHO DINÂMICO -->
+        <%- include('partials/page-hero', { 
+            pageTitle: settings.contact_hero_title || 'Entre em <em>Contato</em>',
+            image: settings.contact_hero_image || 'https://images.unsplash.com/photo-1423666639041-f56000c27a9a?auto=format&fit=crop&q=80&w=1600'
+        }) %>
+
+        <div class="container" style="margin-top: 100px;">
+            <div data-reveal="right" style="margin-bottom: 80px; padding-bottom: 40px; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                <p style="font-size: 1.25rem; color: #555; line-height: 1.5; max-width: 600px;">
+                    <%= settings.contact_page_description || 'Estamos aqui para ajudar você a navegar seu negócio com confiança através de gestão estratégica e capital humano especializado.' %>
+                </p>
+            </div>
+
+            <!-- Middle Section: Sonet-style Split -->
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 100px;">
+                
+                <!-- Left: Contact Details Blocks -->
+                <div style="display: flex; flex-direction: column; gap: 60px;" data-reveal="left">
+                    <!-- Office -->
+                    <div>
+                        <h4 style="font-weight: 800; font-size: 0.8rem; letter-spacing: 2px; color: var(--navy-blue); opacity: 0.4; text-transform: uppercase; margin-bottom: 15px;">Escritório</h4>
+                        <p style="font-size: 1.2rem; color: var(--navy-blue); font-weight: 600; line-height: 1.4;">
+                            <%= settings.address_full || 'Av. Paulista, 1000 - São Paulo, SP' %>
+                        </p>
+                    </div>
+
+                    <!-- Contact -->
+                    <div>
+                        <h4 style="font-weight: 800; font-size: 0.8rem; letter-spacing: 2px; color: var(--navy-blue); opacity: 0.4; text-transform: uppercase; margin-bottom: 15px;">Contato Telefônico</h4>
+                        <a href="tel:<%= settings.contact_phone ? settings.contact_phone.replace(/\D/g, '') : '' %>" style="font-size: 1.2rem; color: var(--navy-blue); text-decoration: none; font-weight: 600; display: block; margin-bottom: 5px;">
+                            <%= settings.contact_phone || '(11) 99999-9999' %>
+                        </a>
+                        <a href="mailto:<%= settings.contact_email %>" style="font-size: 1.2rem; color: var(--navy-blue); text-decoration: none; font-weight: 600;">
+                            <%= settings.contact_email || 'contato@arquegestao.com.br' %>
+                        </a>
+                    </div>
+
+                    <!-- Support -->
+                    <div>
+                        <h4 style="font-weight: 800; font-size: 0.8rem; letter-spacing: 2px; color: var(--navy-blue); opacity: 0.4; text-transform: uppercase; margin-bottom: 15px;">Suporte Ativo</h4>
+                        <p style="font-size: 1.2rem; color: var(--navy-blue); font-weight: 600; line-height: 1.4;">
+                            Segunda a Sexta<br>09:00 — 18:00
+                        </p>
+                    </div>
+
+                    <!-- Social -->
+                    <div>
+                        <h4 style="font-weight: 800; font-size: 0.8rem; letter-spacing: 2px; color: var(--navy-blue); opacity: 0.4; text-transform: uppercase; margin-bottom: 15px;">Siga-nos</h4>
+                        <div style="display: flex; gap: 20px;">
+                            <% 
+                                let sLinks = [];
+                                try { sLinks = JSON.parse(settings.social_links || '[]'); } catch(e) { sLinks = []; }
+                                const iconMap = {
+                                    instagram: 'ri-instagram-line', facebook: 'ri-facebook-fill', linkedin: 'ri-linkedin-fill',
+                                    youtube: 'ri-youtube-fill', tiktok: 'ri-tiktok-fill', twitter: 'ri-twitter-x-fill',
+                                    pinterest: 'ri-pinterest-fill', google: 'ri-google-fill'
+                                };
+                            %>
+                            <% sLinks.forEach(link => { %>
+                                <% if (link.url) { %>
+                                    <a href="<%= link.url %>" target="_blank" style="font-size: 1.6rem; color: var(--navy-blue);">
+                                        <i class="<%= iconMap[link.network] || 'ri-share-line' %>"></i>
+                                    </a>
+                                <% } %>
+                            <% }) %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Clean Minimalist Form -->
+                <div data-reveal="right">
+                    <form id="contact-form" style="display: flex; flex-direction: column; gap: 50px;">
+                        <h3 style="font-size: 2.2rem; color: var(--navy-blue); letter-spacing: -1px; margin-bottom: 10px;"><%- settings.contact_form_title || 'Diga <em>Olá</em>' %></h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">NOME COMPLETO</label>
+                                <input type="text" placeholder="Seu nome aqui" required style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s;" onfocus="this.style.borderColor='var(--navy-blue)'" onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">E-MAIL</label>
+                                <input type="email" placeholder="email@exemplo.com" required style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s;" onfocus="this.style.borderColor='var(--navy-blue)'" onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'">
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">TEMA DE INTERESSE</label>
+                            <select style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; cursor: pointer; color: #555;">
+                                <option value="">Selecione uma opção</option>
+                                <option value="rh">Consultoria de RH</option>
+                                <option value="lideranca">Liderança</option>
+                                <option value="processos">Processos</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">SUA MENSAGEM</label>
+                            <textarea placeholder="Como podemos ajudar você?" required style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s; min-height: 120px; resize: none;" onfocus="this.style.borderColor='var(--navy-blue)'" onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-pill-large" style="background: var(--navy-blue); color: white; border: none; width: 100%; justify-content: center; margin-top: 10px;">
+                            Enviar Mensagem <div class="icon-blue-circle" style="background: var(--accent-red); color: white;"><i class="ri-arrow-right-line"></i></div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Full Width Map (Minimalist) -->
+    <section data-reveal style="height: 450px; width: 100%; filter: grayscale(1) invert(0.05) contrast(1.1); margin-bottom: -10px;">
+        <iframe src="<%= settings.contact_map_url || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.1973656114175!2d-46.65860718502222!3d-23.561349184683057!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da563797%3A0x7337220556133f99!2sAv.%20Paulista%2C%20S%C3%A3o%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1625500000000!5m2!1spt-BR!2sbr' %>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray("[data-reveal]").forEach(el => {
+            let config = {
+                scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
+                opacity: 0, duration: 1.4, ease: "power4.out"
+            };
+            const direction = el.getAttribute('data-reveal');
+            if (direction === 'left') config.x = -80;
+            else if (direction === 'right') config.x = 80;
+            else config.y = 50;
+            gsap.from(el, config);
+        });
+    </script>
+</body>
+</html>

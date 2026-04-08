@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | ARQUÊΔ</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body style="display: flex;">
+    <%- include('../partials/admin-sidebar') %>
+    
+    <main>
+        <div class="card-cms">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
+                <div>
+                    <h1>CMS » <em>Especialidades</em></h1>
+                    <p class="subtitle">Gerencie o portfólio de soluções estratégicas da ARQUÊΔ.</p>
+                </div>
+                <a href="/admin/servicos/novo" class="btn-premium btn-accent"><i class="ri-add-fill"></i> ADICIONAR SOLUÇÃO</a>
+            </header>
+
+            <div class="table-responsive">
+                <% if (services.length === 0) { %>
+                    <div style="text-align: center; color: #aaa; padding: 80px; background: #F8FAFC; border-radius: 20px; border: 2px dashed #E2E8F0;">
+                        <i class="ri-briefcase-line" style="font-size: 3rem; display: block; margin-bottom: 15px; opacity: 0.2;"></i>
+                        Nenhuma especialidade cadastrada.
+                    </div>
+                <% } else { %>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Foto</th>
+                                <th>Título da Solução</th>
+                                <th>Resumo Operacional</th>
+                                <th style="width: 150px;">Ações Táticas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% services.forEach(s => { %>
+                                <tr>
+                                    <td><img src="<%= s.imagem %>" class="img-preview" style="margin-top: 0; width: 80px; height: 50px;"></td>
+                                    <td><strong style="color: var(--primary);"><%= s.titulo %></strong></td>
+                                    <td><p style="font-size: 0.85rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 400px; margin: 0;"><%= s.resumo %></p></td>
+                                    <td>
+                                        <div class="actions">
+                                            <a href="/servicos/<%= s.slug %>" target="_blank" class="btn-action btn-view" title="Visualizar"><i class="ri-eye-line"></i></a>
+                                            <a href="/admin/servicos/editar/<%= s.id %>" class="btn-action btn-edit" title="Refinar"><i class="ri-pencil-line"></i></a>
+                                            <form action="/admin/servicos/delete/<%= s.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Excluir esta especialidade permanentemente?')">
+                                                <button type="submit" class="btn-action btn-delete" title="Remover"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

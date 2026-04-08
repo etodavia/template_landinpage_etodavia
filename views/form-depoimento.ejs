@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-marinho: #0A1128;
+            --accent-red: #D62828;
+            --off-white: #F7F7F4;
+        }
+        body {
+            background: var(--off-white);
+            font-family: 'Inter Tight', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+            margin: 0;
+        }
+        .form-container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 4rem;
+            border-radius: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .form-container h1 { font-size: 2.2rem; color: var(--primary-marinho); font-weight: 900; margin-bottom: 1rem; letter-spacing: -1px; }
+        .form-container p { color: #666; font-size: 1.1rem; line-height: 1.6; margin-bottom: 3rem; }
+
+        .input-group { text-align: left; margin-bottom: 1.5rem; }
+        .input-group label { display: block; font-size: 0.75rem; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .input-group input, .input-group textarea {
+            width: 100%; padding: 18px; border-radius: 15px; border: 1.5px solid #eee; outline: none; transition: 0.3s; font-family: inherit; font-size: 1rem; background: #fafafa;
+        }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--primary-marinho); background: white; box-shadow: 0 10px 20px rgba(0,0,51,0.05); }
+
+        .btn-submit { background: var(--primary-marinho); color: white; border: none; padding: 20px 45px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 1rem; width: 100%; transition: 0.3s; margin-top: 2rem; }
+        .btn-submit:hover { background: var(--accent-red); transform: translateY(-3px); box-shadow: 0 15px 30px rgba(214, 40, 40, 0.2); }
+
+        .success-overlay { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 2rem; }
+        .success-overlay i { font-size: 5rem; color: #059669; margin-bottom: 2rem; }
+        .success-overlay h2 { font-size: 2.5rem; color: var(--primary-marinho); margin-bottom: 1rem; }
+        .success-overlay b { color: #888; font-size: 1.1rem; font-weight: 500; }
+        .btn-back { margin-top: 3rem; text-decoration: none; color: var(--primary-marinho); font-weight: 800; border-bottom: 2px solid var(--accent-red); padding-bottom: 5px; }
+
+        @media (max-width: 600px) { .form-container { padding: 3rem 2rem; } }
+    </style>
+</head>
+<body>
+
+    <% if (locals.success) { %>
+        <div class="success-overlay">
+            <i class="ri-checkbox-circle-fill"></i>
+            <h2>Grato pelo seu depoimento!</h2>
+            <b>Sua mensagem foi enviada para análise de nossa equipe.<br>Em breve ela poderá ser destaque em nosso portal.</b>
+            <a href="/" class="btn-back">VOLTAR PARA A HOME</a>
+        </div>
+    <% } %>
+
+    <div class="form-container">
+        <h1>Sua jornada com a ARQUÊΔ</h1>
+        <p>Valorizamos muito o feedback de nossos parceiros e clientes. Compartilhe sua experiência conosco.</p>
+
+        <form action="/api/depoimentos" method="POST" enctype="multipart/form-data">
+            <div class="input-group" style="text-align: center; margin-bottom: 2rem;">
+                <label style="display: block; width: 100%; cursor: pointer;">
+                    <div style="width: 100px; height: 100px; background: #eee; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #aaa; overflow: hidden; border: 2px dashed #ccc;" id="photoPreview">
+                        <i class="ri-camera-line"></i>
+                    </div>
+                    <span style="font-size: 0.7rem; font-weight: 800; color: var(--primary-marinho);">CLIQUE PARA ANEXAR SUA FOTO</span>
+                    <input type="file" name="foto" id="fotoInput" style="display: none;" accept="image/*" onchange="previewImage(this)">
+                </label>
+            </div>
+            <div class="input-group">
+                <label>Seu Nome Completo</label>
+                <input type="text" name="nome" placeholder="Como devemos chamá-lo?" required>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="input-group">
+                    <label>Cargo / Função</label>
+                    <input type="text" name="cargo" placeholder="Ex: Diretor Executivo" required>
+                </div>
+                <div class="input-group">
+                    <label>Empresa</label>
+                    <input type="text" name="empresa" placeholder="Sua organização" required>
+                </div>
+            </div>
+            <div class="input-group" style="margin-top: 10px;">
+                <label>Seu Relato / Experiência</label>
+                <textarea name="texto" rows="5" placeholder="Conte-nos como a ARQUÊ ajudou seu negócio..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">ENVIAR DEPOIMENTO PARA ANÁLISE</button>
+        </form>
+    </div>
+
+    <script>
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('photoPreview').innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

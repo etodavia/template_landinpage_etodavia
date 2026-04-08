@@ -1,0 +1,104 @@
+<div class="header-wrapper">
+    <% if (settings.show_topbar == 1) { %>
+    <div class="topbar" style="background: var(--navy-blue); color: white; padding: 10px 0; font-size: 0.75rem;">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="topbar-left">
+                <span><i class="ri-map-pin-line"></i> <%= settings.endereco %></span>
+            </div>
+            <div class="topbar-right" style="display: flex; gap: 15px;">
+                <% 
+                    const socialIconsMap = {
+                        instagram: 'ri-instagram-line', facebook: 'ri-facebook-fill', linkedin: 'ri-linkedin-fill', 
+                        youtube: 'ri-youtube-fill', tiktok: 'ri-tiktok-fill', twitter: 'ri-twitter-x-fill', 
+                        pinterest: 'ri-pinterest-fill', google: 'ri-google-fill'
+                    };
+                    let socialLinksHeader = [];
+                    try { socialLinksHeader = JSON.parse(settings.social_links || '[]'); } catch(e) { socialLinksHeader = []; }
+                %>
+                <% socialLinksHeader.forEach(item => { %>
+                    <% if (item.network && item.url && socialIconsMap[item.network]) { %>
+                        <a href="<%= item.url %>" target="_blank" style="color: white; text-decoration: none;"><i class="<%= socialIconsMap[item.network] %>"></i></a>
+                    <% } %>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <header>
+        <a href="/" class="logo">
+            <% if (settings.logo) { %>
+                <img src="<%= settings.logo %>" alt="ARQUÊΔ" class="logo-main" style="max-height: 40px;">
+                <% if (settings.logo_white) { %>
+                    <img src="<%= settings.logo_white %>" alt="ARQUÊΔ" class="logo-white" style="display: none; max-height: 40px;">
+                <% } %>
+            <% } else { %>
+                ARQUÊΔ
+            <% } %>
+        </a>
+        <nav>
+            <ul class="desktop-menu">
+                <% 
+                   let menu = [
+                       { label: 'Home', link: '/' },
+                       { label: 'Sobre', link: '/sobre' },
+                       { label: 'Serviços', link: '/servicos' },
+                       { label: 'Blog', link: '/blog' },
+                       { label: 'Contato', link: '/contato' }
+                   ];
+                   if (settings.site_menu && settings.site_menu.trim() !== '') {
+                       menu = settings.site_menu.split('\n').filter(line => line.includes('|')).map(line => {
+                           const [label, link] = line.split('|');
+                           return { label: label.trim(), link: link.trim() };
+                       });
+                   }
+                %>
+                <% menu.forEach(item => { %>
+                    <li>
+                        <a href="<%= item.link %>" class="menu-item-link">
+                            <div class="roll-btn">
+                                <span class="roll-text"><%= item.label %></span>
+                                <span class="roll-text"><%= item.label %></span>
+                            </div>
+                        </a>
+                    </li>
+                <% }); %>
+            </ul>
+        </nav>
+        
+        <!-- MOBILE/TABLET QUICK ICONS (ENTRE LOGO E BOTÃO) -->
+        <div class="header-mobile-icons">
+            <a href="/" class="m-icon-link" title="Home"><i class="ri-home-4-fill"></i></a>
+            <a href="/admin/login" class="m-icon-link" title="Login"><i class="ri-user-settings-fill"></i></a>
+        </div>
+
+        <div class="header-right">
+            <a href="/admin/login" class="login-link menu-item-link desktop-only">
+                <div class="roll-btn">
+                    <span class="roll-text">Login <i class="ri-login-box-line"></i></span>
+                    <span class="roll-text">Login <i class="ri-login-box-line"></i></span>
+                </div>
+            </a>
+            <% if (settings.whatsapp) { %>
+            <a href="https://wa.me/<%= settings.whatsapp %>?text=Olá%2C%20estive%20no%20site%20e%20gostaria%20de%20agendar%20uma%20consulta." class="btn-cta-header" target="_blank">
+                <%= settings.nav_cta_text || 'Agendar Consulta' %>
+            </a>
+            <% } %>
+        </div>
+    </header>
+</div>
+
+<!-- SCRIPT GSAP PARA EFEITO ROLLING -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        gsap.utils.toArray(".menu-item-link").forEach(link => {
+            const roll = link.querySelector(".roll-btn");
+            link.addEventListener("mouseenter", () => {
+                gsap.to(roll, { yPercent: -50, duration: 0.3, ease: "power2.out" });
+            });
+            link.addEventListener("mouseleave", () => {
+                gsap.to(roll, { yPercent: 0, duration: 0.3, ease: "power2.in" });
+            });
+        });
+    });
+</script>

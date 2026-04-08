@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+    <%- include('partials/header') %>
+    <%- include('partials/page-hero', { pageTitle: 'Política de <em>Privacidade</em>' }) %>
+
+    <main>
+        <section>
+            <div class="container">
+                <div style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
+                    <h2>1. Coleta de Informações</h2>
+                    <p>Coletamos informações que você nos fornece diretamente ao preencher nossos formulários de contato ou newsletter. Isso pode incluir seu nome, e-mail e número de telefone.</p>
+                    
+                    <h2 style="margin-top: 3rem;">2. Uso das Informações</h2>
+                    <p>As informações coletadas são utilizadas exclusivamente para responder às suas solicitações, enviar atualizações sobre nossos serviços (caso autorizado) e melhorar sua experiência em nosso site.</p>
+                    
+                    <h2 style="margin-top: 3rem;">3. Proteção de Dados</h2>
+                    <p>Implementamos medidas de segurança técnicas e administrativas para proteger seus dados pessoais contra acesso não autorizado e uso indevido.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %>
+</body>
+</html>

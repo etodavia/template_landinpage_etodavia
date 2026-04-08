@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <%- include('partials/head-tags') %>
+</head>
+<body style="background: var(--bg-sand);">
+    <%- include('partials/header') %>
+    <%- include('partials/page-hero', { 
+        pageTitle: settings.blog_hero_title || 'Insights & <em>Estratégia</em>',
+        image: settings.blog_hero_image || 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=1600'
+    }) %>
+
+    <main style="padding: 100px 0;">
+        <div class="container">
+            <div style="margin-bottom: 60px;" data-reveal="left">
+                <span class="section-label">Blog Corporativo</span>
+                <h2 style="font-size: 3.2rem; color: var(--navy-blue); line-height: 1; letter-spacing: -2px;">
+                    Últimos <em>Artigos & Insights</em>
+                </h2>
+            </div>
+
+            <!-- Blog Grid (3 Colunas) -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+                <% posts.forEach(post => { %>
+                    <article data-reveal="up" style="background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.05); transition: 0.4s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div style="height: 200px; position: relative;">
+                            <img src="<%= post.imagem %>" alt="<%= post.titulo %>" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div style="position: absolute; top: 15px; left: 15px; background: var(--accent-red); color: white; padding: 6px 12px; border-radius: 50px; font-size: 0.65rem; font-weight: 800; letter-spacing: 1px;">
+                                <%= post.categoria %>
+                            </div>
+                        </div>
+                        <div style="padding: 30px;">
+                            <div style="font-size: 0.75rem; color: #888; margin-bottom: 10px; font-weight: 600;">
+                                <%= post.data %>
+                            </div>
+                            <h3 style="font-size: 1.4rem; color: var(--navy-blue); line-height: 1.2; margin-bottom: 15px; height: 3.4rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">
+                                <%= post.titulo %>
+                            </h3>
+                            <p style="color: #666; line-height: 1.5; margin-bottom: 25px; font-size: 0.85rem; height: 3.8rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical;">
+                                <%= post.resumo %>
+                            </p>
+                            <a href="/blog/<%= post.slug %>" style="text-decoration: none; color: var(--navy-blue); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+                                LER ARTIGO <i class="ri-arrow-right-line"></i>
+                            </a>
+                        </div>
+                    </article>
+                <% }); %>
+            </div>
+        </div>
+    </main>
+
+    <!-- Newsletter Section -->
+    <section style="padding: 100px 0; background: var(--navy-blue); color: white; margin-top: 50px;">
+        <div class="container" style="text-align: center;">
+            <div data-reveal>
+                <h2 style="font-size: 2.8rem; margin-bottom: 25px;">
+                    <%= settings.blog_page_newsletter_title || 'Inscreva-se em nossa Mailing.' %>
+                </h2>
+                <p style="font-size: 1.1rem; opacity: 0.7; max-width: 600px; margin: 0 auto 40px;">
+                    <%= settings.blog_page_newsletter_text || 'Receba conteúdos exclusivos sobre gestão e liderança diretamente no seu e-mail.' %>
+                </p>
+                <form action="/api/newsletter" method="POST" style="max-width: 500px; margin: 0 auto; display: flex; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 50px;">
+                    <input type="email" placeholder="Seu melhor e-mail" style="flex: 1; border: none; background: transparent; color: white; padding-left: 20px; outline: none;">
+                    <button style="background: var(--accent-red); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer;">Inscrever</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray("[data-reveal]").forEach(el => {
+            let config = {
+                scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
+                opacity: 0, duration: 1.4, ease: "power4.out"
+            };
+            const direction = el.getAttribute('data-reveal');
+            if (direction === 'left') config.x = -80;
+            else if (direction === 'right') config.x = 80;
+            else config.y = 50;
+            gsap.from(el, config);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | ARQUÊΔ</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        .cms-layout { display: flex; overflow: hidden; background: #F8FAFC; transition: 0.4s; }
+        .cms-tabs-nav { 
+            width: 280px; background: white; border-right: 1px solid #eee; 
+            padding: 20px 0; overflow-y: auto; flex-shrink: 0; 
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .cms-tabs-nav.collapsed { width: 85px; }
+        .cms-tabs-nav.collapsed .tab-link span, 
+        .cms-tabs-nav.collapsed .tab-category-header { display: none; }
+        .cms-tabs-nav.collapsed .tab-link { justify-content: center; padding: 15px 0; border-right-width: 4px; }
+        .cms-tabs-nav.collapsed .tab-link i { font-size: 1.4rem; margin: 0; }
+
+        .tab-link { padding: 12px 30px; cursor: pointer; display: flex; align-items: center; gap: 12px; color: #64748b; font-size: 0.9rem; font-weight: 600; border-right: 3px solid transparent; transition: 0.3s; }
+        .tab-link:hover { color: var(--primary); background: #F1F5F9; }
+        .tab-link.active { color: var(--primary); background: #F1F5F9; border-right-color: var(--accent); }
+        .tab-link i { font-size: 1.1rem; opacity: 0.7; }
+        .tab-category-header { font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; padding: 20px 30px 10px; }
+        .cms-content { flex: 1; padding: 40px; overflow-y: auto; background: white; transition: 0.4s; }
+        .tab-panel { display: none; max-width: 900px; margin: 0 auto; }
+        .tab-panel.active { display: block; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Botão de Encolher Submenu */
+        .btn-collapse-sub {
+            position: absolute; top: 10px; right: 10px; 
+            width: 25px; height: 25px; border-radius: 50%;
+            background: #f1f5f9; color: #64748b; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; z-index: 10; transition: 0.3s;
+        }
+        .btn-collapse-sub:hover { background: var(--accent); color: white; }
+
+        /* RESPONSIVIDADE MULTI-DISPOSITIVO (TABLET & MOBILE) */
+        @media (max-width: 768px) {
+            .cms-layout { flex-direction: column; height: auto !important; }
+            .cms-tabs-nav { 
+                width: 100% !important; height: auto; display: flex; overflow-x: auto; 
+                padding: 5px 10px; border-right: none; border-bottom: 1px solid #eee; 
+                white-space: nowrap; scrollbar-width: none; -ms-overflow-style: none;
+                background: #f8fafc; gap: 5px;
+            }
+            .cms-tabs-nav.collapsed { width: 100% !important; }
+            .btn-collapse-sub { display: none; }
+            .cms-tabs-nav span { display: inline !important; font-size: 0.75rem; }
+            .cms-tabs-nav::-webkit-scrollbar { display: none; }
+            .tab-category-header { display: none; }
+            .tab-link { 
+                padding: 10px 15px; border-right: none; border-bottom: 2px solid transparent; 
+                flex-direction: column; gap: 4px; text-align: center; min-width: 80px;
+            }
+            .tab-link i { font-size: 1.2rem; }
+            .tab-link.active { border-bottom-color: var(--accent); background: white; }
+            .cms-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body style="display: flex;">
+    <%- include('../partials/admin-sidebar') %>
+
+    <div class="cms-wrapper" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+        <%- include('../partials/admin-header') %>
+
+        <div class="cms-layout" style="height: calc(100vh - 64px);">
+            <nav class="cms-tabs-nav" id="cmsSubNav">
+                <button type="button" class="btn-collapse-sub" onclick="toggleSubNav()"><i class="ri-arrow-left-right-line"></i></button>
+
+                <% if (locals.userRole === 'superadmin') { %>
+                <div class="tab-category-header">Soberania</div>
+                <div class="tab-link active" onclick="switchTab('tab-licenciamento')" style="border-left: 4px solid var(--accent); background: rgba(214, 40, 40, 0.05); color: var(--accent); font-weight: 900; margin-bottom: 20px;"><i class="ri-shield-keyhole-fill"></i> <span>Licenciamento (Elite)</span></div>
+                <% } %>
+                <div class="tab-category-header">Global</div>
+                <div class="tab-link <%= (locals.userRole !== 'superadmin') ? 'active' : '' %>" onclick="switchTab('tab-identidade')"><i class="ri-fingerprint-line"></i> <span>Identidade & Cores</span></div>
+                <div class="tab-link" onclick="switchTab('tab-header')"><i class="ri-layout-top-line"></i> <span>Cabeçalho</span></div>
+                <div class="tab-link" onclick="switchTab('tab-redes')"><i class="ri-share-line"></i> <span>Redes Sociais</span></div>
+
+                <div class="tab-category-header">Home Page</div>
+                <div class="tab-link" onclick="switchTab('tab-home-hero')"><i class="ri-flashlight-line"></i> <span>Hero</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-sobre')"><i class="ri-user-3-line"></i> <span>Sobre</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-servicos')"><i class="ri-service-line"></i> <span>Serviços</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-beneficios')"><i class="ri-star-line"></i> <span>Benefícios</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-artigos')"><i class="ri-article-line"></i> <span>Artigos</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-depoimentos')"><i class="ri-chat-quote-line"></i> <span>Depoimentos</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-newsletter')"><i class="ri-mail-send-line"></i> <span>Newsletter</span></div>
+
+                <div class="tab-category-header">Páginas Internas</div>
+                <div class="tab-link" onclick="switchTab('tab-page-sobre')"><i class="ri-pages-line"></i> <span>Página Sobre</span></div>
+                <div class="tab-link" onclick="switchTab('tab-page-servicos')"><i class="ri-building-line"></i> <span>Página Serviços</span></div>
+                <div class="tab-link" onclick="switchTab('tab-page-blog')"><i class="ri-chat-3-line"></i> <span>Página Blog</span></div>
+                <div class="tab-link" onclick="switchTab('tab-page-contato')"><i class="ri-contacts-book-line"></i> <span>Página Contato</span></div>
+
+                <div class="tab-category-header">Estrutura</div>
+                <div class="tab-link" onclick="switchTab('tab-footer')"><i class="ri-layout-bottom-line"></i> <span>Rodapé</span></div>
+            </nav>
+
+            <form id="cmsForm" action="/admin/conteudo" method="POST" class="cms-content" enctype="multipart/form-data">
+                
+                <!-- IDENTIDADE & CORES -->
+                <div id="tab-identidade" class="tab-panel <%= (locals.userRole !== 'superadmin') ? 'active' : '' %>">
+                    <div class="section-header"><h3>Identidade Corporativa</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Logo Principal (Colorida)</label>
+                            <input type="file" name="logo_file" accept="image/*">
+                            <input type="hidden" name="logo" value="<%= settings.logo %>">
+                            <% if (settings.logo) { %> <img src="<%= settings.logo %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Logo Alternativa (Branca)</label>
+                            <input type="file" name="logo_white_file" accept="image/*">
+                            <input type="hidden" name="logo_white" value="<%= settings.logo_white %>">
+                            <% if (settings.logo_white) { %> <img src="<%= settings.logo_white %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Favicon (Ícone Navegador)</label>
+                            <input type="file" name="favicon_file" accept="image/*">
+                            <input type="hidden" name="favicon" value="<%= settings.favicon %>">
+                            <% if (settings.favicon) { %> <img src="<%= settings.favicon %>" class="img-preview"> <% } %>
+                        </div>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 40px;"><h3>Engine de Cores</h3></div>
+                    <div class="form-grid">
+                        <% 
+                            const colors = [
+                                { label: 'Navy Blue', name: 'color_marinho', value: settings.color_marinho || '#0A1128' },
+                                { label: 'Areia', name: 'color_areia', value: settings.color_areia || '#F7F7F4' },
+                                { label: 'Vermelho de Destaque', name: 'color_vermelho', value: settings.color_vermelho || '#D62828' },
+                                { label: 'Cor do Texto', name: 'color_texto', value: settings.color_texto || '#333333' },
+                                { label: 'Fundo do Cabeçalho', name: 'color_header', value: settings.color_header || '#FFFFFF' },
+                                { label: 'Fundo do Rodapé', name: 'color_footer', value: settings.color_footer || '#0A1128' }
+                            ]
+                        %>
+
+                        <% colors.forEach(color => { %>
+                            <div class="form-group">
+                                <div class="color-field-container">
+                                    <div class="color-swatch-wrapper">
+                                        <div class="color-swatch-preview" style="background-color: <%= color.value %>;"></div>
+                                        <input type="color" class="color-input-hidden" value="<%= color.value %>">
+                                    </div>
+                                    <div class="color-info-wrapper">
+                                        <span class="color-name-label"><%= color.label %></span>
+                                        <input type="text" name="<%= color.name %>" class="color-hex-input" value="<%= color.value.toUpperCase() %>" maxlength="7">
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <!-- CABEÇALHO -->
+                <div id="tab-header" class="tab-panel">
+                    <div class="section-header"><h3>Configurações do Topo</h3></div>
+                    <div class="form-group full">
+                        <label>Exibir Topbar (Endereço e Redes no topo)?</label>
+                        <select name="show_topbar" style="width: 100%; padding: 12px; border-radius: 50px; border: 1px solid #e0e0e0;">
+                            <option value="1" <%= settings.show_topbar == 1 ? 'selected' : '' %>>Sim, exibir topo extra</option>
+                            <option value="0" <%= settings.show_topbar == 0 ? 'selected' : '' %>>Não, ocultar topo extra</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>Endereço à Esquerda</label>
+                        <input type="text" name="endereco" value="<%= settings.endereco %>">
+                    </div>
+                    <div class="form-group full">
+                        <label>Botão CTA (Header)</label>
+                        <input type="text" name="nav_cta_text" value="<%= settings.nav_cta_text %>">
+                    </div>
+                    <div class="form-group full">
+                        <label>WhatsApp Principal</label>
+                        <input type="text" name="whatsapp" value="<%= settings.whatsapp %>">
+                    </div>
+                    <div class="form-group full">
+                        <label>Estrutura do Menu (Um por linha: RÓTULO|LINK)</label>
+                        <textarea name="site_menu" placeholder="Home|/
+Sobre|/sobre
+Serviços|/servicos
+Blog|/blog
+Contato|/contato"><%= settings.site_menu %></textarea>
+                        <p style="font-size: 0.65rem; color: #999; margin-top: 5px;">Use o formato: Nome|/link. Ex: Contato|/contato</p>
+                    </div>
+                </div>
+
+                <!-- REDES SOCIAIS -->
+                <div id="tab-redes" class="tab-panel">
+                    <div class="section-header"><h3>Hub de Canais Sociais (8 Slots)</h3></div>
+                    <p style="font-size: 0.8rem; color: #64748B; margin-bottom: 30px;">Configure até 8 redes sociais. Apenas links preenchidos aparecerão no site.</p>
+                    
+                    <% 
+                        let socialLinks = [];
+                        try {
+                            socialLinks = JSON.parse(settings.social_links || '[]');
+                        } catch(e) { socialLinks = []; }
+                        while(socialLinks.length < 8) socialLinks.push({ network: '', url: '' });
+
+                        const networks = [
+                            { id: 'instagram', label: 'Instagram', icon: 'ri-instagram-line' },
+                            { id: 'facebook', label: 'Facebook', icon: 'ri-facebook-fill' },
+                            { id: 'linkedin', label: 'LinkedIn', icon: 'ri-linkedin-fill' },
+                            { id: 'youtube', label: 'YouTube', icon: 'ri-youtube-fill' },
+                            { id: 'tiktok', label: 'TikTok', icon: 'ri-tiktok-fill' },
+                            { id: 'twitter', label: 'X (Twitter)', icon: 'ri-twitter-x-fill' },
+                            { id: 'pinterest', label: 'Pinterest', icon: 'ri-pinterest-fill' },
+                            { id: 'google', label: 'Google Business', icon: 'ri-google-fill' }
+                        ];
+                    %>
+
+                    <input type="hidden" name="social_links" id="socialLinksData">
+
+                    <div class="social-slots-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <% socialLinks.forEach((slot, idx) => { %>
+                            <div class="social-slot-item" style="background: #F8FAFC; padding: 20px; border-radius: 20px; border: 1px solid #E2E8F0;">
+                                <div style="display: flex; gap: 10px; flex-direction: column;">
+                                    <label style="font-size: 0.65rem; font-weight: 900; color: #94A3B8; text-transform: uppercase;">Slot <%= idx + 1 %></label>
+                                    <select class="social-network-select" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; color: var(--primary);">
+                                        <option value="">-- Selecionar Rede --</option>
+                                        <% networks.forEach(net => { %>
+                                            <option value="<%= net.id %>" <%= slot.network === net.id ? 'selected' : '' %>><%= net.label %></option>
+                                        <% }) %>
+                                    </select>
+                                    <input type="text" class="social-url-input" placeholder="https://..." value="<%= slot.url %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0;">
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+
+                <div id="tab-home-hero" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Seção Hero</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Imagem de Fundo (1200x900px recomendado)</label>
+                            <input type="file" name="hero_image_file" accept="image/*">
+                            <input type="hidden" name="hero_image" value="<%= settings.hero_image %>">
+                            <% if (settings.hero_image) { %> <img src="<%= settings.hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Cor da Sobreposição (Overlay)</label>
+                            <input type="color" name="hero_overlay_color" value="<%= settings.hero_overlay_color || '#0A1128' %>" style="width: 100%; height: 45px; padding: 5px; border-radius: 12px; border: 1px solid #E2E8F0; cursor: pointer;">
+                        </div>
+                        <div class="form-group">
+                            <label>Opacidade do Overlay (0.00 a 1.00)</label>
+                            <input type="number" name="hero_overlay_opacity" value="<%= settings.hero_overlay_opacity || 0.4 %>" step="0.05" min="0" max="1" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%;">
+                        </div>
+                        <div class="form-group">
+                            <label>Título de Impacto</label>
+                            <input type="text" name="home_hero_title" value="<%= settings.home_hero_title %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group full">
+                            <label>Descrição Secundária</label>
+                            <textarea name="home_hero_description"><%= settings.home_hero_description %></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Card Flutuante: Título</label>
+                            <input type="text" name="home_hero_card_title" value="<%= settings.home_hero_card_title %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Card Flutuante: Subtítulo (Link)</label>
+                            <input type="text" name="home_hero_card_subtitle" value="<%= settings.home_hero_card_subtitle %>">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-home-sobre" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Seção Sobre</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Título da Seção</label>
+                            <input type="text" name="about_title" value="<%= settings.about_title %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Texto do Botão</label>
+                            <input type="text" name="home_about_button_text" value="<%= settings.home_about_button_text %>">
+                        </div>
+                        <div class="form-group full">
+                            <label>Resumo Institucional</label>
+                            <textarea name="about_text"><%= settings.about_text %></textarea>
+                        </div>
+                        <div class="form-group full">
+                            <label>Imagem de Destaque</label>
+                            <input type="file" name="about_image_file" accept="image/*">
+                            <input type="hidden" name="about_image" value="<%= settings.about_image %>">
+                            <% if (settings.about_image) { %> <img src="<%= settings.about_image %>" class="img-preview"> <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-home-servicos" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Seção Serviços</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Título da Seção</label>
+                            <input type="text" name="services_section_title" value="<%= settings.services_section_title %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Texto do Botão</label>
+                            <input type="text" name="home_services_button_text" value="<%= settings.home_services_button_text %>">
+                        </div>
+                        <div class="form-group full">
+                            <label>Legenda / Apoio</label>
+                            <input type="text" name="services_section_text" value="<%= settings.services_section_text %>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HOME: BENEFICIOS -->
+                <div id="tab-home-beneficios" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Seção Diferenciais & Benefícios</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Título Base (Impacto)</label>
+                            <input type="text" name="benefits_title" value="<%= settings.benefits_title %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 10px;">
+                            <label>Estilo Visual (Templates Iconbox)</label>
+                            <select name="benefits_template" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%; font-weight: 700; color: var(--primary);">
+                                <option value="style-glass" <%= settings.benefits_template === 'style-glass' ? 'selected' : '' %>>Glassmorphism (Premium)</option>
+                                <option value="style-industrial" <%= settings.benefits_template === 'style-industrial' ? 'selected' : '' %>>Industrial Solid (Power)</option>
+                                <option value="style-clean" <%= settings.benefits_template === 'style-clean' ? 'selected' : '' %>>Minimalist Accent (Focus)</option>
+                                <option value="style-navy" <%= settings.benefits_template === 'style-navy' ? 'selected' : '' %>>Dark Mode (Authority)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: flex; flex-direction: column; gap: 10px;">
+                            <label>Cromatismo de Acento (Cor Custom)</label>
+                            <input type="color" name="benefits_color" value="<%= settings.benefits_color || '#FA641E' %>" style="width: 100%; height: 45px; padding: 5px; border-radius: 12px; border: 1px solid #E2E8F0; cursor: pointer;">
+                        </div>
+                        <div class="form-group full">
+                            <label>Conteúdo Narrativo / Posicionamento</label>
+                            <textarea name="benefits_text" style="height: 100px;"><%= settings.benefits_text %></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Hub de Diferenciais -->
+                    <div style="margin-top: 50px;">
+                        <h4 style="font-size: 0.85rem; font-weight: 900; color: var(--primary); text-transform: uppercase; margin-bottom: 25px; border-bottom: 2px solid #F1F5F9; padding-bottom: 15px;">
+                            <i class="ri-grid-line" style="color: var(--accent);"></i> Arquitetura de Diferenciais (Até 4 Itens)
+                        </h4>
+                        
+                        <% 
+                            let bItems = [];
+                            try { bItems = JSON.parse(settings.benefits_items || '[]'); } catch(e) { bItems = []; }
+                            while(bItems.length < 4) bItems.push({ icon: '', title: '', text: '' });
+                        %>
+                        <input type="hidden" name="benefits_items" id="benefitsData">
+
+                        <div class="social-slots-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
+                            <% bItems.forEach((item, idx) => { %>
+                                <div class="benefit-slot-item" style="background: #F8FAFC; padding: 25px; border-radius: 25px; border: 1px solid #E2E8F0; transition: 0.3s;">
+                                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <label style="font-size: 0.65rem; font-weight: 900; color: #94A3B8; text-transform: uppercase;">Diferencial <%= idx + 1 %></label>
+                                            <i class="ri-medal-line" style="color: #E2E8F0; font-size: 1.2rem;"></i>
+                                        </div>
+                                        <input type="text" class="b-item-icon" placeholder="Ícone (ex: ri-focus-2-line)" value="<%= item.icon %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;">
+                                        <input type="text" class="b-item-title" placeholder="Título Estratégico" value="<%= item.title %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; font-size: 0.9rem;">
+                                        <textarea class="b-item-text" placeholder="Breve descritivo do valor agregado..." style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; height: 90px; font-size: 0.85rem;"><%= item.text %></textarea>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HOME: ARTIGOS -->
+                <div id="tab-home-artigos" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Seção Artigos</h3></div>
+                    <div class="form-group full">
+                        <label>Título Chamada (Insights)</label>
+                        <input type="text" name="blog_section_title" value="<%= settings.blog_section_title %>">
+                        <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                    </div>
+                    <div class="form-group full">
+                        <label>Texto de Apoio</label>
+                        <input type="text" name="blog_section_text" value="<%= settings.blog_section_text %>">
+                    </div>
+                </div>
+
+                <!-- HOME: DEPOIMENTOS -->
+                <div id="tab-home-depoimentos" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Seção Depoimentos</h3></div>
+                    <div class="form-group full">
+                        <label>Título da Seção (Social Proof)</label>
+                        <input type="text" name="testimonial_section_title" value="<%= settings.testimonial_section_title %>">
+                        <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                    </div>
+                </div>
+
+                <!-- HOME: NEWSLETTER -->
+                <div id="tab-home-newsletter" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Seção Newsletter</h3></div>
+                    <div class="form-group full">
+                        <label>Título Convite</label>
+                        <input type="text" name="newsletter_section_title" value="<%= settings.newsletter_section_title %>">
+                        <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                    </div>
+                    <div class="form-group full">
+                        <label>Descrição / Persuasão</label>
+                        <input type="text" name="newsletter_section_text" value="<%= settings.newsletter_section_text %>">
+                    </div>
+                </div>
+
+                <div id="tab-page-sobre" class="tab-panel">
+                    <div class="section-header"><h3>Página: Sobre a ARQUÊΔ</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hero: Título</label>
+                            <input type="text" name="about_hero_title" value="<%= settings.about_hero_title %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem</label>
+                            <input type="file" name="about_hero_image_file" accept="image/*">
+                            <input type="hidden" name="about_hero_image" value="<%= settings.about_hero_image %>">
+                            <% if (settings.about_hero_image) { %> <img src="<%= settings.about_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Nossa História (Esquerda)</label>
+                            <textarea name="about_story_text_left"><%= settings.about_story_text_left %></textarea>
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Nossa História (Direita)</label>
+                            <textarea name="about_story_text_right"><%= settings.about_story_text_right %></textarea>
+                        </div>
+                        <div class="form-group full">
+                            <label>Imagem da História (Principal)</label>
+                            <input type="file" name="about_story_image_file" accept="image/*">
+                            <input type="hidden" name="about_story_image" value="<%= settings.about_story_image %>">
+                            <% if (settings.about_story_image) { %> <img src="<%= settings.about_story_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Nossa Missão</label>
+                            <textarea name="about_mission"><%= settings.about_mission %></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Nossa Visão</label>
+                            <textarea name="about_vision"><%= settings.about_vision %></textarea>
+                        </div>
+                        <div class="form-group full">
+                            <label>Nossos Valores</label>
+                            <textarea name="about_values"><%= settings.about_values %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 40px;"><h4>02b. Chamada da Equipe (O Capital Humano)</h4></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Título da Seção Equipe</label>
+                            <input type="text" name="about_team_title" value="<%= settings.about_team_title %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group full">
+                            <label>Texto Narrativo da Equipe</label>
+                            <textarea name="about_team_text"><%= settings.about_team_text %></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-page-servicos" class="tab-panel">
+                    <div class="section-header"><h3>Página: Listagem de Serviços</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hero: Título</label>
+                            <input type="text" name="services_hero_title" value="<%= settings.services_hero_title %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem</label>
+                            <input type="file" name="services_hero_image_file" accept="image/*">
+                            <input type="hidden" name="services_hero_image" value="<%= settings.services_hero_image %>">
+                            <% if (settings.services_hero_image) { %> <img src="<%= settings.services_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group full">
+                            <label>Narrativa Introdutória</label>
+                            <textarea name="services_page_description"><%= settings.services_page_description %></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-page-blog" class="tab-panel">
+                    <div class="section-header"><h3>Página: Blog & Insights</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hero: Título</label>
+                            <input type="text" name="blog_hero_title" value="<%= settings.blog_hero_title %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem</label>
+                            <input type="file" name="blog_hero_image_file" accept="image/*">
+                            <input type="hidden" name="blog_hero_image" value="<%= settings.blog_hero_image %>">
+                            <% if (settings.blog_hero_image) { %> <img src="<%= settings.blog_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Mailing: Título</label>
+                            <input type="text" name="blog_page_newsletter_title" value="<%= settings.blog_page_newsletter_title %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Mailing: Texto</label>
+                            <textarea name="blog_page_newsletter_text"><%= settings.blog_page_newsletter_text %></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-page-contato" class="tab-panel">
+                    <div class="section-header"><h3>Página: Contato & Suporte</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hero: Título</label>
+                            <input type="text" name="contact_hero_title" value="<%= settings.contact_hero_title %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem</label>
+                            <input type="file" name="contact_hero_image_file" accept="image/*">
+                            <input type="hidden" name="contact_hero_image" value="<%= settings.contact_hero_image %>">
+                            <% if (settings.contact_hero_image) { %> <img src="<%= settings.contact_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group full">
+                            <label>Narrativa de Atendimento</label>
+                            <textarea name="contact_page_description"><%= settings.contact_page_description %></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone de Contato</label>
+                            <input type="text" name="contact_phone" value="<%= settings.contact_phone %>" placeholder="(11) 99999-9999">
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail de Contato</label>
+                            <input type="email" name="contact_email" value="<%= settings.contact_email %>" placeholder="contato@arque.com.br">
+                        </div>
+                        <div class="form-group full">
+                            <label>Endereço Completo</label>
+                            <input type="text" name="address_full" value="<%= settings.address_full %>" placeholder="Av. Paulista, 1000 - São Paulo, SP">
+                        </div>
+                        <div class="form-group full">
+                            <label>Link do Mapa (Google Maps Embed URL)</label>
+                            <input type="text" name="contact_map_url" value="<%= settings.contact_map_url %>" placeholder="https://www.google.com/maps/embed?pb=...">
+                        </div>
+
+                        <div class="section-header" style="margin-top: 30px; grid-column: span 2;"><h4>Configurações do Formulário</h4></div>
+                        <div class="form-group">
+                            <label>Título do Formulário</label>
+                            <input type="text" name="contact_form_title" value="<%= settings.contact_form_title %>" placeholder="Envie sua mensagem">
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail que receberá os Leads</label>
+                            <input type="email" name="contact_form_recipient" value="<%= settings.contact_form_recipient %>" placeholder="leads@arque.com.br">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RODAPÉ -->
+                <div id="tab-footer" class="tab-panel">
+                    <div class="section-header"><h3>Governança de Rodapé</h3></div>
+                    <div class="form-group full">
+                        <label>Resumo Institucional</label>
+                        <textarea name="footer_short_text"><%= settings.footer_short_text %></textarea>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>CNPJ</label>
+                            <input type="text" name="cnpj" value="<%= settings.cnpj %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Link Selo Seguro</label>
+                            <input type="text" name="footer_secure_link" value="<%= settings.footer_secure_link %>">
+                        </div>
+                        <div class="form-group full">
+                            <label>Copyright (Sufixo)</label>
+                            <input type="text" name="footer_text" value="<%= settings.footer_text %>">
+                        </div>
+                    </div>
+                </div>
+                <!-- LICENCIAMENTO & AUTENTICAÇÃO (APENAS SUPERADMIN) -->
+                <% if (locals.userRole === 'superadmin') { %>
+                <div id="tab-licenciamento" class="tab-panel active" style="display: block !important; animation: none !important; opacity: 1 !important;">
+                    <div class="section-header">
+                        <h2 style="color: var(--accent); font-weight: 900; margin-bottom: 20px;">[SISTEMA DE SOBERANIA ATIVO]</h2>
+                        <h3>Soberania & Autenticação do Ecossistema</h3>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group full" style="background: rgba(214, 40, 40, 0.05); padding: 25px; border-radius: 12px; border-left: 5px solid var(--accent);">
+                            <p style="font-size: 0.85rem; color: var(--primary); font-weight: 700; margin-bottom: 20px;">Esta seção é destinada à autenticidade da sua licença ARQUÊΔ. Os dados inseridos aqui serão exibidos exclusivamente no seu Cockpit de Inteligência (Dashboard).</p>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px; align-items: start;">
+                                <div class="form-group">
+                                    <label>QR Code de Autenticação (Imagem)</label>
+                                    <input type="file" name="license_qr_code_file" accept="image/*">
+                                    <input type="hidden" name="license_qr_code" value="<%= settings.license_qr_code %>">
+                                    <% if (settings.license_qr_code) { %> <img src="<%= settings.license_qr_code %>" class="img-preview" style="width: 150px; height: 150px; border: 1px solid #ddd;"> <% } %>
+                                </div>
+                                <div class="form-group">
+                                    <label>Dados de Verificação (Nota Fiscal / Contrato)</label>
+                                    <textarea name="license_nf_data" style="min-height: 200px; font-family: monospace; font-size: 0.8rem;" placeholder="Ex: NF-e: 000.123.456&#10;Série: 001&#10;Emissão: 10/05/2026&#10;Licença: ARQUE-Enterprise-2026"><%= settings.license_nf_data %></textarea>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 30px;">
+                                <div class="form-group">
+                                    <label>Código de Autenticação (Cloud ID / Hash)</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="text" id="auth_code_input" name="license_auth_code" value="<%= settings.license_auth_code %>" placeholder="Ex: BSB-8923-M9SI" style="flex: 1;">
+                                        <button type="button" onclick="generateHash()" class="btn-premium" style="background: #F1F5F9; color: var(--primary); padding: 0 15px; font-size: 0.6rem; font-weight: 900; white-space: nowrap;"><i class="ri-refresh-line"></i> GERAR HASH</button>
+                                    </div>
+                                    <script>
+                                        function generateHash() {
+                                            const chars = '0123456789ABCDEF';
+                                            let res = 'ET-';
+                                            for(let i=0; i<4; i++) res += chars[Math.floor(Math.random() * 16)];
+                                            res += '-';
+                                            for(let i=0; i<4; i++) res += chars[Math.floor(Math.random() * 16)];
+                                            document.getElementById('auth_code_input').value = res;
+                                        }
+                                    </script>
+                                </div>
+                                <div class="form-group">
+                                    <label>Documento de Compra (PDF da NF)</label>
+                                    <input type="file" name="license_pdf_file" accept=".pdf">
+                                    <input type="hidden" name="license_pdf" value="<%= settings.license_pdf %>">
+                                    <% if (settings.license_pdf) { %>
+                                        <div style="margin-top: 5px; font-size: 0.7rem; color: var(--accent); font-weight: 700;">
+                                            <i class="ri-file-pdf-line"></i> PDF Carregado: <a href="<%= settings.license_pdf %>" target="_blank" style="color: inherit;">Visualizar Documento</a>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleSubNav() {
+            const nav = document.getElementById('cmsSubNav');
+            nav.classList.toggle('collapsed');
+            localStorage.setItem('cmsSubNavCollapsed', nav.classList.contains('collapsed'));
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+            
+            const activeLink = document.querySelector(`[onclick="switchTab('${tabId}')"]`);
+            if(activeLink) activeLink.classList.add('active');
+            
+            const activePanel = document.getElementById(tabId);
+            if(activePanel) activePanel.classList.add('active');
+        }
+
+        // Roteamento de Aba via URL (Licenciamento Elite)
+        window.onload = function() {
+            // Aplicar estado do submenu
+            if (localStorage.getItem('cmsSubNavCollapsed') === 'true') {
+                document.getElementById('cmsSubNav').classList.add('collapsed');
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTab = urlParams.get('tab');
+            if (targetTab) {
+                switchTab(targetTab);
+            }
+        };
+
+        // Sincronização da Engine de Cores
+        document.querySelectorAll('.color-field-container').forEach(container => {
+            const colorInput = container.querySelector('.color-input-hidden');
+            const hexInput = container.querySelector('.color-hex-input');
+            const swatch = container.querySelector('.color-swatch-preview');
+
+            // Do Seletor para o Texto
+            colorInput.addEventListener('input', (e) => {
+                const color = e.target.value.toUpperCase();
+                hexInput.value = color;
+                swatch.style.backgroundColor = color;
+            });
+
+            // Do Texto para o Seletor
+            hexInput.addEventListener('input', (e) => {
+                let val = e.target.value;
+                if (val.length > 0 && !val.startsWith('#')) {
+                    val = '#' + val;
+                    hexInput.value = val;
+                }
+                if (/^#[0-9A-F]{6}$/i.test(val)) {
+                    colorInput.value = val;
+                    swatch.style.backgroundColor = val;
+                }
+            });
+        });
+
+        // Hub de Redes Sociais: Consolidação JSON
+        document.getElementById('cmsForm').addEventListener('submit', function(e) {
+            const slots = [];
+            document.querySelectorAll('.social-slot-item').forEach(item => {
+                const network = item.querySelector('.social-network-select').value;
+                const url = item.querySelector('.social-url-input').value.trim();
+                
+                if (network && url) {
+                    slots.push({ network, url });
+                }
+            });
+            document.getElementById('socialLinksData').value = JSON.stringify(slots);
+
+            // Hub de Diferenciais: Consolidação JSON
+            const benefits = [];
+            document.querySelectorAll('.benefit-slot-item').forEach(item => {
+                const icon = item.querySelector('.b-item-icon').value.trim();
+                const title = item.querySelector('.b-item-title').value.trim();
+                const text = item.querySelector('.b-item-text').value.trim();
+                
+                if (icon || title || text) {
+                    benefits.push({ icon, title, text });
+                }
+            });
+            document.getElementById('benefitsData').value = JSON.stringify(benefits);
+        });
+    </script>
+</body>
+</html>

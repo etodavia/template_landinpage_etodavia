@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <%- include('partials/head-tags') %>
+    <style>
+        .service-page-header {
+            background: var(--bg-sand);
+            padding: 160px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-meta-label {
+            display: inline-block;
+            background: white;
+            color: var(--navy-blue);
+            padding: 8px 24px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+
+        .service-page-title {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            line-height: 0.9;
+            color: var(--navy-blue);
+            letter-spacing: -5px;
+            margin-bottom: 40px;
+        }
+
+        .service-intro-text {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            color: #555;
+            max-width: 700px;
+            border-left: 6px solid var(--accent-red);
+            padding-left: 30px;
+        }
+
+        .service-layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 100px;
+            padding: 100px 0;
+        }
+
+        .main-service-img {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            border-radius: 40px;
+            margin-bottom: 60px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+        }
+
+        .content-body h2, .content-body h3 {
+            font-size: 2.8rem;
+            color: var(--navy-blue);
+            letter-spacing: -2px;
+            margin: 60px 0 30px;
+        }
+
+        .content-body p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 30px;
+        }
+
+        /* Sidebar Refinement */
+        .service-aside {
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .action-card {
+            background: var(--navy-blue);
+            color: white;
+            padding: 50px;
+            border-radius: 40px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card h4 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+
+        .action-card p {
+            font-size: 1rem;
+            opacity: 0.7;
+            margin-bottom: 35px;
+        }
+
+        .btn-wa-service {
+            background: white;
+            color: var(--navy-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 20px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 800;
+            transition: 0.4s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-wa-service:hover {
+            transform: scale(1.05);
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            color: var(--navy-blue);
+        }
+
+        .feature-list i {
+            color: var(--accent-red);
+            font-size: 1.4rem;
+        }
+
+        /* Print and Global Helpers */
+        @media (max-width: 1024px) {
+            .service-layout-grid { grid-template-columns: 1fr; gap: 60px; }
+            .service-page-title { font-size: 3.5rem; letter-spacing: -2px; }
+            .main-service-img { height: 400px; }
+        }
+
+        .no-print { .no-print { display: block; } }
+        @media print {
+            .no-print { display: none !important; }
+            .container { max-width: 100% !important; }
+            .service-page-header { padding: 40px 0; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header') %>
+
+    <main>
+        <!-- CABEÇALHO DINÂMICO DO SERVIÇO -->
+        <%- include('partials/page-hero', { 
+            pageTitle: service.titulo,
+            image: service.imagem
+        }) %>
+
+        <div class="container" style="margin-top: 100px;">
+            <div data-reveal style="margin-bottom: 60px;">
+                <div class="service-intro-text">
+                    <%= service.resumo %>
+                </div>
+            </div>
+
+    <main class="container">
+        <div class="service-layout-grid">
+            <!-- CONTEÚDO PRINCIPAL -->
+            <article>
+                <div style="height: 0px;"></div>
+                
+                <div class="content-body" data-reveal>
+                    <%- service.conteudo %>
+                    
+                    <h3>Abordagem de <em>Alta Performance</em></h3>
+                    <p>
+                        Na ARQUÊΔ, não entregamos apenas soluções pontuais. Nossa metodologia para <strong><%= service.titulo %></strong> baseia-se em uma visão sistêmica que conecta o capital humano aos resultados financeiros. Mapeamos gargalos, treinamos lideranças e redesenhamos fluxos para que sua empresa opere em sua máxima potência.
+                    </p>
+
+                    <!-- Formulário de Conversão Contextual -->
+                    <div class="no-print" style="margin-top: 80px; padding: 60px; border-radius: 40px; background: white; border: 1px solid #eee; box-shadow: 0 20px 50px rgba(0,0,0,0.02);">
+                        <h4 style="font-size: 2rem; color: var(--navy-blue); margin-bottom: 30px; letter-spacing: -1px;">Dúvidas sobre este serviço?</h4>
+                        <form action="/api/leads" method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <input type="hidden" name="assunto" value="Interesse: <%= service.titulo %>">
+                            <input type="text" name="nome" placeholder="Seu Nome" required style="padding: 18px; border-radius: 15px; border: 1px solid #ddd; outline: none;">
+                            <input type="email" name="email" placeholder="Seu E-mail Profissional" required style="padding: 18px; border-radius: 15px; border: 1px solid #ddd; outline: none;">
+                            <textarea name="mensagem" placeholder="Como podemos ajudar sua operação hoje?" style="grid-column: span 2; padding: 18px; border-radius: 15px; border: 1px solid #ddd; height: 120px; outline: none;"></textarea>
+                            <button type="submit" class="btn-wa-service" style="grid-column: span 2; background: var(--navy-blue); color: white; border: none; cursor: pointer;">SOLICITAR CONSULTA TÉCNICA</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+
+            <!-- BARRA LATERAL -->
+            <aside class="service-aside no-print" data-reveal="right">
+                <div class="action-card">
+                    <h4>Agende sua <br> <em>Conexão.</em></h4>
+                    <p>Fale diretamente com um de nossos consultores seniores sobre este serviço.</p>
+                    <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-wa-service">
+                        <i class="ri-whatsapp-line"></i> CONVERSAR AGORA
+                    </a>
+
+                    <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;">
+                        <span style="font-size: 0.7rem; font-weight: 800; opacity: 0.5; letter-spacing: 1px;">COMPARTILHAR</span>
+                        <div style="display: flex; gap: 15px; margin-top: 15px;">
+                            <a href="https://linkedin.com/sharing/share-offsite/?url=<%= encodeURIComponent('https://arquegestao.com.br/servicos/' + service.slug) %>" target="_blank" style="color: white; font-size: 1.4rem;"><i class="ri-linkedin-fill"></i></a>
+                            <a href="https://wa.me/?text=<%= encodeURIComponent(service.titulo + ' - https://arquegestao.com.br/servicos/' + service.slug) %>" target="_blank" style="color: white; font-size: 1.4rem;"><i class="ri-whatsapp-line"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding: 0 20px;">
+                    <h5 style="font-size: 0.8rem; font-weight: 800; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">Diferenciais</h5>
+                    <ul class="feature-list">
+                        <li><i class="ri-check-double-line"></i> Visão Sistêmica</li>
+                        <li><i class="ri-check-double-line"></i> Foco em Resultado</li>
+                        <li><i class="ri-check-double-line"></i> Mentoria Senior</li>
+                        <li><i class="ri-check-double-line"></i> Metodologia Própria</li>
+                    </ul>
+
+                    <button onclick="window.print()" style="margin-top: 40px; width: 100%; padding: 15px; border-radius: 100px; border: 1px solid #ddd; background: white; color: #666; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <i class="ri-printer-line"></i> IMPRIMIR ESCOPO
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray("[data-reveal]").forEach(el => {
+            let config = {
+                scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
+                opacity: 0, duration: 1.6, ease: "expo.out"
+            };
+            const dir = el.getAttribute('data-reveal');
+            if (dir === 'up') config.y = 100;
+            else if (dir === 'right') config.x = 80;
+            else config.y = 40;
+            gsap.from(el, config);
+        });
+    </script>
+</body>
+</html>

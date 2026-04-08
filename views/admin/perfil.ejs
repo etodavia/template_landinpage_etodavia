@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --admin-marinho: #000033;
+            --admin-light: #F4F4F9;
+            --accent-red: #D62828;
+        }
+        body { background: var(--admin-light); display: flex; padding: 0; margin:0; min-height: 100vh; font-family: 'Inter Tight', sans-serif; }
+        
+        aside {
+            width: 260px; background: var(--admin-marinho); color: white; padding: 2.5rem 1.5rem;
+            display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+        }
+        aside h2 { margin-bottom: 3.5rem; font-size: 1.4rem; letter-spacing: 2px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; }
+        aside nav ul { list-style: none; padding: 0; }
+        aside nav a { text-decoration: none; color: rgba(255,255,255,0.5); font-size: 0.95rem; display: flex; align-items: center; gap: 12px; padding: 1rem; border-radius: 12px; transition: 0.3s; font-weight: 600; }
+        aside nav a:hover, aside nav a.active { background: rgba(255,255,255,0.1); color: white; }
+        aside nav a.active { background: var(--accent-red); color: white; }
+
+        main { flex: 1; padding: 3rem 4rem; overflow-y: auto; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+        .page-header h1 { font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0; }
+
+        .profile-container { max-width: 800px; }
+        .profile-card { background: white; padding: 3rem; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
+        .profile-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, var(--admin-marinho), var(--accent-red)); }
+
+        .user-avatar { width: 100px; height: 100px; background: var(--admin-marinho); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 800; margin-bottom: 2rem; border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .form-group input {
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #eee; outline: none; transition: 0.3s; font-family: inherit; font-size: 0.95rem; font-weight: 600; color: var(--admin-marinho);
+        }
+        .form-group input:focus { border-color: var(--admin-marinho); box-shadow: 0 0 0 4px rgba(0,0,51,0.05); }
+
+        .btn-update { background: var(--admin-marinho); color: white; border: none; padding: 18px 45px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 0.95rem; width: 100%; transition: 0.3s; margin-top: 2rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-update:hover { background: var(--accent-red); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(214, 40, 40, 0.2); }
+
+        .alert { padding: 15px; border-radius: 12px; margin-bottom: 25px; font-weight: 600; font-size: 0.9rem; text-align: center; }
+        .alert-success { background: #ecfdf5; color: #059669; }
+
+        .footer-sig { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd; font-size: 0.75rem; opacity: 0.4; display: flex; justify-content: space-between; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/admin-sidebar') %>
+
+    <main>
+        <div class="page-header">
+            <h1>Gestão de Perfil</h1>
+        </div>
+
+        <% if (locals.success) { %>
+            <div class="alert alert-success"><i class="ri-checkbox-circle-line"></i> Alterações salvas com sucesso!</div>
+        <% } %>
+        <% if (locals.error) { %>
+            <div class="alert alert-error"><i class="ri-error-warning-line"></i> Erro ao salvar alterações. Tente novamente.</div>
+        <% } %>
+
+        <div class="profile-container">
+            <div class="profile-card">
+                <div class="user-avatar">
+                    <%= user.nome.charAt(0) %>
+                </div>
+
+                <form action="/admin/perfil" method="POST">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label>Nome do Administrador</label>
+                            <input type="text" name="nome" value="<%= user.nome %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail de Login</label>
+                            <input type="email" name="email" value="<%= user.email %>" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>WhatsApp do Site (Canal de Atendimento)</label>
+                        <input type="text" name="whatsapp" value="<%= whatsapp %>" placeholder="Ex: 5511999999999">
+                        <small style="color: #888; font-size: 0.7rem; margin-top: 5px; display: block;">Este número alimenta todos os botões de contato e flutuantes do site.</small>
+                    </div>
+
+                    <div class="form-group" style="padding-top: 2rem; border-top: 1px solid #f0f0f0; margin-top: 2rem;">
+                        <label>Nova Senha (Deixe em branco para manter a atual)</label>
+                        <input type="password" name="senha" placeholder="••••••••••••">
+                    </div>
+
+                    <button type="submit" class="btn-update">
+                        <i class="ri-save-fill"></i> ATUALIZAR MEUS DADOS
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-sig">
+            <div>ARQUÊ GESTÃO Admin v1.2</div>
+            <div>FEITO PELA E-TODAVIA AGÊNCIA CRIATIVA</div>
+        </div>
+    </main>
+</body>
+</html>

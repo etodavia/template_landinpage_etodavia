@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --admin-marinho: #000033;
+            --admin-light: #F4F4F9;
+            --accent-red: #D62828;
+        }
+        body { background: var(--admin-light); display: flex; padding: 0; margin:0; min-height: 100vh; font-family: 'Inter Tight', sans-serif; }
+        
+        /* Main Content */
+        main { flex: 1; padding: 3rem 4rem; overflow-y: auto; overflow-x: hidden; min-height: 100vh; position: relative; }
+        
+        @media (max-width: 992px) {
+            main { padding: 5rem 1rem 2rem; }
+            .config-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+            .page-header h1 { font-size: 1.4rem !important; }
+        }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+        .page-header h1 { font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0; }
+
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+        .config-card { background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); }
+        .config-card h3 { font-size: 1.1rem; color: var(--admin-marinho); margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; font-weight: 800; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #eee; outline: none; transition: 0.3s; font-family: inherit; font-size: 0.9rem;
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--admin-marinho); box-shadow: 0 0 0 4px rgba(0,0,51,0.05); }
+
+        .btn-save { background: var(--admin-marinho); color: white; border: none; padding: 18px 45px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 0.95rem; width: 100%; transition: 0.3s; margin-top: 10px; }
+        .btn-save:hover { background: var(--accent-red); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(214, 40, 40, 0.2); }
+
+        .alert { padding: 15px; border-radius: 12px; margin-bottom: 25px; font-weight: 600; font-size: 0.9rem; text-align: center; }
+        .alert-success { background: #ecfdf5; color: #059669; }
+        .alert-error { background: #fef2f2; color: #dc2626; }
+
+        .tab-title { opacity: 0.5; font-size: 0.7rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.5rem; display: block; }
+
+        .footer-sig { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd; font-size: 0.75rem; opacity: 0.4; display: flex; justify-content: space-between; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/admin-sidebar') %>
+
+    <main>
+        <%- include('../partials/admin-header') %>
+        <div style="padding: 3rem 4rem;">
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0;">Configurações do Sistema</h1>
+            </div>
+
+        <% const urlParams = new URLSearchParams(typeof query !== 'undefined' ? query : ''); %>
+        <% if (typeof settings !== 'undefined' && settings.success) { %>
+            <div class="alert alert-success"><i class="ri-checkbox-circle-line"></i> Alterações salvas com sucesso!</div>
+        <% } %>
+
+        <form action="/admin/config" method="POST">
+            <div class="config-grid">
+                
+                <!-- SEO & GERAL -->
+                <div class="config-card">
+                    <h3><i class="ri-global-line"></i> SEO & Institucional</h3>
+                    <div class="form-group">
+                        <label>WhatsApp Oficial (Ex: 5511999999999)</label>
+                        <input type="text" name="whatsapp" value="<%= settings.whatsapp %>" placeholder="Apenas Números">
+                    </div>
+                    <div class="form-group">
+                        <label>Meta Título da Home</label>
+                        <input type="text" name="meta_title_home" value="<%= settings.meta_title_home %>" placeholder="Título para o Google">
+                    </div>
+                    <div class="form-group">
+                        <label>Meta Descrição da Home</label>
+                        <textarea name="meta_description_home" rows="3" placeholder="Descrição para os resultados de busca"><%= settings.meta_description_home %></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Keywords (Palavras-Chave)</label>
+                        <textarea name="meta_keywords" rows="2" placeholder="gestão, consultoria, arque..."><%= settings.meta_keywords %></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>CNPJ Empresa</label>
+                            <input type="text" name="cnpj" value="<%= settings.cnpj %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Endereço / Sede</label>
+                            <input type="text" name="endereco" value="<%= settings.endereco %>">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS & PIXELS -->
+                <div class="config-card">
+                    <h3><i class="ri-flashlight-line"></i> Pixels & Tags</h3>
+                    <div class="form-group">
+                        <label>Google Analytics ID (GT-XXXX)</label>
+                        <input type="text" name="google_analytics" value="<%= settings.google_analytics %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Facebook Pixel ID</label>
+                        <input type="text" name="facebook_pixel" value="<%= settings.facebook_pixel %>">
+                    </div>
+                    <div class="form-group">
+                        <label>Pinterest Pixel ID</label>
+                        <input type="text" name="pinterest_pixel" value="<%= settings.pinterest_pixel %>">
+                    </div>
+                    <div class="form-group">
+                        <label>LinkedIn Insight Tag ID</label>
+                        <input type="text" name="linkedin_pixel" value="<%= settings.linkedin_pixel %>">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                         <div class="form-group">
+                            <label>SCRIPT HEAD (Personalizado)</label>
+                            <textarea name="custom_head_code" rows="4" style="font-family: monospace; font-size: 0.75rem;"><%= settings.custom_head_code %></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>SCRIPT BODY (Personalizado)</label>
+                            <textarea name="custom_body_code" rows="4" style="font-family: monospace; font-size: 0.75rem;"><%= settings.custom_body_code %></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SMTP & ENVIO -->
+                <div class="config-card">
+                    <h3><i class="ri-mail-settings-line"></i> Configuração de E-mail (SMTP)</h3>
+                    <p style="font-size: 0.8rem; color: #888; margin-bottom: 2rem;">Necessário para o envio automático de leads e respostas.</p>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Servidor SMTP (Ex: smtp.host.com)</label>
+                            <input type="text" name="smtp_host" value="<%= settings.smtp_host %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Porta</label>
+                            <input type="number" name="smtp_port" value="<%= settings.smtp_port %>" placeholder="465 ou 587">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>Usuário / E-mail</label>
+                            <input type="text" name="smtp_user" value="<%= settings.smtp_user %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Senha do SMTP</label>
+                            <input type="password" name="smtp_pass" value="<%= settings.smtp_pass %>" placeholder="••••••••••••">
+                        </div>
+                    </div>
+                    
+                    <h4 style="font-size: 0.8rem; border-top: 1px solid #eee; padding-top: 15px; margin-top: 20px; color: var(--admin-marinho);">Respostas Automáticas</h4>
+                    <div class="form-group">
+                        <label>Assunto (E-mail Contato)</label>
+                        <input type="text" name="email_subject_contact" value="<%= settings.email_subject_contact %>" placeholder="Ex: Recebemos seu contato!">
+                    </div>
+                    <div class="form-group">
+                        <label>Resposta Automática (Contato)</label>
+                        <textarea name="email_reply_contact" rows="4" placeholder="Olá, recebemos sua mensagem e retornaremos em breve..."><%= settings.email_reply_contact %></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>Assunto (E-mail Newsletter)</label>
+                        <input type="text" name="email_subject_newsletter" value="<%= settings.email_subject_newsletter %>" placeholder="Ex: Bem-vindo à nossa Newsletter!">
+                    </div>
+                    <div class="form-group">
+                        <label>Resposta Automática (Newsletter)</label>
+                        <textarea name="email_reply_newsletter" rows="4" placeholder="Obrigado por assinar nossa newsletter! Prepare-se para insights exclusivos..."><%= settings.email_reply_newsletter %></textarea>
+                    </div>
+                </div>
+
+                <!-- AÇÕES -->
+                <div class="config-card" style="display: flex; flex-direction: column; justify-content: center; align-items: center; border: 2px dashed #eee; background: #fafafa;">
+                    <i class="ri-save-3-fill" style="font-size: 3rem; color: var(--admin-marinho); opacity: 0.1; margin-bottom: 20px;"></i>
+                    <p style="text-align: center; font-size: 0.9rem; color: #888; margin-bottom: 30px;">Clique no botão abaixo para aplicar todas as mudanças em tempo real no site público.</p>
+                    <button type="submit" class="btn-save">SALVAR TODAS AS ALTERAÇÕES</button>
+                    <p style="margin-top: 20px; font-size: 0.75rem; font-weight: 700; color: var(--admin-marinho);">ARQUÊ GESTÃO Admin v1.2</p>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="footer-sig">
+            <div>CENTRAL DE CONFIGURAÇÕES ARQUÊ</div>
+            <div>PROJETO PROTEGIDO POR AGÊNCIA E-TODAVIA</div>
+        </div>
+    </main>
+
+    <script>
+        // Check for success message in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('success')) {
+            // Keep the message visible
+        }
+    </script>
+</body>
+</html>

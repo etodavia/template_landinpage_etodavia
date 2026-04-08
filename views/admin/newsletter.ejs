@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            --admin-marinho: #000033;
+            --admin-light: #F4F4F9;
+            --accent-red: #D62828;
+        }
+        body { background: var(--admin-light); display: flex; padding: 0; margin:0; min-height: 100vh; font-family: 'Inter Tight', sans-serif; }
+        
+        /* Main Content */
+        main { flex: 1; padding: 3rem 4rem; overflow-y: auto; overflow-x: hidden; min-height: 100vh; position: relative; }
+        
+        @media (max-width: 992px) {
+            main { padding: 5rem 1rem 2rem; }
+            .page-header h1 { font-size: 1.4rem !important; }
+        }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+        .page-header h1 { font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0; }
+
+        .email-card {
+            background: white; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); padding: 1rem;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fcfcfc; padding: 1.2rem 1.5rem; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #888; border-bottom: 1px solid #eee; }
+        td { padding: 1.2rem 1.5rem; font-size: 0.95rem; color: var(--admin-marinho); border-bottom: 1px solid #f9f9f9; }
+
+        .btn-export { background: var(--admin-marinho); color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        .btn-export:hover { background: var(--accent-red); transform: translateY(-2px); }
+
+        .btn-delete { color: #dc2626; background: transparent; border: none; cursor: pointer; transition: 0.3s; font-size: 1.2rem; }
+        .btn-delete:hover { transform: scale(1.1); }
+
+        .footer-sig { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd; font-size: 0.75rem; opacity: 0.4; display: flex; justify-content: space-between; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/admin-sidebar') %>
+
+    <main>
+        <%- include('../partials/admin-header') %>
+        <div style="padding: 3rem 4rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0;">Inscritos Newsletter</h1>
+                <a href="#" id="exportNews" class="btn-export"><i class="ri-file-excel-line"></i> EXPORTAR EMAILS</a>
+            </div>
+
+        <div class="email-card">
+            <table id="newsTable">
+                <thead>
+                    <tr>
+                        <th>E-mail do Assinante</th>
+                        <th>Data de Inscrição</th>
+                        <th style="text-align: right;">Gerenciar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if(emails && emails.length > 0) { %>
+                        <% emails.forEach(item => { %>
+                            <tr>
+                                <td style="font-weight: 700;"><%= item.email %></td>
+                                <td style="opacity: 0.6;"><%= new Date(item.created_at).toLocaleDateString('pt-BR') %> às <%= new Date(item.created_at).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}) %></td>
+                                <td style="text-align: right;">
+                                    <form action="/admin/newsletter/delete/<%= item.id %>" method="POST" onsubmit="return confirm('Excluir este e-mail?');">
+                                        <button type="submit" class="btn-delete" title="Remover"><i class="ri-delete-bin-line"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="3" style="text-align: center; padding: 5rem; opacity: 0.4;">Nenhum e-mail inscrito.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-sig">
+            <div>ARQUÊ GESTÃO Admin v1.2</div>
+            <div>FEITO PELA E-TODAVIA AGÊNCIA CRIATIVA</div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('exportNews').addEventListener('click', function(e) {
+            e.preventDefault();
+            let csv = 'Email,InscritoEm\n';
+            const rows = document.querySelectorAll('#newsTable tbody tr');
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if(cols.length > 1) {
+                    csv += `"${cols[0].innerText}","${cols[1].innerText}"\n`;
+                }
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.setAttribute('href', URL.createObjectURL(blob));
+            link.setAttribute('download', 'newsletter_arque_' + new Date().toLocaleDateString('pt-BR') + '.csv');
+            link.click();
+        });
+    </script>
+</body>
+</html>

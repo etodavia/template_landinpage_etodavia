@@ -1,0 +1,133 @@
+<style>
+    aside {
+        width: 260px; background: #000033; color: white; padding: 2.5rem 1.5rem;
+        display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.05); z-index: 5000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+    }
+    aside::-webkit-scrollbar { width: 4px; }
+    aside::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    aside.collapsed { width: 80px; padding: 2.5rem 0.75rem; }
+    aside.collapsed h2, aside.collapsed .nav-text, aside.collapsed .nav-label { display: none; }
+    aside.collapsed nav a { justify-content: center; padding: 1rem 0; }
+    aside h2 { margin-bottom: 3.5rem; font-size: 1.4rem; letter-spacing: 2px; font-weight: 800; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; overflow: hidden; white-space: nowrap; }
+    aside nav ul { list-style: none; padding: 0; }
+    aside nav li { margin-bottom: 0.5rem; }
+    aside nav a { text-decoration: none; color: rgba(255,255,255,0.5); font-size: 0.95rem; display: flex; align-items: center; gap: 12px; padding: 1rem; border-radius: 12px; transition: 0.3s; font-weight: 600; }
+    aside nav a:hover, aside nav a.active { background: rgba(255,255,255,0.1); color: white; }
+    aside nav a.active { background: #D62828; color: white; box-shadow: 0 10px 20px rgba(214, 40, 40, 0.2); }
+
+    @media (max-width: 992px) {
+        aside { position: fixed; left: -260px; height: 100vh; }
+        aside.active { left: 0; }
+    }
+</style>
+
+<aside id="adminSidebar">
+    <div style="padding: 2.5rem 1rem 3rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 1rem;">
+        <h2 style="font-size: 1.15rem; letter-spacing: 3px; font-weight: 900; margin: 0; color: white;">ARQUÊΔ <span class="nav-text" style="font-size: 0.6rem; opacity: 0.5; display: block; letter-spacing: 1px; font-weight: 400; margin-top: 5px;">COCKPIT OPERACIONAL</span></h2>
+    </div>
+    <nav>
+        <ul>
+            <li>
+                <a href="/admin/dashboard" class="<%= (locals.title === 'Dashboard') ? 'active' : '' %>">
+                    <i class="ri-dashboard-fill"></i> <span class="nav-text">Dashboard</span>
+                </a>
+            </li>
+            <% if (locals.userRole === 'superadmin') { %>
+            <li>
+                <a href="/admin/conteudo?tab=tab-licenciamento" style="border: 1px solid rgba(214, 40, 40, 0.4); background: rgba(214, 40, 40, 0.1); color: #ff4d4d !important; margin: 5px 0;">
+                    <i class="ri-shield-keyhole-fill"></i> <span class="nav-text">Licenciamento (Elite)</span>
+                </a>
+            </li>
+            <% } %>
+            <li>
+                <a href="/admin/leads" class="<%= (locals.title === 'Gestão de Leads' || locals.title === 'Gerenciar Leads') ? 'active' : '' %>">
+                    <i class="ri-user-voice-fill"></i> <span class="nav-text">Leads (Site)</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/newsletter" class="<%= (locals.title === 'Newsletter') ? 'active' : '' %>">
+                    <i class="ri-mail-send-fill"></i> <span class="nav-text">Newsletter</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/comentarios" class="<%= (locals.title === 'Moderação de Comentários') ? 'active' : '' %>">
+                    <i class="ri-chat-check-fill"></i> <span class="nav-text">Comentários</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/depoimentos" class="<%= (locals.title === 'Moderação de Depoimentos') ? 'active' : '' %>">
+                    <i class="ri-star-smile-fill"></i> <span class="nav-text">Depoimentos</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/config" class="<%= (locals.title.includes('Configur')) ? 'active' : '' %>">
+                    <i class="ri-settings-4-fill"></i> <span class="nav-text">Configurações (Geral)</span>
+                </a>
+            </li>
+            <li class="nav-label" style="margin-top: 1.5rem; padding: 0 1rem; color: rgba(255,255,255,0.3); font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">CONTEÚDO E CMS</li>
+            <li>
+                <a href="/admin/conteudo" class="<%= (locals.title.includes('CMS')) ? 'active' : '' %>">
+                    <i class="ri-layout-masonry-fill"></i> <span class="nav-text">Editor Global</span>
+                </a>
+            </li>
+            <% if (locals.userRole === 'superadmin') { %>
+            <li>
+                <a href="/admin/conteudo?tab=licenciamento" style="color: var(--accent); opacity: 0.8;">
+                    <i class="ri-shield-check-fill"></i> <span class="nav-text">Licenciamento (Elite)</span>
+                </a>
+            </li>
+            <% } %>
+            <li>
+                <a href="/admin/posts" class="<%= (locals.title.includes('Blog')) ? 'active' : '' %>">
+                    <i class="ri-article-fill"></i> <span class="nav-text">Blog</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/servicos" class="<%= (locals.title.includes('Especialidades')) ? 'active' : '' %>">
+                    <i class="ri-briefcase-4-fill"></i> <span class="nav-text">Especialidades</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/equipe" class="<%= (locals.title.includes('Equipe')) ? 'active' : '' %>">
+                    <i class="ri-team-fill"></i> <span class="nav-text">Gestão de Equipe</span>
+                </a>
+            </li>
+            <li style="margin-bottom: 2rem">
+                <a href="/admin/perfil" class="<%= (locals.title === 'Meu Perfil') ? 'active' : '' %>">
+                    <i class="ri-user-settings-fill"></i> <span class="nav-text">Meu Perfil</span>
+                </a>
+            </li>
+            
+            <li style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem">
+                <a href="/" target="_blank"><i class="ri-external-link-fill"></i> <span class="nav-text">Ver Site Público</span></a>
+            </li>
+            <li>
+                <a href="/admin/login" style="color: #ff4d4d;"><i class="ri-logout-box-r-fill"></i> <span class="nav-text">Sair do Painel</span></a>
+            </li>
+        </ul>
+    </nav>
+</aside>
+
+<script>
+    function toggleAdminMenu() {
+        const sidebar = document.getElementById('adminSidebar');
+        if (window.innerWidth <= 992) {
+            sidebar.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+        }
+    }
+    // Fechar ao clicar fora no mobile
+    document.addEventListener('click', (e) => {
+        const sidebar = document.getElementById('adminSidebar');
+        const floatingBtn = document.querySelector('.menu-toggle-floating');
+        if (window.innerWidth <= 992 && sidebar.classList.contains('active')) {
+            if (!sidebar.contains(e.target) && !e.target.closest('.menu-toggle-btn') && !e.target.closest('.menu-toggle-floating')) {
+                sidebar.classList.remove('active');
+            }
+        }
+    });
+</script>

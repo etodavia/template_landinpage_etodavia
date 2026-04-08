@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | ARQUÊΔ</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        .form-container { max-width: 900px; margin: 40px auto; background: white; padding: 40px; border-radius: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+        .input-group { margin-bottom: 25px; }
+        .input-group label { display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase; }
+        .input-group input, .input-group textarea, .input-group select { width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-family: inherit; font-size: 1rem; }
+        .input-group textarea { height: 150px; }
+        .btn-submit { background: var(--primary-marinho); color: white; border: none; padding: 18px 40px; border-radius: 50px; font-weight: 800; cursor: pointer; transition: 0.3s; width: 100%; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(10, 17, 40, 0.2); }
+        .editor-hint { font-size: 0.7rem; color: #aaa; margin-top: 5px; }
+    </style>
+</head>
+<body style="background: #fdfdfd; display: flex;">
+    <%- include('../partials/admin-sidebar') %>
+    
+    <main style="flex: 1; padding: 40px;">
+        <div class="form-container">
+            <header style="margin-bottom: 40px;">
+                <h1 style="font-size: 2.2rem; margin-bottom: 5px;"><%= post ? 'Editar' : 'Criar' %> Artigo no <em>Blog</em></h1>
+                <p>O conhecimento da ARQUÊΔ sendo compartilhado com autoridade.</p>
+            </header>
+
+            <form action="<%= post ? '/admin/posts/editar/' + post.id : '/admin/posts' %>" method="POST" enctype="multipart/form-data">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="input-group">
+                        <label>Título do Artigo</label>
+                        <input type="text" name="titulo" placeholder="Ex: O Futuro da Liderança" required onkeyup="generateSlug(this.value)" value="<%= post ? post.titulo : '' %>">
+                    </div>
+                    <div class="input-group">
+                        <label>Slug (URL amigável)</label>
+                        <input type="text" name="slug" id="slugInput" placeholder="ex: futuro-da-lideranca" required value="<%= post ? post.slug : '' %>">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="input-group">
+                        <label>Categoria</label>
+                        <select name="categoria">
+                            <% ['GESTÃO', 'LIDERANÇA', 'CULTURA', 'ESTRATÉGIA'].forEach(cat => { %>
+                                <option value="<%= cat %>" <%= post && post.categoria === cat ? 'selected' : '' %>><%= cat %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Imagem de Capa <span style="color: var(--cms-danger); font-size: 0.65rem;">(Recomendado: 1200x630px)</span></label>
+                        <input type="file" name="imagem_file" accept="image/*">
+                        <input type="hidden" name="imagem" value="<%= post ? post.imagem : '' %>">
+                        <% if (post && post.imagem) { %>
+                            <p style="font-size: 0.7rem; color: #aaa; margin-top: 5px;">Mídia Atual: <%= post.imagem %></p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Resumo (Breadcrumb / Card)</label>
+                    <textarea name="resumo" placeholder="Uma breve descrição que convide à leitura..." required><%= post ? post.resumo : '' %></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Conteúdo Completo (Aceita HTML/Pausas)</label>
+                    <textarea name="conteudo" placeholder="Escreva aqui seu artigo completo..." required><%= post ? post.conteudo : '' %></textarea>
+                    <p class="editor-hint">Dica: Use marcas HTML (e.g. &lt;h3&gt;, &lt;p&gt;, &lt;strong&gt;) para formatar seu texto.</p>
+                </div>
+
+                <div style="margin-top: 40px; padding: 25px; background: #f8f9fa; border-radius: 20px; border: 1px dashed #ddd;">
+                    <h4 style="margin: 0 0 20px; font-size: 0.9rem; letter-spacing: 1px; color: var(--primary-marinho); text-transform: uppercase;">Otimização de SEO (Busca)</h4>
+                    <div class="input-group">
+                        <label>Título SEO (Meta Title)</label>
+                        <input type="text" name="meta_title" placeholder="Aparecerá na aba do navegador e no Google" value="<%= post ? post.meta_title : '' %>">
+                    </div>
+                    <div class="input-group">
+                        <label>Descrição SEO (Meta Description)</label>
+                        <textarea name="meta_description" placeholder="Aparecerá no resumo do Google (ideal 160 caracteres)"><%= post ? post.meta_description : '' %></textarea>
+                    </div>
+                </div>
+
+                <!-- Governança de Exibição -->
+                <div style="margin-top: 30px; padding: 30px; background: white; border-radius: 20px; border: 1px solid #eee;">
+                    <h4 style="margin: 0 0 20px; font-size: 0.9rem; letter-spacing: 1px; color: var(--primary-marinho); text-transform: uppercase; display: flex; align-items: center; gap: 10px;">
+                        <i class="ri-settings-4-line"></i> Controle de Visibilidade
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="hidden" name="destaque_home" value="0">
+                            <input type="checkbox" name="destaque_home" value="1" <%= post && post.destaque_home ? 'checked' : '' %> style="width: auto;">
+                            <label style="margin-bottom: 0;">Destaque na Home?</label>
+                        </div>
+                        <div class="input-group" style="display: flex; align-items: center; gap: 10px;">
+                            <input type="hidden" name="ativo" value="0">
+                            <input type="checkbox" name="ativo" value="1" <%= !post || post.ativo ? 'checked' : '' %> style="width: auto;">
+                            <label style="margin-bottom: 0;">Artigo Ativo?</label>
+                        </div>
+                        <div class="input-group">
+                            <label>Ordem de Prioridade</label>
+                            <input type="number" name="ordem" value="<%= post ? post.ordem : 0 %>">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" style="margin-top: 30px;"><%= post ? 'SALVAR ALTERAÇÕES' : 'PUBLICAR AGORA NO BLOG' %></button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        function generateSlug(text) {
+            const slug = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+            document.getElementById('slugInput').value = slug;
+        }
+    </script>
+</body>
+</html>

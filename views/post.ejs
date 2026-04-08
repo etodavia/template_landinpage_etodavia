@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <%- include('partials/head-tags') %>
+    <style>
+        /* Floating Share Bar (Lateral) */
+        .share-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 100;
+        }
+        .share-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            color: var(--navy-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px; /* Estilo mais quadrado/moderno */
+            text-decoration: none;
+            font-size: 1.3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .share-icon:hover {
+            background: var(--navy-blue);
+            color: white;
+            transform: scale(1.15) translateX(5px);
+        }
+        .share-icon i { transition: 0.3s; }
+        
+        @media (max-width: 1200px) {
+            .share-sidebar { 
+                position: relative; 
+                flex-direction: row; 
+                justify-content: center; 
+                left: auto; 
+                top: auto; 
+                transform: none; 
+                margin-top: 40px;
+                padding-top: 40px;
+                border-top: 1px solid #eee;
+            }
+        }
+
+        /* PDF Printing Aesthetic */
+        .print-only-header { display: none; }
+        .print-page-footer { display: none; }
+
+        @media print {
+            body { background: white !important; font-size: 11pt !important; }
+            .no-print { display: none !important; }
+            
+            .print-only-header { 
+                display: flex !important; 
+                align-items: center;
+                justify-content: space-between;
+                background: linear-gradient(90deg, #0A1128 0%, #D62828 100%) !important; 
+                color: white !important; 
+                padding: 40px !important; 
+                border-radius: 0 0 40px 40px !important;
+                margin-bottom: 50px !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .print-only-header h2 { font-size: 2rem !important; margin: 0 !important; }
+            
+            .container { max-width: 100% !important; margin: 0 !important; padding: 0 50px !important; }
+            .post-intro { background: transparent !important; padding: 0 !important; margin-bottom: 30px !important; }
+            .post-intro h1 { font-size: 3rem !important; color: #0A1128 !important; text-align: left !important; margin-bottom: 20px !important; }
+            
+            .article-body { border-left: 4px solid #D62828 !important; padding-left: 30px !important; margin-top: 40px !important; }
+            .article-body h3 { color: #D62828 !important; border-bottom: 2px solid #eee !important; padding-bottom: 10px !important; }
+            
+            img { border-radius: 20px !important; box-shadow: none !important; margin: 30px 0 !important; width: 100% !important; }
+            
+            .print-page-footer {
+                display: block !important;
+                margin-top: 60px !important;
+                padding-top: 20px !important;
+                border-top: 1px solid #ddd !important;
+                text-align: center !important;
+                font-size: 0.8rem !important;
+                color: #888 !important;
+            }
+        }
+    </style>
+</head>
+<body style="background: white;">
+    
+    <!-- PDF Header -->
+    <div class="print-only-header">
+        <div>
+            <h2>ARQUÊΔ</h2>
+            <p style="opacity: 0.8; font-size: 0.9rem;">Gestão Estratégica & Capital Humano</p>
+        </div>
+        <div style="text-align: right; font-size: 0.8rem; opacity: 0.8;">
+            Documento Exclusivo • <%= new Date().toLocaleDateString('pt-BR') %>
+        </div>
+    </div>
+
+    <%- include('partials/header') %>
+
+    <!-- Floating Share Sidebar -->
+    <div class="share-sidebar no-print" data-reveal="left">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent('https://arquegestao.com.br/blog/' + post.slug) %>" class="share-icon" target="_blank" title="Facebook"><i class="ri-facebook-fill"></i></a>
+        <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent('https://arquegestao.com.br/blog/' + post.slug) %>&text=<%= encodeURIComponent(post.titulo) %>" class="share-icon" target="_blank" title="X (Twitter)"><i class="ri-twitter-x-fill"></i></a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=<%= encodeURIComponent('https://arquegestao.com.br/blog/' + post.slug) %>" class="share-icon" target="_blank" title="LinkedIn"><i class="ri-linkedin-fill"></i></a>
+        <a href="https://wa.me/?text=<%= encodeURIComponent(post.titulo + ' - https://arquegestao.com.br/blog/' + post.slug) %>" class="share-icon" target="_blank" title="WhatsApp"><i class="ri-whatsapp-line"></i></a>
+    </div>
+
+    <!-- main content as before but with more colors -->
+    <main>
+        <!-- CABEÇALHO DINÂMICO DO POST -->
+        <%- include('partials/page-hero', { 
+            pageTitle: post.titulo,
+            image: post.imagem
+        }) %>
+
+        <div class="container" style="margin-top: 40px; margin-bottom: 60px;">
+            <div data-reveal style="display: flex; justify-content: center; gap: 30px; align-items: center;">
+                <span class="section-label" style="background: var(--accent-red); color: white; border: none; padding: 5px 20px; font-weight: 800; border-radius: 50px;"><%= post.categoria %></span>
+                <div style="font-size: 1rem; color: #888; font-weight: 600;">
+                    Postado em <%= post.data %> • Por Equipe ARQUÊ
+                </div>
+            </div>
+        </div>
+
+<div style="height: 40px;"></div>
+
+    <main style="padding: 80px 0;">
+        <div class="container" style="max-width: 800px;">
+            <div class="article-body" style="font-size: 1.25rem; line-height: 1.8; color: #333;" data-reveal>
+                <div style="background: var(--bg-sand); padding: 30px; border-radius: 20px; border-left: 6px solid var(--accent-red); margin-bottom: 40px;">
+                    <p style="margin-bottom: 0;"><strong><%= post.resumo %></strong></p>
+                </div>
+                <%- post.conteudo %>
+                
+                <p style="margin-top: 2rem;">Na ARQUÊ, acreditamos que a gestão eficiente não é apenas sobre números, mas sobre pessoas e processos alinhados a uma visão clara. Ao implementar essas estratégias, sua empresa não apenas sobrevive aos desafios do mercado, mas prospera através de uma base sólida de confiança e performance.</p>
+                
+                <h3 style="color: var(--navy-blue); font-size: 2rem; margin: 3rem 0 1.5rem; letter-spacing: -1px;">Próximos Passos: Execução</h3>
+                <p>O sucesso da implementação depende de um acompanhamento constante e da abertura para feedbacks em todos os níveis da organização. Nossa consultoria especializada pode ajudar sua empresa a diagnosticar exatamente onde estão os gargalos e atuar de forma assertiva.</p>
+            </div>
+
+            <div class="no-print" style="margin-top: 80px; padding: 40px; background: whitesmoke; border-radius: 30px; display: flex; justify-content: space-between; align-items: center;" data-reveal>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <span style="font-weight: 800; color: var(--navy-blue); font-size: 0.8rem; letter-spacing: 1px;">UTILIDADE:</span>
+                    <button onclick="window.print()" style="background: var(--navy-blue); color: white; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.9rem; transition: 0.3s;" onmouseover="this.style.background='var(--accent-red)'" onmouseout="this.style.background='var(--navy-blue)'">
+                        <i class="ri-printer-line" style="font-size: 1.2rem;"></i> GERAR PDF COLORIDO
+                    </button>
+                </div>
+                <div>
+                     <a href="/blog" style="text-decoration: none; color: var(--navy-blue); font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="ri-arrow-left-line"></i> VOLTAR AO LISTADO
+                    </a>
+                </div>
+            </div>
+
+            <section id="comments" class="no-print" style="margin-top: 100px;" data-reveal>
+                <h3 style="font-size: 2.2rem; color: var(--navy-blue); letter-spacing: -1px; margin-bottom: 30px;">
+                    Discussão & <em>Interação</em>
+                </h3>
+
+                <!-- Feedback de Comentário -->
+                <% if (locals.success === 'comment') { %>
+                    <div style="background: #ecfdf5; color: #059669; padding: 25px; border-radius: 20px; font-weight: 700; margin-bottom: 30px; display: flex; align-items: center; gap: 15px;">
+                        <i class="ri-checkbox-circle-fill" style="font-size: 1.5rem;"></i>
+                        Obrigado! Seu comentário foi enviado para moderação e aparecerá em breve.
+                    </div>
+                <% } %>
+
+                <!-- Lista de Comentários Aprovados -->
+                <div class="comments-list" style="margin-bottom: 60px;">
+                    <% if (locals.comments && locals.comments.length > 0) { %>
+                        <% locals.comments.forEach(c => { %>
+                            <div style="background: #fdfdfd; padding: 30px; border-radius: 25px; border: 1px solid #eee; margin-bottom: 20px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <strong style="color: var(--navy-blue); font-size: 1.1rem;"><%= c.nome %></strong>
+                                    <span style="font-size: 0.8rem; color: #aaa; font-weight: 600;"><%= new Date(c.created_at).toLocaleDateString('pt-BR') %></span>
+                                </div>
+                                <p style="font-size: 1rem; color: #555; line-height: 1.6; margin: 0;">"<%= c.comentario %>"</p>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <p style="color: #888; font-style: italic; font-size: 1rem; margin-bottom: 40px;">Seja o primeiro a comentar sobre este artigo.</p>
+                    <% } %>
+                </div>
+
+                <div style="background: var(--bg-sand); padding: 40px; border-radius: 30px;">
+                    <h4 style="font-size: 1.4rem; color: var(--navy-blue); margin-bottom: 25px;">Deixe sua opinião</h4>
+                    <form action="/api/comentarios" method="POST" style="display: flex; flex-direction: column; gap: 25px;">
+                        <input type="hidden" name="post_id" value="<%= post.slug %>">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">NOME COMPLETO</label>
+                                <input type="text" name="nome" placeholder="Seu nome" required style="padding: 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; background: white;">
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">E-MAIL (PRIVADO)</label>
+                                <input type="email" name="email" placeholder="seu@email.com" required style="padding: 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; background: white;">
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">COMENTÁRIO</label>
+                            <textarea name="comentario" placeholder="Escreva aqui sua percepção ou dúvida..." required style="padding: 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; height: 150px; resize: none; background: white;"></textarea>
+                        </div>
+                        <button type="submit" class="btn-pill-large" style="background: var(--navy-blue); color: white; width: fit-content; padding: 18px 50px; border: none; font-weight: 800; letter-spacing: 1px;">
+                            ENVIAR PARA MODERAÇÃO <div class="icon-blue-circle" style="background: var(--accent-red); color: white; width: 30px; height: 30px;"><i class="ri-send-plane-fill"></i></div>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div class="print-page-footer">
+        © <%= new Date().getFullYear() %> ARQUÊ GESTÃO - Todos os direitos reservados. Conteúdo Educativo e Corporativo.
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray("[data-reveal]").forEach(el => {
+            let config = {
+                scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
+                opacity: 0, duration: 1.4, ease: "power4.out"
+            };
+            const direction = el.getAttribute('data-reveal');
+            if (direction === 'left') config.x = -80;
+            else if (direction === 'right') config.x = 80;
+            else config.y = 50;
+            gsap.from(el, config);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | ARQUÊΔ</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        .post-list-container { max-width: 1200px; margin: 40px auto; padding: 20px; }
+        .post-row { background: white; padding: 20px 30px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; border: 1px solid #f0f0f0; transition: transform 0.3s; }
+        .post-row:hover { transform: translateX(10px); border-color: #eee; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
+        .post-main { display: flex; align-items: center; gap: 20px; flex: 1; }
+        .post-thumb { width: 80px; height: 60px; border-radius: 12px; object-fit: cover; }
+        .post-info h3 { font-size: 1.1rem; color: var(--primary-marinho); margin-bottom: 5px; }
+        .post-info p { font-size: 0.8rem; color: #aaa; }
+        .post-actions { display: flex; gap: 10px; }
+        .btn-action { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: 0.3s; }
+        .btn-view { background: #f0f4ff; color: #3b82f6; }
+        .btn-edit { background: #fef3c7; color: #d97706; }
+        .btn-delete { background: #fef2f2; color: #ef4444; border: none; }
+        .btn-post-novo { background: #D62828; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 30px; transition: 0.3s; }
+        .btn-post-novo:hover { background: #0A1128; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body style="background: #f8f9fa; display: flex;">
+    <%- include('../partials/admin-sidebar') %>
+    
+    <main style="flex: 1; padding: 40px;">
+        <div class="post-list-container">
+            <header style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+                <div>
+                    <h1 style="font-size: 2.5rem; margin-bottom: 5px;">Gerenciar <em>Blog</em></h1>
+                    <p>Controle total sobre os artigos publicados no seu ecossistema digital.</p>
+                </div>
+                <a href="/admin/posts/novo" class="btn-post-novo"><i class="ri-add-line"></i> NOVO ARTIGO</a>
+            </header>
+
+            <div class="posts-list">
+                <% if (posts.length === 0) { %>
+                    <p style="text-align: center; color: #aaa; padding: 100px; background: white; border-radius: 20px;">Nenhum artigo publicado ainda.</p>
+                <% } else { %>
+                    <% posts.forEach(p => { %>
+                        <div class="post-row">
+                            <div class="post-main">
+                                <img src="<%= p.imagem %>" class="post-thumb">
+                                <div class="post-info">
+                                    <h3><%= p.titulo %></h3>
+                                    <p><%= p.categoria %> • Publicado em <%= p.created_at.toLocaleDateString('pt-BR') %></p>
+                                </div>
+                            </div>
+                            <div class="post-actions">
+                                <a href="/blog/<%= p.slug %>" target="_blank" class="btn-action btn-view" title="Ver no site"><i class="ri-eye-line"></i></a>
+                                <a href="/admin/posts/editar/<%= p.id %>" class="btn-action btn-edit" title="Refinar Artigo"><i class="ri-pencil-line"></i></a>
+                                <form action="/admin/posts/delete/<%= p.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir?')">
+                                    <button type="submit" class="btn-action btn-delete" title="Excluir Permanentemente"><i class="ri-delete-bin-line"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

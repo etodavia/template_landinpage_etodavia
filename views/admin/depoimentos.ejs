@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root { --admin-marinho: #000033; --admin-light: #F4F4F9; --accent-red: #D62828; }
+        body { background: var(--admin-light); display: flex; padding: 0; margin:0; min-height: 100vh; font-family: 'Inter Tight', sans-serif; }
+        main { flex: 1; padding: 3rem 4rem; overflow-y: auto; overflow-x: hidden; min-height: 100vh; position: relative; }
+        @media (max-width: 992px) {
+            main { padding: 5rem 1rem 2rem; }
+            .page-header h1 { font-size: 1.4rem !important; }
+            .testimonial-card { padding: 1rem !important; }
+        }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+        .page-header h1 { font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; }
+
+        .testimonial-card { background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px; border-left: 5px solid #ddd; position: relative; }
+        .testimonial-card.approved { border-left-color: #059669; }
+        .testimonial-card.pending { border-left-color: #f59e0b; }
+
+        .testimonial-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .testimonial-info h3 { font-size: 1rem; color: var(--admin-marinho); margin: 0; display: flex; align-items: center; gap: 10px; }
+        .testimonial-info p { font-size: 0.75rem; color: #888; font-weight: 600; margin: 4px 0 0 0; }
+        .testimonial-text { font-size: 0.95rem; color: #444; font-style: italic; line-height: 1.5; margin: 15px 0; background: #f9f9f9; padding: 15px; border-radius: 12px; }
+        
+        .testimonial-actions { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-approve { background: #059669; color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: 700; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+        .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 10px 25px; border-radius: 50px; font-weight: 700; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+
+        .badge { padding: 4px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
+        .badge-pending { background: #fffbeb; color: #b45309; }
+        .badge-approved { background: #ecfdf5; color: #059669; }
+
+        .footer-sig { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd; font-size: 0.75rem; opacity: 0.4; display: flex; justify-content: space-between; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <%- include('../partials/admin-sidebar') %>
+    <main>
+        <div class="page-header">
+            <h1>Moderação de Depoimentos</h1>
+            <a href="/depoimentos/novo" target="_blank" style="background: var(--admin-marinho); color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.85rem;"><i class="ri-external-link-line"></i> LINK DO FORMULÁRIO EXTERNO</a>
+        </div>
+
+        <div class="testimonials-list">
+            <% if (depoimentos.length === 0) { %>
+                <div style="text-align: center; padding: 4rem; opacity: 0.5;">
+                    <i class="ri-chat-quote-line" style="font-size: 3rem;"></i>
+                    <p>Nenhum depoimento enviado ainda.</p>
+                </div>
+            <% } %>
+
+            <% depoimentos.forEach(d => { %>
+                <div class="testimonial-card <%= d.aprovado ? 'approved' : 'pending' %>">
+                    <div class="testimonial-header">
+                        <div style="display: flex; gap: 20px; align-items: flex-start;">
+                            <% if (d.foto) { %>
+                                <img src="<%= d.foto %>" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                            <% } else { %>
+                                <div style="width: 60px; height: 60px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 1.5rem;">
+                                    <i class="ri-user-smile-line"></i>
+                                </div>
+                            <% } %>
+                            <div class="testimonial-info">
+                                <h3><%= d.nome %> <span class="badge <%= d.aprovado ? 'badge-approved' : 'badge-pending' %>"><%= d.aprovado ? 'Aprovado' : 'Pendente' %></span></h3>
+                                <p><%= d.cargo %> • <%= d.empresa %> • <%= new Date(d.created_at).toLocaleDateString('pt-BR') %></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-text">"<%= d.texto %>"</div>
+                    <div class="testimonial-actions">
+                        <% if (!d.aprovado) { %>
+                            <form action="/admin/depoimentos/aprovar/<%= d.id %>" method="POST">
+                                <button type="submit" class="btn-approve"><i class="ri-check-double-line"></i> APROVAR TESTEMUNHO</button>
+                            </form>
+                        <% } %>
+                        <form action="/admin/depoimentos/delete/<%= d.id %>" method="POST" onsubmit="return confirm('Excluir este depoimento permanentemente?')">
+                            <button type="submit" class="btn-delete"><i class="ri-delete-bin-3-line"></i> EXCLUIR</button>
+                        </form>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <div class="footer-sig">
+            <div>ARQUÊ GESTÃO Admin v1.2</div>
+            <div>PROJETO PROTEGIDO POR AGÊNCIA E-TODAVIA</div>
+        </div>
+    </main>
+</body>
+</html>

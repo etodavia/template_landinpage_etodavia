@@ -1,0 +1,31 @@
+<header class="admin-top-header" style="background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f8fafc; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <button class="menu-toggle-btn" onclick="toggleAdminMenu()" style="background: #f1f5f9; border: none; width: 40px; height: 40px; border-radius: 10px; font-size: 1.4rem; color: #0f172a; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;">
+            <i class="ri-menu-2-line"></i>
+        </button>
+        <div style="display: flex; flex-direction: column;">
+            <h1 style="font-size: 1.25rem; margin: 0; font-weight: 900; letter-spacing: 2px; color: #0f172a; display: flex; align-items: center; gap: 10px;">
+                <span style="background: #D62828; color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 1rem;"><i class="ri-pulse-fill"></i></span> ARQUÊΔ <span class="desktop-only" style="opacity: 0.3; font-weight: 400; font-size: 0.7rem; letter-spacing: 1px;">CMS 360°</span>
+            </h1>
+            <div style="font-size: 0.6rem; font-weight: 800; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">
+                GOVERNANÇA: <span style="color: <%= locals.userRole === 'superadmin' ? '#D62828' : '#0f172a' %>;"><%= locals.userRole === 'superadmin' ? '✨ SUPER ADMIN' : '🛡️ OPERACIONAL' %></span>
+            </div>
+        </div>
+    </div>
+    <div class="admin-top-actions" style="display: flex; align-items: center; gap: 15px;">
+        <% if (locals.title.includes('Editor') || locals.title.includes('CMS')) { %>
+            <button type="submit" form="cmsForm" class="btn-premium" style="background: #0f172a; color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);">
+                <i class="ri-save-3-fill"></i> SALVAR <span class="desktop-only">ALTERAÇÕES</span>
+            </button>
+        <% } %>
+        <a href="/admin/perfil" style="background: #f8fafc; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 1.3rem; transition: 0.3s;"><i class="ri-user-settings-fill"></i></a>
+    </div>
+</header>
+
+<style>
+    .desktop-only { display: inline !important; }
+    @media (max-width: 768px) {
+        .desktop-only { display: none !important; }
+        .admin-top-header { padding: 10px 15px !important; }
+    }
+</style>

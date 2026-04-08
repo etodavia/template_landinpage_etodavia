@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | ARQUÊΔ</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+        .stat-card::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 6px; background: var(--primary); }
+        .stat-card.red::after { background: var(--accent); }
+        
+        .stat-card h3 { font-size: 0.6rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+        .stat-card p { font-size: 2.2rem; font-weight: 900; color: var(--primary); margin: 0; letter-spacing: -0.05em; }
+        
+        .chart-box { background: white; padding: 40px; border-radius: 30px; border: 1px solid var(--border); margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+    </style>
+</head>
+<body style="display: flex;">
+    <%- include('../partials/admin-sidebar') %>
+
+    <main style="flex: 1; min-height: 100vh; overflow-x: hidden; background: #F8FAFC;">
+        <%- include('../partials/admin-header') %>
+        
+        <div style="padding: 40px;">
+            <div style="margin-bottom: 40px;">
+                <h1 style="font-size: 2rem; margin: 0; color: #000033;">Cockpit de <em>Inteligência</em></h1>
+                <p class="subtitle" style="margin: 5px 0 0; opacity: 0.6;">Monitoramento de tráfego e conversões do ecossistema ARQUÊΔ.</p>
+            </div>
+
+        <div class="form-grid" style="grid-template-columns: repeat(2, 1fr); gap: 30px;">
+            <div class="stat-card">
+                <h3>Leads Capturados</h3>
+                <p><%= typeof leads !== 'undefined' ? leads : 0 %></p>
+            </div>
+            <div class="stat-card red">
+                <h3>Assinantes Newsletter</h3>
+                <p><%= typeof news !== 'undefined' ? news : 0 %></p>
+            </div>
+        </div>
+
+        <div class="chart-box" style="padding: 20px;">
+            <h3 style="font-size: 0.7rem; font-weight: 900; color: var(--primary); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.1em;">Fluxo de Conversão (Mensal)</h3>
+            <canvas id="leadsChart" height="40" data-chart='<%- JSON.stringify(chartData) %>'></canvas>
+        </div>
+
+        <!-- AUTENTICAÇÃO DE PROPRIEDADE (CERTIFICADO DIGITAL - VISÍVEL PARA ADMIN E SUPERADMIN) -->
+        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+            <div style="background: white; padding: 30px; border-radius: 24px; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                <h4 style="font-size: 0.65rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Autenticação Digital</h4>
+                <% if (settings.license_qr_code) { %>
+                    <img src="<%= settings.license_qr_code %>" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 15px;">
+                <% } else { %>
+                    <div style="width: 140px; height: 140px; background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 2rem; margin-bottom: 15px;">
+                        <i class="ri-qr-code-line"></i>
+                    </div>
+                <% } %>
+                <span style="font-size: 0.6rem; font-weight: 800; color: var(--accent); background: rgba(214, 40, 40, 0.05); padding: 4px 10px; border-radius: 4px;">SITE REGISTRADO</span>
+            </div>
+
+            <div style="background: white; padding: 30px; border-radius: 24px; border: 1px solid var(--border);">
+                <h4 style="font-size: 0.65rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Dados de Aquisição do Ecossistema</h4>
+                <div style="font-family: 'Courier New', Courier, monospace; font-size: 0.75rem; line-height: 1.5; color: var(--primary); background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; min-height: 100px;">
+                    <%- settings.license_nf_data ? settings.license_nf_data.replace(/\n/g, '<br>') : 'Aguardando sincronização de dados fiscais...' %>
+                </div>
+                <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 0.6rem; font-weight: 900; color: #94a3b8; text-transform: uppercase;">
+                    <div>
+                        <span style="display: block; margin-bottom: 4px;">AUTH CODE: <span style="color: var(--primary);"><%= settings.license_auth_code || 'PENDENTE' %></span></span>
+                        <span>Hash ID: <%= Math.random().toString(36).substring(7).toUpperCase() %></span>
+                    </div>
+                    <% if (settings.license_pdf) { %>
+                        <a href="<%= settings.license_pdf %>" target="_blank" style="background: var(--primary); color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                            <i class="ri-file-pdf-line"></i> VER NF (PDF)
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; opacity: 0.5; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">
+            <div>ARQUÊ GESTÃO • GOVERNANÇA v1.5</div>
+            <div>© 2026 E-TODAVIA • PROPRIEDADE TÉCNICA</div>
+        </footer>
+    </main>
+
+    <script>
+        const chartEl = document.getElementById('leadsChart');
+        const ctx = chartEl.getContext('2d');
+        const rawData = JSON.parse(chartEl.getAttribute('data-chart') || '[]');
+        
+        const labels = rawData.map(d => d.mes);
+        const values = rawData.map(d => d.qtd);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels.length ? labels : ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Leads',
+                    data: values.length ? values : [12, 19, 15, 25, 22, 30],
+                    borderColor: '#0A1128',
+                    backgroundColor: 'rgba(10, 17, 40, 0.03)',
+                    borderWidth: 4,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#D62828',
+                    pointBorderColor: '#fff',
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#F1F5F9' },
+                        ticks: { font: { weight: '800' }, color: '#94A3B8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { weight: '800' }, color: '#94A3B8' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

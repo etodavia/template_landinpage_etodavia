@@ -367,17 +367,21 @@ footer {
 }
 
 @media (max-width: 1024px) {
+    .topbar { display: none !important; }
     header { 
         height: 70px;
-        padding: 0 4%;
+        padding: 0 15px;
         justify-content: space-between;
-        gap: 15px;
+        gap: 10px;
+        width: 100%;
+        box-sizing: border-box;
     }
     header nav { display: none; } 
     .header-right .login-link { display: none; }
+    .header-right { margin-left: 0 !important; gap: 10px; }
     header .btn-cta-header { 
-        padding: 8px 15px; 
-        font-size: 0.75rem; 
+        padding: 8px 12px; 
+        font-size: 0.7rem; 
         white-space: nowrap;
         min-width: fit-content;
     }
@@ -393,16 +397,15 @@ footer {
     .header-mobile-icons {
         display: flex;
         align-items: center;
-        gap: 15px;
-        margin: 0 auto 0 20px; /* Entre Logo e Botão */
+        gap: 10px;
+        margin: 0 auto;
     }
 
     .m-icon-link {
-        font-size: 1.4rem;
-        color: white;
+        font-size: 1.2rem;
+        color: var(--text-header, var(--navy-blue));
         text-decoration: none;
         opacity: 1;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
     .m-floating-nav {

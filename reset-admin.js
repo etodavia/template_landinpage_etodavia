@@ -20,13 +20,13 @@ async function reset() {
         console.log('⏳ Atualizando usuário administrador...');
         
         // Remove se existir e cria de novo para garantir
-        await connection.query('DELETE FROM usuarios WHERE email = "admin@teste.com"');
+        await connection.query('DELETE FROM usuarios WHERE email = "admin@arquegestao.com.br"');
         await connection.query('INSERT INTO usuarios (nome, email, senha, nivel) VALUES (?, ?, ?, ?)', 
-            ['Admin ARQUÊ', 'admin@teste.com', hash, 'admin']
+            ['Admin ARQUÊ', 'admin@arquegestao.com.br', hash, 'admin']
         );
 
         console.log('✅ SENHA RESETADA COM SUCESSO!');
-        console.log('👉 E-mail: admin@teste.com');
+        console.log('👉 E-mail: admin@arquegestao.com.br');
         console.log('👉 Senha: Et.123654*');
         console.log('🚀 Pode tentar o login novamente agora!');
         process.exit(0);

@@ -21,7 +21,7 @@
             </div>
 
             <!-- Middle Section: Sonet-style Split -->
-            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 100px;">
+            <div class="contact-grid-main">
                 
                 <!-- Left: Contact Details Blocks -->
                 <div style="display: flex; flex-direction: column; gap: 60px;" data-reveal="left">
@@ -81,7 +81,7 @@
                     <form id="contact-form" style="display: flex; flex-direction: column; gap: 50px;">
                         <h3 style="font-size: 2.2rem; color: var(--navy-blue); letter-spacing: -1px; margin-bottom: 10px;"><%- settings.contact_form_title || 'Diga <em>Olá</em>' %></h3>
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                        <div class="contact-form-grid">
                             <div style="display: flex; flex-direction: column; gap: 10px;">
                                 <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">NOME COMPLETO</label>
                                 <input type="text" placeholder="Seu nome aqui" required style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s;" onfocus="this.style.borderColor='var(--navy-blue)'" onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'">

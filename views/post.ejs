@@ -196,7 +196,7 @@
                     <h4 style="font-size: 1.4rem; color: var(--navy-blue); margin-bottom: 25px;">Deixe sua opinião</h4>
                     <form action="/api/comentarios" method="POST" style="display: flex; flex-direction: column; gap: 25px;">
                         <input type="hidden" name="post_id" value="<%= post.slug %>">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                        <div class="contact-form-grid" style="gap: 25px;">
                             <div style="display: flex; flex-direction: column; gap: 8px;">
                                 <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">NOME COMPLETO</label>
                                 <input type="text" name="nome" placeholder="Seu nome" required style="padding: 15px; border-radius: 12px; border: 1px solid #ddd; outline: none; background: white;">

@@ -191,7 +191,7 @@
                     <!-- Formulário de Conversão Contextual -->
                     <div class="no-print" style="margin-top: 80px; padding: 60px; border-radius: 40px; background: white; border: 1px solid #eee; box-shadow: 0 20px 50px rgba(0,0,0,0.02);">
                         <h4 style="font-size: 2rem; color: var(--navy-blue); margin-bottom: 30px; letter-spacing: -1px;">Dúvidas sobre este serviço?</h4>
-                        <form action="/api/leads" method="POST" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <form action="/api/leads" method="POST" class="contact-form-grid" style="gap: 20px;">
                             <input type="hidden" name="assunto" value="Interesse: <%= service.titulo %>">
                             <input type="text" name="nome" placeholder="Seu Nome" required style="padding: 18px; border-radius: 15px; border: 1px solid #ddd; outline: none;">
                             <input type="email" name="email" placeholder="Seu E-mail Profissional" required style="padding: 18px; border-radius: 15px; border: 1px solid #ddd; outline: none;">

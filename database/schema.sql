@@ -1,7 +1,3 @@
--- Criação do banco se não existir
-CREATE DATABASE IF NOT EXISTS arque_gestao;
-USE arque_gestao;
-
 -- Tabela de Usuários (Login Admin)
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,

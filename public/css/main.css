@@ -482,7 +482,28 @@ footer {
         70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
         100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
     }
+
+    .services-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+    .blog-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+    .blog-featured-card { grid-template-columns: 1fr !important; }
+    .blog-featured-card > div:first-child { height: 200px !important; }
+    .contact-grid-main { grid-template-columns: 1fr !important; gap: 50px !important; }
+    .contact-form-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
+    
+    .newsletter-form { flex-direction: column !important; width: 100% !important; border-radius: 20px !important; background: transparent !important; padding: 0 !important; }
+    .newsletter-form input { border-radius: 50px !important; background: rgba(255,255,255,0.1) !important; padding: 15px !important; margin-bottom: 10px !important; }
+    
+    .hero-content { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .hero-content div { justify-content: center !important; }
 }
+
+/* Responsive Grids (Desktop) */
+.services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.blog-featured-card { background: white; color: var(--navy-blue); border-radius: 20px; display: grid; grid-template-columns: 1fr 1.5fr; overflow: hidden; margin-bottom: 30px; }
+.contact-grid-main { display: grid; grid-template-columns: 1fr 1.5fr; gap: 100px; }
+.contact-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+
 
 /* ESTILOS DE DESK (OCULTAR ELEMENTOS MOBILE NO DESKTOP) */
 @media (min-width: 1025px) {

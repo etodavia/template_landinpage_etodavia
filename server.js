@@ -226,10 +226,10 @@ app.use((req, res, next) => {
 
 // ROTA ATUALIZADA PARA INTEGRAR O NOVO HERO (519481.jpg)
 app.get('/img/hero_optimo.png', (req, res) => {
-    res.sendFile('c:\\Users\\krsvm\\OneDrive\\Desktop\\E-TODAVIA\\SITES DO SHOWCASE\\SITES INTITUCIONAIS\\ARQUÊ GESTÃO\\519481.jpg');
+    res.sendFile(path.join(__dirname, '519481.jpg'));
 });
 app.get('/img/logo-agencia.png', (req, res) => {
-    res.sendFile('c:\\Users\\krsvm\\OneDrive\\Desktop\\E-TODAVIA\\SITES DO SHOWCASE\\SITES INTITUCIONAIS\\ARQUÊ GESTÃO\\public\\img\\logo-agencia.png');
+    res.sendFile(path.join(__dirname, 'public', 'img', 'logo-agencia.png'));
 });
 
 // Middleware de Governança de Acesso (RBAC Industrial via JWT Cookie)
@@ -694,5 +694,5 @@ app.post('/api/comentarios', async (req, res) => {
     } catch (e) { res.redirect(`/blog/${post_id}?error=comment`); }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`🚀 ARQUÊΔ SISTEMA ON: Porta ${PORT}`));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 ARQUÊΔ SISTEMA ON: Porta ${PORT}`));

@@ -36,6 +36,8 @@
                 <a href="/admin/posts/novo" class="btn-post-novo"><i class="ri-add-line"></i> NOVO ARTIGO</a>
             </header>
 
+            <%- include('../partials/admin-alerts') %>
+
             <div class="posts-list">
                 <% if (posts.length === 0) { %>
                     <p style="text-align: center; color: #aaa; padding: 100px; background: white; border-radius: 20px;">Nenhum artigo publicado ainda.</p>

@@ -179,21 +179,21 @@ async function setupDB() {
             try { await pool.execute("ALTER TABLE usuarios ADD COLUMN nivel ENUM('superadmin', 'admin', 'editor') DEFAULT 'admin'"); } catch(err) {}
         }
 
-        const hashedSuper = await bcrypt.hash('ET.2026*', 10);
-        const hashedAdmin = await bcrypt.hash('Arque.2026*', 10);
+        // Garantir que SuperAdmin e Admin existam sem sobrescrever senhas alteradas
+        const [existingUsers] = await pool.execute('SELECT email FROM usuarios');
+        const userEmails = existingUsers.map(u => u.email);
 
-        // Garantir que SuperAdmin e Admin existam
-        await pool.execute(`
-            INSERT INTO usuarios (nome, email, senha, nivel) 
-            VALUES (?, ?, ?, ?) 
-            ON DUPLICATE KEY UPDATE senha = VALUES(senha), nivel = VALUES(nivel)
-        `, ['Super Admin ET', 'superadmin@etodavia.com', hashedSuper, 'superadmin']);
+        if (!userEmails.includes('superadmin@etodavia.com')) {
+            const hashedSuper = await bcrypt.hash('ET.2026*', 10);
+            await pool.execute('INSERT INTO usuarios (nome, email, senha, nivel) VALUES (?, ?, ?, ?)', 
+                ['Super Admin ET', 'superadmin@etodavia.com', hashedSuper, 'superadmin']);
+        }
 
-        await pool.execute(`
-            INSERT INTO usuarios (nome, email, senha, nivel) 
-            VALUES (?, ?, ?, ?) 
-            ON DUPLICATE KEY UPDATE senha = VALUES(senha), nivel = VALUES(nivel)
-        `, ['Admin Arquê', 'admin@arquegestao.com', hashedAdmin, 'admin']);
+        if (!userEmails.includes('admin@arquegestao.com')) {
+            const hashedAdmin = await bcrypt.hash('Arque.2026*', 10);
+            await pool.execute('INSERT INTO usuarios (nome, email, senha, nivel) VALUES (?, ?, ?, ?)', 
+                ['Admin Arquê', 'admin@arquegestao.com', hashedAdmin, 'admin']);
+        }
 
         console.log('✅ DATABASE: Usuários (Super/Admin) sincronizados/atualizados.');
     } catch (err) { console.error('❌ DATABASE: Falha na sincronização.', err); }
@@ -220,6 +220,8 @@ app.use((req, res, next) => {
     else if (path.startsWith('/servicos')) res.locals.currentPage = 'servicos';
     else if (path.startsWith('/blog')) res.locals.currentPage = 'blog';
     else if (path.startsWith('/contato')) res.locals.currentPage = 'contato';
+    else if (path.startsWith('/politica')) res.locals.currentPage = 'politica';
+    else if (path.startsWith('/termos')) res.locals.currentPage = 'termos';
     else res.locals.currentPage = '';
     next();
 });
@@ -280,9 +282,9 @@ app.get('/', async (req, res) => {
         const [testimonials] = await pool.execute('SELECT * FROM depoimentos WHERE aprovado = TRUE ORDER BY created_at DESC');
         
         res.render('index', { 
-            title: res.locals.settings.meta_title_home || 'Home | ARQUÊ GESTÃO', 
-            description: res.locals.settings.meta_description_home,
-            keywords: res.locals.settings.meta_keywords,
+            title: res.locals.settings.meta_title_home || 'ARQUÊ GESTÃO | Consultoria Estratégica e Capital Humano', 
+            description: res.locals.settings.meta_description_home || 'Especialistas em impulsionar o capital humano e elevar a performance operacional com visão sistêmica e resultados exponenciais.',
+            keywords: res.locals.settings.meta_keywords || 'gestão, consultoria, rh, capital humano, performance, arquê gestão',
             posts,
             services,
             team,
@@ -362,30 +364,64 @@ app.post('/admin/conteudo', upload.fields([
 ]), async (req, res) => {
     let updateData = { ...req.body };
     
-    // Processar Uploads Se Existirem
+    // Whitelist de colunas válidas no banco para evitar erros de SQL
+    const validColumns = [
+        'site_name', 'footer_text', 'home_hero_title', 'home_hero_description', 'services_hero_title',
+        'instagram_url', 'linkedin_url', 'facebook_url', 'nav_cta_text', 'endereco', 'whatsapp',
+        'color_marinho', 'color_areia', 'color_vermelho', 'color_texto', 'color_header', 'color_footer',
+        'color_header_text', 'color_footer_text', 'hero_image', 'about_title', 'about_text', 'about_image',
+        'benefits_title', 'benefits_text', 'about_story_text_left', 'about_story_text_right',
+        'about_mission', 'about_vision', 'about_values', 'about_team_title', 'about_team_text',
+        'about_hero_title', 'about_hero_image', 'services_hero_image', 'blog_hero_title', 'blog_hero_image',
+        'contact_hero_title', 'contact_hero_image', 'cnpj', 'logo', 'logo_white', 'favicon', 'show_topbar',
+        'footer_secure_link', 'footer_short_text', 'services_section_title', 'services_section_text',
+        'blog_section_title', 'blog_section_text', 'testimonial_section_title', 'newsletter_section_title',
+        'newsletter_section_text', 'services_page_description', 'blog_page_newsletter_title',
+        'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'home_hero_card_title',
+        'home_hero_card_subtitle', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
+        'social_links', 'benefits_items', 'benefits_template', 'benefits_color', 'hero_overlay_color',
+        'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
+        'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
+        'license_pdf', 'license_auth_code'
+    ];
+
+    // Processar Uploads
     const fileFields = [
         'hero_image', 'about_image', 'about_hero_image', 
         'services_hero_image', 'blog_hero_image', 'contact_hero_image',
-        'about_story_image',
-        'logo', 'logo_white', 'favicon', 'license_qr_code', 'license_pdf'
+        'about_story_image', 'logo', 'logo_white', 'favicon', 
+        'license_qr_code', 'license_pdf'
     ];
 
     fileFields.forEach(field => {
         const fileKey = field + '_file';
-        if(req.files[fileKey]) {
+        if(req.files && req.files[fileKey]) {
             updateData[field] = `/uploads/${req.files[fileKey][0].filename}`;
         }
         delete updateData[fileKey];
     });
 
-    const fields = Object.keys(updateData);
+    // Filtrar apenas campos que existem no banco
+    const filteredData = {};
+    Object.keys(updateData).forEach(key => {
+        if (validColumns.includes(key)) {
+            filteredData[key] = updateData[key];
+        }
+    });
+
+    const fields = Object.keys(filteredData);
     if(fields.length === 0) return res.redirect('/admin/conteudo');
+    
     const sets = fields.map(f => `${f} = ?`).join(', ');
-    const values = Object.values(updateData);
+    const values = Object.values(filteredData);
+
     try {
         await pool.execute(`UPDATE configuracoes_globais SET ${sets} WHERE id = 1`, values);
         res.redirect('/admin/conteudo?success=1');
-    } catch (e) { res.redirect('/admin/conteudo?error=1'); }
+    } catch (e) { 
+        console.error('❌ CMS SAVE ERROR:', e);
+        res.redirect('/admin/conteudo?error=1'); 
+    }
 });
 
 app.get('/admin/posts', async (req, res) => {
@@ -405,7 +441,10 @@ app.post('/admin/posts', upload.single('imagem_file'), async (req, res) => {
         await pool.execute('INSERT INTO posts (slug, titulo, categoria, data, resumo, imagem, conteudo, meta_title, meta_description, destaque_home, ordem, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
             [slug, titulo, categoria, new Date().toLocaleDateString('pt-BR'), resumo, imagem, conteudo, meta_title, meta_description, destaque_home_val, parseInt(ordem) || 0, ativo_val]);
         res.redirect('/admin/posts?success=1');
-    } catch (e) { res.redirect('/admin/posts/novo?error=1'); }
+    } catch (e) { 
+        console.error('❌ POST SAVE ERROR:', e);
+        res.redirect('/admin/posts/novo?error=1'); 
+    }
 });
 app.get('/admin/posts/editar/:id', async (req, res) => {
     try {
@@ -426,7 +465,10 @@ app.post('/admin/posts/editar/:id', upload.single('imagem_file'), async (req, re
         await pool.execute('UPDATE posts SET slug=?, titulo=?, categoria=?, resumo=?, imagem=?, conteudo=?, meta_title=?, meta_description=?, destaque_home=?, ordem=?, ativo=? WHERE id=?', 
             [slug, titulo, categoria, resumo, imagem, conteudo, meta_title, meta_description, destaque_home_val, parseInt(ordem) || 0, ativo_val, req.params.id]);
         res.redirect('/admin/posts?success=1');
-    } catch (e) { res.redirect(`/admin/posts/editar/${req.params.id}?error=1`); }
+    } catch (e) { 
+        console.error('❌ POST EDIT ERROR:', e);
+        res.redirect(`/admin/posts/editar/${req.params.id}?error=1`); 
+    }
 });
 app.post('/admin/posts/delete/:id', async (req, res) => {
     try {
@@ -450,7 +492,10 @@ app.post('/admin/equipe', upload.single('imagem_file'), async (req, res) => {
     try {
         await pool.execute('INSERT INTO equipe (nome, funcao, imagem, ordem) VALUES (?, ?, ?, ?)', [nome, funcao, imagem, parseInt(ordem) || 0]);
         res.redirect('/admin/equipe?success=1');
-    } catch (e) { res.redirect('/admin/equipe/novo?error=1'); }
+    } catch (e) { 
+        console.error('❌ TEAM SAVE ERROR:', e);
+        res.redirect('/admin/equipe/novo?error=1'); 
+    }
 });
 app.get('/admin/equipe/editar/:id', async (req, res) => {
     try {
@@ -466,7 +511,10 @@ app.post('/admin/equipe/editar/:id', upload.single('imagem_file'), async (req, r
     try {
         await pool.execute('UPDATE equipe SET nome=?, funcao=?, imagem=?, ordem=? WHERE id=?', [nome, funcao, imagem, parseInt(ordem) || 0, req.params.id]);
         res.redirect('/admin/equipe?success=1');
-    } catch (e) { res.redirect(`/admin/equipe/editar/${req.params.id}?error=1`); }
+    } catch (e) { 
+        console.error('❌ TEAM EDIT ERROR:', e);
+        res.redirect(`/admin/equipe/editar/${req.params.id}?error=1`); 
+    }
 });
 app.post('/admin/equipe/delete/:id', async (req, res) => {
     try {
@@ -492,7 +540,10 @@ app.post('/admin/servicos', upload.single('imagem_file'), async (req, res) => {
         await pool.execute('INSERT INTO servicos (slug, titulo, resumo, imagem, conteudo, icone, meta_title, meta_description, destaque_home, ordem, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
             [slug, titulo, resumo, imagem, conteudo, icone, meta_title, meta_description, destaque_home_val, parseInt(ordem) || 0, ativo_val]);
         res.redirect('/admin/servicos?success=1');
-    } catch (e) { res.redirect('/admin/servicos/novo?error=1'); }
+    } catch (e) { 
+        console.error('❌ SERVICE SAVE ERROR:', e);
+        res.redirect('/admin/servicos/novo?error=1'); 
+    }
 });
 app.get('/admin/servicos/editar/:id', async (req, res) => {
     try {
@@ -513,7 +564,10 @@ app.post('/admin/servicos/editar/:id', upload.single('imagem_file'), async (req,
         await pool.execute('UPDATE servicos SET slug=?, titulo=?, resumo=?, imagem=?, conteudo=?, icone=?, meta_title=?, meta_description=?, destaque_home=?, ordem=?, ativo=? WHERE id=?', 
             [slug, titulo, resumo, imagem, conteudo, icone, meta_title, meta_description, destaque_home_val, parseInt(ordem) || 0, ativo_val, req.params.id]);
         res.redirect('/admin/servicos?success=1');
-    } catch (e) { res.redirect(`/admin/servicos/editar/${req.params.id}?error=1`); }
+    } catch (e) { 
+        console.error('❌ SERVICE EDIT ERROR:', e);
+        res.redirect(`/admin/servicos/editar/${req.params.id}?error=1`); 
+    }
 });
 app.post('/admin/servicos/delete/:id', async (req, res) => {
     try {
@@ -605,7 +659,10 @@ app.post('/admin/config', async (req, res) => {
             email_reply_contact, email_reply_newsletter, email_subject_contact, email_subject_newsletter
         ]);
         res.redirect('/admin/config?success=1');
-    } catch (e) { res.redirect('/admin/config?error=1'); }
+    } catch (e) { 
+        console.error('❌ CONFIG SAVE ERROR:', e);
+        res.redirect('/admin/config?error=1'); 
+    }
 });
 
 app.get('/admin/perfil', async (req, res) => {

@@ -104,6 +104,7 @@
             </nav>
 
             <form id="cmsForm" action="/admin/conteudo" method="POST" class="cms-content" enctype="multipart/form-data">
+                <%- include('../partials/admin-alerts') %>
                 
                 <!-- IDENTIDADE & CORES -->
                 <div id="tab-identidade" class="tab-panel <%= (locals.userRole !== 'superadmin') ? 'active' : '' %>">

@@ -53,9 +53,13 @@
                        });
                    }
                 %>
-                <% menu.forEach(item => { %>
+                <% menu.forEach(item => { 
+                    const isActive = (locals.currentPage === item.label.toLowerCase()) || 
+                                   (locals.currentPage === 'home' && item.link === '/') ||
+                                   (item.link !== '/' && locals.currentPage === item.link.replace('/', ''));
+                %>
                     <li>
-                        <a href="<%= item.link %>" class="menu-item-link">
+                        <a href="<%= item.link %>" class="menu-item-link <%= isActive ? 'active' : '' %>">
                             <div class="roll-btn">
                                 <span class="roll-text"><%= item.label %></span>
                                 <span class="roll-text"><%= item.label %></span>

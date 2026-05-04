@@ -58,10 +58,7 @@
                 <h1 style="font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0;">Configurações do Sistema</h1>
             </div>
 
-        <% const urlParams = new URLSearchParams(typeof query !== 'undefined' ? query : ''); %>
-        <% if (typeof settings !== 'undefined' && settings.success) { %>
-            <div class="alert alert-success"><i class="ri-checkbox-circle-line"></i> Alterações salvas com sucesso!</div>
-        <% } %>
+        <%- include('../partials/admin-alerts') %>
 
         <form action="/admin/config" method="POST">
             <div class="config-grid">

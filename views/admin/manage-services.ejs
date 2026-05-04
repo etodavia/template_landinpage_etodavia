@@ -21,6 +21,8 @@
                 <a href="/admin/servicos/novo" class="btn-premium btn-accent"><i class="ri-add-fill"></i> ADICIONAR SOLUÇÃO</a>
             </header>
 
+            <%- include('../partials/admin-alerts') %>
+
             <div class="table-responsive">
                 <% if (services.length === 0) { %>
                     <div style="text-align: center; color: #aaa; padding: 80px; background: #F8FAFC; border-radius: 20px; border: 2px dashed #E2E8F0;">

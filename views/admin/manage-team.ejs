@@ -21,11 +21,7 @@
                 <a href="/admin/equipe/novo" class="btn-premium btn-accent"><i class="ri-user-add-line"></i> ADICIONAR MEMBRO</a>
             </header>
 
-            <% if (locals.success) { %>
-                <div style="background: #E8F5E9; color: #2E7D32; padding: 20px 30px; border-radius: 18px; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; font-weight: 700; border: 1px solid #C8E6C9;">
-                    <i class="ri-checkbox-circle-fill" style="font-size: 1.4rem;"></i> Alteração realizada com sucesso!
-                </div>
-            <% } %>
+            <%- include('../partials/admin-alerts') %>
 
             <div class="table-responsive">
                 <table>

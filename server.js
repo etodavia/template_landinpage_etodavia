@@ -265,32 +265,52 @@ app.use(async (req, res, next) => {
 
 // FRONT-END ROUTES (DATABASE DRIVEN)
 app.get('/', async (req, res) => {
+    let posts = [];
+    let services = [];
+    let team = [];
+    let testimonials = [];
+
     try {
-        // Lógica de Destaque para Posts: Prioriza marcados, fallback para últimos 3 ativos
-        let [posts] = await pool.execute('SELECT * FROM posts WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 3');
-        if (posts.length === 0) {
-            [posts] = await pool.execute('SELECT * FROM posts WHERE ativo = 1 ORDER BY created_at DESC LIMIT 3');
+        // Consultar Posts (com fallback)
+        try {
+            [posts] = await pool.execute('SELECT * FROM posts WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 3');
+            if (posts.length === 0) [posts] = await pool.execute('SELECT * FROM posts WHERE ativo = 1 ORDER BY created_at DESC LIMIT 3');
+        } catch (err) {
+            console.warn('⚠️ Fallback Post Query (Missing Columns?):', err.message);
+            [posts] = await pool.execute('SELECT * FROM posts ORDER BY created_at DESC LIMIT 3');
         }
 
-        // Lógica de Destaque para Serviços: Prioriza marcados, fallback para últimos 3 ativos
-        let [services] = await pool.execute('SELECT * FROM servicos WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 3');
-        if (services.length === 0) {
-            [services] = await pool.execute('SELECT * FROM servicos WHERE ativo = 1 ORDER BY created_at ASC LIMIT 3');
+        // Consultar Serviços (com fallback)
+        try {
+            [services] = await pool.execute('SELECT * FROM servicos WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 3');
+            if (services.length === 0) [services] = await pool.execute('SELECT * FROM servicos WHERE ativo = 1 ORDER BY created_at ASC LIMIT 3');
+        } catch (err) {
+            console.warn('⚠️ Fallback Service Query (Missing Columns?):', err.message);
+            [services] = await pool.execute('SELECT * FROM servicos ORDER BY created_at ASC LIMIT 3');
         }
 
-        const [team] = await pool.execute('SELECT * FROM equipe ORDER BY ordem ASC, created_at DESC');
-        const [testimonials] = await pool.execute('SELECT * FROM depoimentos WHERE aprovado = TRUE ORDER BY created_at DESC');
+        // Consultar Equipe e Depoimentos
+        [team] = await pool.execute('SELECT * FROM equipe ORDER BY ordem ASC, created_at DESC');
+        
+        try {
+            [testimonials] = await pool.execute('SELECT * FROM depoimentos WHERE aprovado = TRUE ORDER BY created_at DESC');
+        } catch (err) {
+            [testimonials] = await pool.execute('SELECT * FROM depoimentos ORDER BY created_at DESC');
+        }
         
         res.render('index', { 
-            title: res.locals.settings.meta_title_home || 'ARQUÊ GESTÃO | Consultoria Estratégica e Capital Humano', 
-            description: res.locals.settings.meta_description_home || 'Especialistas em impulsionar o capital humano e elevar a performance operacional com visão sistêmica e resultados exponenciais.',
-            keywords: res.locals.settings.meta_keywords || 'gestão, consultoria, rh, capital humano, performance, arquê gestão',
+            title: res.locals.settings?.meta_title_home || 'ARQUÊ GESTÃO | Consultoria Estratégica e Capital Humano', 
+            description: res.locals.settings?.meta_description_home || 'Especialistas em impulsionar o capital humano e elevar a performance operacional com visão sistêmica e resultados exponenciais.',
+            keywords: res.locals.settings?.meta_keywords || 'gestão, consultoria, rh, capital humano, performance, arquê gestão',
             posts,
             services,
             team,
             testimonials
         });
-    } catch (e) { res.render('index', { title: 'Home | ARQUÊ', posts: [], services: [], team: [], testimonials: [] }); }
+    } catch (e) { 
+        console.error('❌ CRITICAL HOME ROUTE ERROR:', e);
+        res.render('index', { title: 'Home | ARQUÊ', posts: [], services: [], team: [], testimonials: [] }); 
+    }
 });
 
 app.get('/sobre', async (req, res) => {

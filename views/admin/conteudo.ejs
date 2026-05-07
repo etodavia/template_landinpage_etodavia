@@ -517,7 +517,10 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                                 <div class="icon-preview-box" style="width: 45px; height: 45px; background: white; border: 1px solid #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent);">
                                                     <i class="<%= item.icon || 'ri-star-line' %>"></i>
                                                 </div>
-                                                <input type="text" class="b-item-icon" list="iconSuggestions" placeholder="Ex: ri-shield-line" value="<%= item.icon %>" style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;" oninput="updateIconPreview(this)">
+                                                <div style="flex: 1; position: relative;">
+                                                    <input type="text" class="b-item-icon" list="iconSuggestions" placeholder="Digite a classe (ex: ri-rocket-line)" value="<%= item.icon %>" style="width: 100%; padding: 12px; padding-right: 35px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;" oninput="updateIconPreview(this)">
+                                                    <button type="button" onclick="this.previousElementSibling.value=''; updateIconPreview(this.previousElementSibling)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #f1f5f9; border: none; color: #94a3b8; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;"><i class="ri-close-line"></i></button>
+                                                </div>
                                             </div>
                                         </div>
 

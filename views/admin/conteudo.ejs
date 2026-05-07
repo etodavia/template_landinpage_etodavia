@@ -506,14 +506,25 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                             <label style="font-size: 0.65rem; font-weight: 900; color: #94A3B8; text-transform: uppercase;">Diferencial <%= idx + 1 %></label>
                                             <i class="ri-medal-line" style="color: #E2E8F0; font-size: 1.2rem;"></i>
                                         </div>
-                                        <div style="display: flex; gap: 10px; align-items: center;">
-                                            <div class="icon-preview-box" style="width: 45px; height: 45px; background: white; border: 1px solid #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent);">
-                                                <i class="<%= item.icon || 'ri-star-line' %>"></i>
+                                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                                            <label style="font-size: 0.7rem; font-weight: 800; color: #475569;">CÓDIGO DO ÍCONE (Remix Icon)</label>
+                                            <div style="display: flex; gap: 10px; align-items: center;">
+                                                <div class="icon-preview-box" style="width: 45px; height: 45px; background: white; border: 1px solid #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent);">
+                                                    <i class="<%= item.icon || 'ri-star-line' %>"></i>
+                                                </div>
+                                                <input type="text" class="b-item-icon" list="iconSuggestions" placeholder="Ex: ri-shield-line" value="<%= item.icon %>" style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;" oninput="updateIconPreview(this)">
                                             </div>
-                                            <input type="text" class="b-item-icon" list="iconSuggestions" placeholder="Ícone (ex: ri-focus-2-line)" value="<%= item.icon %>" style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;" oninput="updateIconPreview(this)">
                                         </div>
-                                        <input type="text" class="b-item-title" placeholder="Título Estratégico" value="<%= item.title %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; font-size: 0.9rem;">
-                                        <textarea class="b-item-text" placeholder="Breve descritivo do valor agregado..." style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; height: 90px; font-size: 0.85rem;"><%= item.text %></textarea>
+
+                                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                                            <label style="font-size: 0.7rem; font-weight: 800; color: #475569;">TÍTULO DO CARD</label>
+                                            <input type="text" class="b-item-title" placeholder="Ex: Qualidade Superior" value="<%= item.title %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; font-size: 0.9rem;">
+                                        </div>
+
+                                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                                            <label style="font-size: 0.7rem; font-weight: 800; color: #475569;">TEXTO DESCRITIVO</label>
+                                            <textarea class="b-item-text" placeholder="Descreva o benefício aqui..." style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; height: 90px; font-size: 0.85rem;"><%= item.text %></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             <% }) %>

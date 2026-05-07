@@ -15,7 +15,6 @@
         * { margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', sans-serif; }
         body { background: var(--navy); display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
-        /* Subtle background animation or element */
         body::before {
             content: '';
             position: absolute;
@@ -85,10 +84,43 @@
         }
         button:hover { background: #000; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
         
-        .footer-login { margin-top: 50px; border-top: 1px solid #F1F5F9; padding-top: 30px; display: flex; flex-direction: column; gap: 15px; }
-        .footer-login p { font-size: 0.7rem; font-weight: 800; color: #CBD5E1; text-transform: uppercase; letter-spacing: 1px; }
-        .footer-login img { height: 24px; opacity: 0.2; transition: 0.3s; }
-        .footer-login img:hover { opacity: 0.6; }
+        .back-home {
+            margin-top: 25px;
+            display: block;
+            text-decoration: none;
+            color: var(--accent);
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .back-home:hover { opacity: 0.7; transform: translateX(-5px); }
+
+        .footer-login { 
+            margin-top: 50px; 
+            border-top: 1px solid #F1F5F9; 
+            padding-top: 30px; 
+            text-align: center;
+        }
+        .footer-login p { 
+            font-size: 0.6rem; 
+            font-weight: 800; 
+            color: #CBD5E1; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-bottom: 15px;
+        }
+        
+        .et-credit {
+            text-decoration: none;
+            color: #94A3B8;
+            font-size: 0.65rem;
+            line-height: 1.5;
+            display: block;
+            transition: 0.3s;
+        }
+        .et-credit:hover { color: var(--navy); }
+        .et-credit i { color: var(--accent); margin-right: 4px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -105,10 +137,17 @@
             </div>
             <button type="submit">ACESSAR GOVERNANÇA</button>
         </form>
+
+        <a href="/" class="back-home">
+            <i class="ri-arrow-left-line"></i> VOLTAR PARA HOME
+        </a>
+
         <div class="footer-login">
             <p>Digital Governance Platform</p>
-            <a href="https://agenciaetodavia.com.br" target="_blank">
-                <img src="/img/logo-agencia.png" alt="E-TODAVIA">
+            <a href="https://agenciaetodavia.com.br" target="_blank" class="et-credit">
+                <i class="ri-shield-check-line"></i> Website produzido exclusivamente pela<br>
+                <strong>E-TODAVIA Agência Criativa Ltda</strong><br>
+                CNPJ 52.594.366/0001-30
             </a>
         </div>
     </div>
@@ -131,7 +170,6 @@
                     localStorage.setItem('token', result.token);
                     localStorage.setItem('userRole', result.role);
                     
-                    // Definir Cookie para o Servidor ler (res.render)
                     document.cookie = `token=${result.token}; path=/; max-age=43200; SameSite=Lax`;
                     document.cookie = `userRole=${result.role}; path=/; max-age=43200; SameSite=Lax`;
 

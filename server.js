@@ -55,13 +55,16 @@ async function setupDB() {
             'services_page_description TEXT', 'blog_page_newsletter_title VARCHAR(255)', 'blog_page_newsletter_text TEXT', 'contact_page_description TEXT',
             'site_menu TEXT',
             'home_hero_card_title VARCHAR(255)', 'home_hero_card_subtitle VARCHAR(255)', 'home_about_button_text VARCHAR(100)', 'home_services_button_text VARCHAR(100)',
-            'about_story_image VARCHAR(255)', 'social_links TEXT',
+            'about_story_image VARCHAR(255)', 'social_links TEXT', 'about_story_lead TEXT', 'about_guidelines_title VARCHAR(255)', 'about_guidelines_text TEXT',
             'benefits_items TEXT', 'benefits_template VARCHAR(50)', 'benefits_color VARCHAR(50)',
             'hero_overlay_color VARCHAR(50) DEFAULT "#0A1128"', 'hero_overlay_opacity DECIMAL(3,2) DEFAULT 0.40',
             'contact_phone VARCHAR(50)', 'contact_email VARCHAR(255)', 'address_full TEXT', 'contact_map_url TEXT',
             'contact_form_title VARCHAR(255)', 'contact_form_recipient VARCHAR(255)',
             'license_qr_code VARCHAR(255)', 'license_nf_data TEXT',
-            'license_pdf VARCHAR(255)', 'license_auth_code VARCHAR(255)'
+            'license_pdf VARCHAR(255)', 'license_auth_code VARCHAR(255)',
+            'admin_primary_color VARCHAR(20) DEFAULT "#0A1128"', 'admin_accent_color VARCHAR(20) DEFAULT "#D62828"', 
+            'admin_logo VARCHAR(255)', 'admin_header_logo VARCHAR(255)',
+            'contact_form_fields TEXT', 'header_strip_text TEXT'
         ];
         for (const col of columns) {
             try {
@@ -140,7 +143,20 @@ async function setupDB() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log('✅ DATABASE: Postagens e Serviços (CMS) Prontos.');
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS newsletter (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                status ENUM('ativo', 'cancelado') DEFAULT 'ativo',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        try {
+            await pool.execute('ALTER TABLE newsletter ADD COLUMN nome VARCHAR(100) AFTER id');
+            console.log('✅ DATABASE: Coluna [nome] adicionada à Newsletter.');
+        } catch (e) { /* Coluna já existe */ }
+
+        console.log('✅ DATABASE: Postagens, Serviços e Newsletter (CMS) Prontos.');
 
         // Inserir Dados Iniciais se estiver vazio
         const [postsExist] = await pool.execute('SELECT id FROM posts LIMIT 1');
@@ -231,7 +247,12 @@ app.get('/img/hero_optimo.png', (req, res) => {
     res.sendFile(path.join(__dirname, '519481.jpg'));
 });
 app.get('/img/logo-agencia.png', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'img', 'logo-agencia.png'));
+    const logoPath = path.join(__dirname, 'public', 'img', 'logo-agencia.png');
+    if (fs.existsSync(logoPath)) {
+        res.sendFile(logoPath);
+    } else {
+        res.status(404).send('Logo not found');
+    }
 });
 
 // Middleware de Governança de Acesso (RBAC Industrial via JWT Cookie)
@@ -273,11 +294,11 @@ app.get('/', async (req, res) => {
     try {
         // Consultar Posts (com fallback)
         try {
-            [posts] = await pool.execute('SELECT * FROM posts WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 3');
-            if (posts.length === 0) [posts] = await pool.execute('SELECT * FROM posts WHERE ativo = 1 ORDER BY created_at DESC LIMIT 3');
+            [posts] = await pool.execute('SELECT * FROM posts WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 4');
+            if (posts.length === 0) [posts] = await pool.execute('SELECT * FROM posts WHERE ativo = 1 ORDER BY created_at DESC LIMIT 4');
         } catch (err) {
             console.warn('⚠️ Fallback Post Query (Missing Columns?):', err.message);
-            [posts] = await pool.execute('SELECT * FROM posts ORDER BY created_at DESC LIMIT 3');
+            [posts] = await pool.execute('SELECT * FROM posts ORDER BY created_at DESC LIMIT 4');
         }
 
         // Consultar Serviços (com fallback)
@@ -367,7 +388,11 @@ app.get('/blog/:slug', async (req, res) => {
 });
 
 // CMS ADMIN ROUTES
-app.get('/admin/conteudo', (req, res) => res.render('admin/conteudo', { title: 'Editor Global (CMS)', success: req.query.success }));
+app.get('/admin/conteudo', (req, res) => res.render('admin/conteudo', { 
+    title: 'Editor Global (CMS)', 
+    success: req.query.success,
+    activeTab: req.query.tab || ''
+}));
 app.post('/admin/conteudo', upload.fields([
     { name: 'hero_image_file', maxCount: 1 }, 
     { name: 'about_image_file', maxCount: 1 },
@@ -380,7 +405,9 @@ app.post('/admin/conteudo', upload.fields([
     { name: 'logo_white_file', maxCount: 1 },
     { name: 'favicon_file', maxCount: 1 },
     { name: 'license_qr_code_file', maxCount: 1 },
-    { name: 'license_pdf_file', maxCount: 1 }
+    { name: 'license_pdf_file', maxCount: 1 },
+    { name: 'admin_logo_file', maxCount: 1 },
+    { name: 'admin_header_logo_file', maxCount: 1 }
 ]), async (req, res) => {
     let updateData = { ...req.body };
     
@@ -399,10 +426,11 @@ app.post('/admin/conteudo', upload.fields([
         'newsletter_section_text', 'services_page_description', 'blog_page_newsletter_title',
         'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'home_hero_card_title',
         'home_hero_card_subtitle', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
+        'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
         'social_links', 'benefits_items', 'benefits_template', 'benefits_color', 'hero_overlay_color',
         'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
-        'license_pdf', 'license_auth_code'
+        'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields'
     ];
 
     // Processar Uploads
@@ -410,7 +438,7 @@ app.post('/admin/conteudo', upload.fields([
         'hero_image', 'about_image', 'about_hero_image', 
         'services_hero_image', 'blog_hero_image', 'contact_hero_image',
         'about_story_image', 'logo', 'logo_white', 'favicon', 
-        'license_qr_code', 'license_pdf'
+        'license_qr_code', 'license_pdf', 'admin_logo', 'admin_header_logo'
     ];
 
     fileFields.forEach(field => {
@@ -500,8 +528,8 @@ app.post('/admin/posts/delete/:id', async (req, res) => {
 // CRUD EQUIPE (CAPITAL HUMANO)
 app.get('/admin/equipe', async (req, res) => {
     try {
-        const [members] = await pool.execute('SELECT * FROM equipe ORDER BY ordem ASC, created_at DESC');
-        res.render('admin/manage-team', { title: 'Gestão de Equipe', members, success: req.query.success });
+        const [equipe] = await pool.execute('SELECT * FROM equipe ORDER BY ordem ASC, created_at DESC');
+        res.render('admin/manage-team', { title: 'Gestão de Equipe', equipe, success: req.query.success });
     } catch (e) { res.send('Erro ao carregar equipe'); }
 });
 app.get('/admin/equipe/novo', (req, res) => res.render('admin/form-team', { title: 'Novo Membro', member: null }));
@@ -610,15 +638,34 @@ app.get('/admin/dashboard', async (req, res) => {
     try {
         const [l] = await pool.execute('SELECT COUNT(*) as n FROM contatos');
         const [n] = await pool.execute('SELECT COUNT(*) as n FROM newsletter');
+        
+        // Busca conversões dos últimos 6 meses (Leads + Newsletter)
         const [monthlyData] = await pool.execute(`
-            SELECT DATE_FORMAT(created_at, '%b') as mes, COUNT(*) as qtd 
-            FROM contatos 
-            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-            GROUP BY DATE_FORMAT(created_at, '%m')
-            ORDER BY created_at ASC
+            SELECT mes, SUM(qtd) as qtd FROM (
+                SELECT DATE_FORMAT(created_at, '%b') as mes, DATE_FORMAT(created_at, '%m') as mes_num, COUNT(*) as qtd 
+                FROM contatos 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+                GROUP BY mes, mes_num
+                UNION ALL
+                SELECT DATE_FORMAT(created_at, '%b') as mes, DATE_FORMAT(created_at, '%m') as mes_num, COUNT(*) as qtd 
+                FROM newsletter 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+                GROUP BY mes, mes_num
+            ) as combined
+            GROUP BY mes, mes_num
+            ORDER BY mes_num ASC
         `);
-        res.render('admin/dashboard', { title: 'Dashboard', leads: l[0].n, news: n[0].n, chartData: monthlyData });
-    } catch (e) { res.render('admin/dashboard', { title: 'Dashboard', leads: 0, news: 0, chartData: [] }); }
+
+        res.render('admin/dashboard', { 
+            title: 'Dashboard', 
+            leads: l[0].n, 
+            news: n[0].n, 
+            chartData: monthlyData 
+        });
+    } catch (e) { 
+        console.error('❌ DASHBOARD ERROR:', e);
+        res.render('admin/dashboard', { title: 'Dashboard', leads: 0, news: 0, chartData: [] }); 
+    }
 });
 
 app.get('/admin/leads', async (req, res) => {

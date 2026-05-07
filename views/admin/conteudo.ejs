@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %> | ARQUÊΔ</title>
     <link rel="stylesheet" href="/css/admin.css">
-    <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         .cms-layout { display: flex; overflow: hidden; background: #F8FAFC; transition: 0.4s; }
@@ -65,13 +64,14 @@
         }
     </style>
 </head>
-<body style="display: flex;">
-    <%- include('../partials/admin-sidebar') %>
-
-    <div class="cms-wrapper" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-        <%- include('../partials/admin-header') %>
-
-        <div class="cms-layout" style="height: calc(100vh - 64px);">
+<body>
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            
+            <div class="cms-layout">
             <nav class="cms-tabs-nav" id="cmsSubNav">
                 <button type="button" class="btn-collapse-sub" onclick="toggleSubNav()"><i class="ri-arrow-left-right-line"></i></button>
 
@@ -83,6 +83,10 @@
                 <div class="tab-link <%= (locals.userRole !== 'superadmin') ? 'active' : '' %>" onclick="switchTab('tab-identidade')"><i class="ri-fingerprint-line"></i> <span>Identidade & Cores</span></div>
                 <div class="tab-link" onclick="switchTab('tab-header')"><i class="ri-layout-top-line"></i> <span>Cabeçalho</span></div>
                 <div class="tab-link" onclick="switchTab('tab-redes')"><i class="ri-share-line"></i> <span>Redes Sociais</span></div>
+                <div class="tab-link" onclick="switchTab('tab-seo')"><i class="ri-search-line"></i> <span>SEO & Marketing</span></div>
+                <% if (locals.userRole === 'superadmin') { %>
+                <div class="tab-link" onclick="switchTab('tab-admin-branding')" style="color: #4338ca;"><i class="ri-palette-line"></i> <span>Branding do Painel</span></div>
+                <% } %>
 
                 <div class="tab-category-header">Home Page</div>
                 <div class="tab-link" onclick="switchTab('tab-home-hero')"><i class="ri-flashlight-line"></i> <span>Hero</span></div>
@@ -141,7 +145,9 @@
                                 { label: 'Vermelho de Destaque', name: 'color_vermelho', value: settings.color_vermelho || '#D62828' },
                                 { label: 'Cor do Texto', name: 'color_texto', value: settings.color_texto || '#333333' },
                                 { label: 'Fundo do Cabeçalho', name: 'color_header', value: settings.color_header || '#FFFFFF' },
-                                { label: 'Fundo do Rodapé', name: 'color_footer', value: settings.color_footer || '#0A1128' }
+                                { label: 'Texto do Cabeçalho', name: 'color_header_text', value: settings.color_header_text || '#333333' },
+                                { label: 'Fundo do Rodapé', name: 'color_footer', value: settings.color_footer || '#0A1128' },
+                                { label: 'Texto do Rodapé', name: 'color_footer_text', value: settings.color_footer_text || '#FFFFFF' }
                             ]
                         %>
 
@@ -164,13 +170,25 @@
 
                 <!-- CABEÇALHO -->
                 <div id="tab-header" class="tab-panel">
-                    <div class="section-header"><h3>Configurações do Topo</h3></div>
+                    <div class="section-header"><h3>Configurações do Topo & Marca</h3></div>
+                    <div class="form-group full">
+                        <label>Favicon (Ícone do Navegador)</label>
+                        <input type="file" name="favicon_file" accept="image/*">
+                        <input type="hidden" name="favicon" value="<%= settings.favicon %>">
+                        <% if (settings.favicon) { %> <img src="<%= settings.favicon %>" class="img-preview"> <% } %>
+                        <p class="field-note"><i class="ri-information-line"></i> Este é o ícone que aparece na aba do navegador.</p>
+                    </div>
                     <div class="form-group full">
                         <label>Exibir Topbar (Endereço e Redes no topo)?</label>
                         <select name="show_topbar" style="width: 100%; padding: 12px; border-radius: 50px; border: 1px solid #e0e0e0;">
                             <option value="1" <%= settings.show_topbar == 1 ? 'selected' : '' %>>Sim, exibir topo extra</option>
                             <option value="0" <%= settings.show_topbar == 0 ? 'selected' : '' %>>Não, ocultar topo extra</option>
                         </select>
+                    </div>
+                    <div class="form-group full">
+                        <label>Mensagem da Faixa Superior (Topbar Alert)</label>
+                        <input type="text" name="header_strip_text" value="<%= settings.header_strip_text || '' %>" placeholder="Ex: Participe da nossa próxima Mentoria de Liderança!">
+                        <p class="field-note"><i class="ri-information-line"></i> Esta mensagem aparecerá na barra preta no topo do site.</p>
                     </div>
                     <div class="form-group full">
                         <label>Endereço à Esquerda</label>
@@ -238,6 +256,120 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                         <% }) %>
                     </div>
                 </div>
+                
+                <!-- SEO & MARKETING -->
+                <div id="tab-seo" class="tab-panel">
+                    <div class="section-header"><h3>SEO & Estratégia de Marketing</h3></div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Meta Title (Página Inicial)</label>
+                            <input type="text" name="meta_title_home" value="<%= settings.meta_title_home %>" placeholder="Título que aparece no Google">
+                        </div>
+                        <div class="form-group full">
+                            <label>Meta Description (Página Inicial)</label>
+                            <textarea name="meta_description_home" rows="3" placeholder="Resumo do site para os buscadores"><%= settings.meta_description_home %></textarea>
+                        </div>
+                        <div class="form-group full">
+                            <label>Keywords (Palavras-chave separadas por vírgula)</label>
+                            <input type="text" name="meta_keywords" value="<%= settings.meta_keywords %>" placeholder="consultoria, rh, gestão, etc">
+                        </div>
+
+                        <div class="section-header" style="margin-top: 40px;"><h4>Rastreamento e Pixels</h4></div>
+                        
+                        <div class="form-group">
+                            <label>Google Analytics ID</label>
+                            <input type="text" name="google_analytics" value="<%= settings.google_analytics %>" placeholder="UA-XXXXX-Y ou G-XXXXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label>Facebook Pixel ID</label>
+                            <input type="text" name="facebook_pixel" value="<%= settings.facebook_pixel %>" placeholder="Ex: 123456789012345">
+                        </div>
+                        <div class="form-group">
+                            <label>Pinterest Tag ID</label>
+                            <input type="text" name="pinterest_pixel" value="<%= settings.pinterest_pixel %>" placeholder="Ex: 261XXXXXXXXXX">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn Insight ID</label>
+                            <input type="text" name="linkedin_pixel" value="<%= settings.linkedin_pixel %>" placeholder="Ex: 1234567">
+                        </div>
+
+                        <div class="section-header" style="margin-top: 40px;"><h4>Scripts Customizados (Tag Manager / APIs)</h4></div>
+                        
+                        <div class="form-group full">
+                            <label>Scripts no Cabeçalho (Dentro do &lt;head&gt;)</label>
+                            <textarea name="custom_head_code" rows="5" placeholder="Cole aqui scripts do Google Tag Manager, Verificação de Domínio, etc"><%= settings.custom_head_code %></textarea>
+                            <p class="field-note"><i class="ri-warning-line"></i> Use com cuidado. Códigos mal formatados podem quebrar o site.</p>
+                        </div>
+                        <div class="form-group full">
+                            <label>Scripts no Início do Corpo (Logo após &lt;body&gt;)</label>
+                            <textarea name="custom_body_code" rows="5" placeholder="Cole aqui scripts de NoScript, Chatbots, etc"><%= settings.custom_body_code %></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <% if (locals.userRole === 'superadmin') { %>
+                <!-- BRANDING DO PAINEL (WHITE LABEL) -->
+                <div id="tab-admin-branding" class="tab-panel">
+                    <div class="section-header"><h3>Branding do Painel de Controle <span style="background: #4338ca; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem;">WHITE LABEL</span></h3></div>
+                    <p style="font-size: 0.8rem; color: #64748B; margin-bottom: 30px;">Personalize a interface administrativa para cada cliente. Estas cores e logos afetam apenas o ambiente de gestão.</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Logo do Dashboard (Exibida na Sidebar - Fundo Escuro)</label>
+                            <input type="file" name="admin_logo_file" accept="image/*">
+                            <input type="hidden" name="admin_logo" value="<%= settings.admin_logo %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Recomendado: Logo Branca/Vazada.</p>
+                            <% if (settings.admin_logo) { %> <img src="<%= settings.admin_logo %>" class="img-preview" style="background: #0A1128; padding: 10px;"> <% } %>
+                        </div>
+
+                        <div class="form-group full">
+                            <label>Logo do Topo (Exibida no Cabeçalho - Fundo Claro)</label>
+                            <input type="file" name="admin_header_logo_file" accept="image/*">
+                            <input type="hidden" name="admin_header_logo" value="<%= settings.admin_header_logo %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Recomendado: Logo Colorida/Dark.</p>
+                            <% if (settings.admin_header_logo) { %> <img src="<%= settings.admin_header_logo %>" class="img-preview" style="background: #FFFFFF; padding: 10px; border: 1px solid #eee;"> <% } %>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cor Primária do Painel (Sidebar/Botões)</label>
+                            <div class="color-field-container">
+                                <div class="color-swatch-wrapper">
+                                    <div class="color-swatch-preview" style="background-color: <%= settings.admin_primary_color || '#0A1128' %>"></div>
+                                    <input type="color" class="color-input-hidden" name="admin_primary_color" value="<%= settings.admin_primary_color || '#0A1128' %>">
+                                </div>
+                                <div class="color-info-wrapper">
+                                    <span class="color-name-label">Primary Admin</span>
+                                    <input type="text" class="color-hex-input" value="<%= settings.admin_primary_color || '#0A1128' %>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cor de Destaque (Accent)</label>
+                            <div class="color-field-container">
+                                <div class="color-swatch-wrapper">
+                                    <div class="color-swatch-preview" style="background-color: <%= settings.admin_accent_color || '#D62828' %>"></div>
+                                    <input type="color" class="color-input-hidden" name="admin_accent_color" value="<%= settings.admin_accent_color || '#D62828' %>">
+                                </div>
+                                <div class="color-info-wrapper">
+                                    <span class="color-name-label">Accent Admin</span>
+                                    <input type="text" class="color-hex-input" value="<%= settings.admin_accent_color || '#D62828' %>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; padding: 25px; background: #EEF2FF; border-radius: 20px; border: 1px solid #C7D2FE; color: #4338ca;">
+                        <h4 style="font-size: 0.85rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <i class="ri-lightbulb-line"></i> DICA DE REUSO
+                        </h4>
+                        <p style="font-size: 0.75rem; line-height: 1.6; font-weight: 500;">
+                            Ao configurar um novo cliente, você pode alterar essas cores para combinar com a marca dele, dando uma sensação de plataforma exclusiva. Isso valoriza a sua entrega como agência.
+                        </p>
+                    </div>
+                </div>
+                <% } %>
 
                 <div id="tab-home-hero" class="tab-panel">
                     <div class="section-header"><h3>Home Page » Seção Hero</h3></div>
@@ -370,7 +502,12 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                             <label style="font-size: 0.65rem; font-weight: 900; color: #94A3B8; text-transform: uppercase;">Diferencial <%= idx + 1 %></label>
                                             <i class="ri-medal-line" style="color: #E2E8F0; font-size: 1.2rem;"></i>
                                         </div>
-                                        <input type="text" class="b-item-icon" placeholder="Ícone (ex: ri-focus-2-line)" value="<%= item.icon %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;">
+                                        <div style="display: flex; gap: 10px; align-items: center;">
+                                            <div class="icon-preview-box" style="width: 45px; height: 45px; background: white; border: 1px solid #E2E8F0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--accent);">
+                                                <i class="<%= item.icon || 'ri-star-line' %>"></i>
+                                            </div>
+                                            <input type="text" class="b-item-icon" list="iconSuggestions" placeholder="Ícone (ex: ri-focus-2-line)" value="<%= item.icon %>" style="flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;" oninput="updateIconPreview(this)">
+                                        </div>
                                         <input type="text" class="b-item-title" placeholder="Título Estratégico" value="<%= item.title %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; font-size: 0.9rem;">
                                         <textarea class="b-item-text" placeholder="Breve descritivo do valor agregado..." style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; height: 90px; font-size: 0.85rem;"><%= item.text %></textarea>
                                     </div>
@@ -421,31 +558,40 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                 <div id="tab-page-sobre" class="tab-panel">
                     <div class="section-header"><h3>Página: Sobre a ARQUÊΔ</h3></div>
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>Hero: Título</label>
+                        <div class="form-group full">
+                            <label>Hero: Título Principal</label>
                             <input type="text" name="about_hero_title" value="<%= settings.about_hero_title %>">
-                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para o estilo itálico serifado.</p>
                         </div>
-                        <div class="form-group">
-                            <label>Hero: Imagem</label>
+                        <div class="form-group full">
+                            <label>Hero: Imagem de Fundo</label>
                             <input type="file" name="about_hero_image_file" accept="image/*">
                             <input type="hidden" name="about_hero_image" value="<%= settings.about_hero_image %>">
                             <% if (settings.about_hero_image) { %> <img src="<%= settings.about_hero_image %>" class="img-preview"> <% } %>
                         </div>
-                        <div class="form-group">
-                            <label>Nossa História (Esquerda)</label>
-                            <textarea name="about_story_text_left"><%= settings.about_story_text_left %></textarea>
-                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
-                        </div>
-                        <div class="form-group">
-                            <label>Nossa História (Direita)</label>
-                            <textarea name="about_story_text_right"><%= settings.about_story_text_right %></textarea>
+
+                        <div class="section-header" style="margin-top: 30px;"><h4>A Nossa História (Grid Assimétrico)</h4></div>
+                        <div class="form-group full">
+                            <label>Título de Impacto (Esquerda)</label>
+                            <input type="text" name="about_story_text_left" value="<%= settings.about_story_text_left %>">
                         </div>
                         <div class="form-group full">
-                            <label>Imagem da História (Principal)</label>
-                            <input type="file" name="about_story_image_file" accept="image/*">
-                            <input type="hidden" name="about_story_image" value="<%= settings.about_story_image %>">
-                            <% if (settings.about_story_image) { %> <img src="<%= settings.about_story_image %>" class="img-preview"> <% } %>
+                            <label>Texto de Apoio (Lead)</label>
+                            <input type="text" name="about_story_lead" value="<%= settings.about_story_lead %>">
+                        </div>
+                        <div class="form-group full">
+                            <label>Narrativa Completa (Direita)</label>
+                            <textarea name="about_story_text_right" style="height: 150px;"><%= settings.about_story_text_right %></textarea>
+                        </div>
+
+                        <div class="section-header" style="margin-top: 30px;"><h4>Diretrizes (DNA Estratégico)</h4></div>
+                        <div class="form-group">
+                            <label>Título da Seção Diretrizes</label>
+                            <input type="text" name="about_guidelines_title" value="<%= settings.about_guidelines_title %>">
+                        </div>
+                        <div class="form-group">
+                            <label>Subtítulo / Descrição</label>
+                            <input type="text" name="about_guidelines_text" value="<%= settings.about_guidelines_text %>">
                         </div>
                         <div class="form-group">
                             <label>Nossa Missão</label>
@@ -459,14 +605,11 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                             <label>Nossos Valores</label>
                             <textarea name="about_values"><%= settings.about_values %></textarea>
                         </div>
-                    </div>
 
-                    <div class="section-header" style="margin-top: 40px;"><h4>02b. Chamada da Equipe (O Capital Humano)</h4></div>
-                    <div class="form-grid">
+                        <div class="section-header" style="margin-top: 30px;"><h4>Chamada da Equipe</h4></div>
                         <div class="form-group">
                             <label>Título da Seção Equipe</label>
                             <input type="text" name="about_team_title" value="<%= settings.about_team_title %>">
-                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
                         </div>
                         <div class="form-group full">
                             <label>Texto Narrativo da Equipe</label>
@@ -562,6 +705,22 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                             <label>E-mail que receberá os Leads</label>
                             <input type="email" name="contact_form_recipient" value="<%= settings.contact_form_recipient %>" placeholder="leads@arque.com.br">
                         </div>
+
+                        <!-- EDITOR DE FORMULÁRIO -->
+                        <div class="form-group full" style="margin-top: 20px;">
+                            <label style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>Campos do Formulário (Editor Dinâmico)</span>
+                                <button type="button" onclick="addFormField()" style="background: var(--admin-accent); color: white; border: none; padding: 5px 15px; border-radius: 6px; font-size: 0.7rem; cursor: pointer; font-weight: 800;">+ ADICIONAR CAMPO</button>
+                            </label>
+                            <div id="form-builder-container" style="background: #f8f9fa; padding: 20px; border-radius: 15px; border: 1px solid #eee; margin-top: 10px;">
+                                <div id="form-fields-list" style="display: flex; flex-direction: column; gap: 10px;">
+                                    <!-- Campos serão inseridos aqui pelo JS -->
+                                </div>
+                            </div>
+                            <input type="hidden" name="contact_form_fields" id="contact_form_fields_json" value='<%= settings.contact_form_fields || "[]" %>'>
+                            <p class="field-note"><i class="ri-information-line"></i> Defina quais perguntas o seu cliente quer fazer para os leads.</p>
+                            <p class="field-note" style="color: var(--admin-accent); font-weight: 800;"><i class="ri-whatsapp-line"></i> IMPORTANTE: Para que o botão de WhatsApp funcione na aba de Leads, adicione um campo com o nome "WhatsApp" ou "Telefone" e marque como obrigatório.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -644,10 +803,12 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     </div>
                 </div>
                 <% } %>
+                <%- include('../partials/admin-footer') %>
             </form>
-        </div>
-    </div>
-
+            </div> <!-- cms-layout -->
+        </div> <!-- admin-main -->
+    </div> <!-- admin-app -->
+</body>
     <script>
         function toggleSubNav() {
             const nav = document.getElementById('cmsSubNav');
@@ -707,6 +868,13 @@ Contato|/contato"><%= settings.site_menu %></textarea>
             });
         });
 
+        // Atualização de Preview de Ícone em Tempo Real
+        function updateIconPreview(input) {
+            const preview = input.parentElement.querySelector('i');
+            const val = input.value.trim();
+            preview.className = val || 'ri-star-line';
+        }
+
         // Hub de Redes Sociais: Consolidação JSON
         document.getElementById('cmsForm').addEventListener('submit', function(e) {
             const slots = [];
@@ -732,7 +900,87 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                 }
             });
             document.getElementById('benefitsData').value = JSON.stringify(benefits);
+
+            // Consolidação JSON do Editor de Formulário
+            document.getElementById('contact_form_fields_json').value = JSON.stringify(formFields);
         });
+
+        // --- EDITOR DE FORMULÁRIO DINÂMICO ---
+        let formFields = [];
+        try {
+            formFields = JSON.parse(document.getElementById('contact_form_fields_json').value || '[]');
+        } catch(e) { formFields = []; }
+
+        function renderFormFields() {
+            const container = document.getElementById('form-fields-list');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            if (formFields.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #94a3b8; font-size: 0.75rem; padding: 20px;">Nenhum campo personalizado. O formulário usará o padrão (Nome, E-mail, Mensagem).</p>';
+            }
+
+            formFields.forEach((field, index) => {
+                const div = document.createElement('div');
+                div.style = "display: grid; grid-template-columns: 2fr 1fr 1fr 40px; gap: 10px; align-items: center; background: white; padding: 10px; border-radius: 10px; border: 1px solid #eee;";
+                div.innerHTML = `
+                    <input type="text" placeholder="Nome do Campo" value="${field.label}" onchange="updateFormField(${index}, 'label', this.value)" style="padding: 8px; font-size: 0.8rem;">
+                    <select onchange="updateFormField(${index}, 'type', this.value)" style="padding: 8px; font-size: 0.8rem;">
+                        <option value="text" ${field.type === 'text' ? 'selected' : ''}>Texto Curto</option>
+                        <option value="email" ${field.type === 'email' ? 'selected' : ''}>E-mail</option>
+                        <option value="tel" ${field.type === 'tel' ? 'selected' : ''}>Telefone</option>
+                        <option value="textarea" ${field.type === 'textarea' ? 'selected' : ''}>Texto Longo</option>
+                    </select>
+                    <label style="font-size: 0.7rem; display: flex; align-items: center; gap: 5px; cursor: pointer; margin: 0;">
+                        <input type="checkbox" ${field.required ? 'checked' : ''} onchange="updateFormField(${index}, 'required', this.checked)"> Obrigatório
+                    </label>
+                    <button type="button" onclick="removeFormField(${index})" style="background: #fee2e2; color: #ef4444; border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer;"><i class="ri-delete-bin-line"></i></button>
+                `;
+                container.appendChild(div);
+            });
+            
+            document.getElementById('contact_form_fields_json').value = JSON.stringify(formFields);
+        }
+
+        window.addFormField = function() {
+            formFields.push({ label: '', type: 'text', required: true });
+            renderFormFields();
+        };
+
+        window.removeFormField = function(index) {
+            formFields.splice(index, 1);
+            renderFormFields();
+        };
+
+        window.updateFormField = function(index, key, value) {
+            formFields[index][key] = value;
+            document.getElementById('contact_form_fields_json').value = JSON.stringify(formFields);
+        };
+
+        // Iniciar renderização se estivermos na aba de contato
+        renderFormFields();
     </script>
+
+    <!-- LISTA DE SUGESTÕES DE ÍCONES (REMIX ICON) -->
+    <datalist id="iconSuggestions">
+        <option value="ri-rocket-line">Foguete (Agilidade/Lançamento)</option>
+        <option value="ri-medal-line">Medalha (Qualidade/Excelência)</option>
+        <option value="ri-shield-check-line">Escudo (Segurança/Confiança)</option>
+        <option value="ri-team-line">Time (Colaboração/Pessoas)</option>
+        <option value="ri-customer-service-2-line">Atendimento (Suporte/SAC)</option>
+        <option value="ri-global-line">Globo (Internacional/Abrangência)</option>
+        <option value="ri-lightbulb-line">Lâmpada (Inovação/Ideias)</option>
+        <option value="ri-honour-line">Honra (Ética/Valores)</option>
+        <option value="ri-focus-2-line">Foco (Objetividade/Precisão)</option>
+        <option value="ri-briefcase-line">Maleta (Gestão/Corporativo)</option>
+        <option value="ri-line-chart-line">Gráfico (Resultados/Crescimento)</option>
+        <option value="ri-thumb-up-line">Like (Satisfação/Aprovação)</option>
+        <option value="ri-user-star-line">Estrela (Exclusividade/VIP)</option>
+        <option value="ri-service-line">Serviço (Manutenção/Especialidade)</option>
+        <option value="ri-shake-hands-line">Aperto de Mão (Parceria/Acordo)</option>
+        <option value="ri-timer-line">Relógio (Pontualidade/Prazo)</option>
+        <option value="ri-money-dollar-circle-line">Cifrão (Economia/Custo-benefício)</option>
+        <option value="ri-leaf-line">Folha (Sustentabilidade/Ecológico)</option>
+    </datalist>
 </body>
 </html>

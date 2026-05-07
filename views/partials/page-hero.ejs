@@ -2,7 +2,22 @@
     <div class="container">
         <div class="page-hero-content">
             <span class="section-label" data-reveal style="color: white; opacity: 0.6;">Consultoria Boutique ARQUÊΔ</span>
-            <h1 data-reveal style="color: white;"><%- pageTitle %></h1>
+            <h1 data-reveal style="color: white;">
+                <% if (pageTitle.includes('<em>')) { %>
+                    <%- pageTitle %>
+                <% } else { %>
+                    <% 
+                        const words = pageTitle.split(' ');
+                        if (words.length > 1) {
+                            const lastWord = words.pop();
+                            const rest = words.join(' ');
+                    %>
+                        <%= rest %> <em><%= lastWord %></em>
+                    <% } else { %>
+                        <%= pageTitle %>
+                    <% } %>
+                <% } %>
+            </h1>
         </div>
     </div>
 </section>

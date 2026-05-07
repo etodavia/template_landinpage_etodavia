@@ -8,99 +8,110 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
-<body style="display: flex;">
-    <%- include('../partials/admin-sidebar') %>
-    
-    <main>
-        <div class="card-cms" style="max-width: 1000px; margin: 0 auto;">
-            <header style="margin-bottom: 50px; border-bottom: 2px solid #F1F5F9; padding-bottom: 30px;">
-                <h1><%= service ? 'Refinar' : 'Arquitetar' %> Solução <em>Estratégica</em></h1>
-                <p class="subtitle">Expanda o portfólio de autoridade da ARQUÊΔ com precisão tática.</p>
-            </header>
+<body>
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            
+            <div class="admin-content-scroll">
+                <div style="padding: 2.5rem 4rem;">
+                    <div style="max-width: 1000px; margin: 0 auto; background: white; padding: 40px; border-radius: 30px; border: 1px solid #f0f0f0; box-shadow: 0 15px 40px rgba(0,0,0,0.02);">
+                        <header style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h2 style="font-size: 2rem; color: #0A1128; margin: 0;"><%= service ? 'Refinar' : 'Arquitetar' %> Solução <em>Estratégica</em></h2>
+                                <p style="color: #888; font-size: 0.9rem; margin-top: 5px;">Expanda o portfólio de autoridade da ARQUÊΔ com precisão tática.</p>
+                            </div>
+                            <a href="/admin/servicos" style="text-decoration: none; color: #666; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 5px;">
+                                <i class="ri-arrow-left-line"></i> VOLTAR
+                            </a>
+                        </header>
 
-            <form action="<%= service ? '/admin/servicos/editar/' + service.id : '/admin/servicos' %>" method="POST" enctype="multipart/form-data">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Título da Solução</label>
-                        <input type="text" name="titulo" placeholder="Ex: Diagnóstico Cultural 360°" required onkeyup="generateSlug(this.value)" value="<%= service ? service.titulo : '' %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Slug (URL Estratégica)</label>
-                        <input type="text" name="slug" id="slugInput" required value="<%= service ? service.slug : '' %>">
-                    </div>
+                        <form action="<%= service ? '/admin/servicos/editar/' + service.id : '/admin/servicos' %>" method="POST" enctype="multipart/form-data">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Título da Solução</label>
+                                    <input type="text" name="titulo" placeholder="Ex: Diagnóstico Cultural 360°" required onkeyup="generateSlug(this.value)" value="<%= service ? service.titulo : '' %>" style="width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Slug (URL Estratégica)</label>
+                                    <input type="text" name="slug" id="slugInput" required value="<%= service ? service.slug : '' %>" style="width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem;">
+                                </div>
+                            </div>
 
-                    <div class="form-group">
-                        <label>Ícone Representativo (RemixIcon)</label>
-                        <input type="text" name="icone" placeholder="ri-team-line" required value="<%= service ? service.icone : '' %>">
-                    </div>
-                    <div class="form-group">
-                        <label>Mídia de Capa (Upload)</label>
-                        <input type="file" name="imagem_file" accept="image/*">
-                        <input type="hidden" name="imagem" value="<%= service ? service.imagem : '' %>">
-                        <% if (service && service.imagem) { %>
-                            <img src="<%= service.imagem %>" class="img-preview">
-                        <% } %>
-                    </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Ícone Representativo (RemixIcon)</label>
+                                    <input type="text" name="icone" placeholder="ri-team-line" required value="<%= service ? service.icone : '' %>" style="width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem;">
+                                </div>
+                                <div class="form-group">
+                                    <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Mídia de Capa</label>
+                                    <input type="file" name="imagem_file" accept="image/*" style="width: 100%; padding: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 0.9rem;">
+                                    <input type="hidden" name="imagem" value="<%= service ? service.imagem : '' %>">
+                                    <% if (service && service.imagem) { %>
+                                        <p style="font-size: 0.7rem; color: #aaa; margin-top: 5px;">Mídia Atual: <%= service.imagem %></p>
+                                    <% } %>
+                                </div>
+                            </div>
 
-                    <div class="form-group full">
-                        <label>Resumo Executivo (Card de Seleção)</label>
-                        <textarea name="resumo" placeholder="Descreva o valor imediato desta solução em até 3 linhas..." required><%= service ? service.resumo : '' %></textarea>
-                    </div>
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Resumo Executivo (Card de Seleção)</label>
+                                <textarea name="resumo" placeholder="Descreva o valor imediato desta solução em até 3 linhas..." required style="width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem; min-height: 100px; resize: vertical;"><%= service ? service.resumo : '' %></textarea>
+                            </div>
 
-                    <div class="form-group full">
-                        <label>Metodologia Detalhada (Conteúdo Principal)</label>
-                        <textarea name="conteudo" style="height: 250px;" placeholder="Estruture a entrega técnica, benefícios e processos..." required><%= service ? service.conteudo : '' %></textarea>
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Metodologia Detalhada (Conteúdo Principal)</label>
+                                <textarea name="conteudo" placeholder="Estruture a entrega técnica, benefícios e processos..." required style="width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem; min-height: 250px; resize: vertical;"><%= service ? service.conteudo : '' %></textarea>
+                            </div>
+
+                            <div style="margin-top: 40px; padding: 30px; background: #f8fafc; border-radius: 24px; border: 1px solid #f0f0f0;">
+                                <h4 style="margin: 0 0 20px; font-size: 0.8rem; letter-spacing: 1px; color: #0A1128; text-transform: uppercase;">Otimização de SEO (Busca)</h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                                    <div class="form-group">
+                                        <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Meta Title</label>
+                                        <input type="text" name="meta_title" placeholder="Título que aparece no Google..." value="<%= service ? service.meta_title : '' %>" style="width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Meta Description</label>
+                                        <textarea name="meta_description" placeholder="Descritivo estratégico para indexação..." style="width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem; min-height: 80px; resize: vertical;"><%= service ? service.meta_description : '' %></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Governança de Exibição -->
+                            <div style="margin-top: 30px; padding: 30px; background: white; border-radius: 24px; border: 1px solid #f0f0f0;">
+                                <h4 style="margin: 0 0 20px; font-size: 0.8rem; letter-spacing: 1px; color: #0A1128; text-transform: uppercase; display: flex; align-items: center; gap: 10px;">
+                                    <i class="ri-settings-4-line"></i> Controle de Visibilidade
+                                </h4>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 25px;">
+                                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="hidden" name="destaque_home" value="0">
+                                        <input type="checkbox" name="destaque_home" value="1" <%= service && service.destaque_home ? 'checked' : '' %> style="width: 20px; height: 20px; accent-color: #0A1128;">
+                                        <label style="font-weight: 700; font-size: 0.85rem; color: #444; margin: 0;">Destaque na Home?</label>
+                                    </div>
+                                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="hidden" name="ativo" value="0">
+                                        <input type="checkbox" name="ativo" value="1" <%= !service || service.ativo ? 'checked' : '' %> style="width: 20px; height: 20px; accent-color: #0A1128;">
+                                        <label style="font-weight: 700; font-size: 0.85rem; color: #444; margin: 0;">Solução Ativa?</label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="display: block; font-weight: 800; font-size: 0.7rem; color: #666; margin-bottom: 5px; text-transform: uppercase;">Ordem</label>
+                                        <input type="number" name="ordem" value="<%= service ? service.ordem : 0 %>" style="width: 100%; padding: 10px; border: 1px solid #eee; border-radius: 8px;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-premium" style="width: 100%; margin-top: 40px; background: #0A1128; color: white; border: none; padding: 18px; border-radius: 50px; font-weight: 900; letter-spacing: 1px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.3s;">
+                                <i class="ri-save-3-line"></i> <%= service ? 'SALVAR ALTERAÇÕES' : 'PUBLICAR AGORA NO PORTFÓLIO' %>
+                            </button>
+                        </form>
                     </div>
+                    <%- include('../partials/admin-footer') %>
                 </div>
-
-                <div style="margin-top: 50px; padding: 40px; background: #F8FAFC; border-radius: 30px; border: 1px solid var(--border);">
-                    <h4 style="font-size: 0.9rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                        <i class="ri-search-eye-line" style="color: var(--accent);"></i> Otimização SEO (Motores de Pesquisa)
-                    </h4>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Meta Title (Título da Aba)</label>
-                            <input type="text" name="meta_title" placeholder="Título que aparece no Google..." value="<%= service ? service.meta_title : '' %>">
-                        </div>
-                        <div class="form-group">
-                            <label>Meta Description (Resumo SEO)</label>
-                            <textarea name="meta_description" style="height: 100px;" placeholder="Descritivo estratégico para indexação..."><%= service ? service.meta_description : '' %></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Governança de Exibição -->
-                <div style="margin-top: 50px; padding: 40px; background: #FFF; border-radius: 30px; border: 1px solid var(--border);">
-                    <h4 style="font-size: 0.9rem; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
-                        <i class="ri-layout-grid-line" style="color: var(--accent);"></i> Governança de Exibição
-                    </h4>
-                    <div class="form-grid">
-                        <div class="form-group" style="display: flex; align-items: center; gap: 15px;">
-                            <input type="hidden" name="destaque_home" value="0">
-                            <input type="checkbox" name="destaque_home" value="1" <%= service && service.destaque_home ? 'checked' : '' %> style="width: auto; height: auto;">
-                            <label style="margin-bottom: 0;">Exibir em Destaque na Home?</label>
-                        </div>
-                        <div class="form-group" style="display: flex; align-items: center; gap: 15px;">
-                            <input type="hidden" name="ativo" value="0">
-                            <input type="checkbox" name="ativo" value="1" <%= !service || service.ativo ? 'checked' : '' %> style="width: auto; height: auto;">
-                            <label style="margin-bottom: 0;">Solução Ativa (Páginas de Listagem)?</label>
-                        </div>
-                        <div class="form-group">
-                            <label>Ordem de Exibição (Numérica)</label>
-                            <input type="number" name="ordem" value="<%= service ? service.ordem : 0 %>">
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 50px; display: flex; gap: 20px;">
-                    <button type="submit" class="btn-premium btn-primary" style="flex: 1;">
-                        <i class="ri-save-3-line"></i> <%= service ? 'SALVAR ALTERAÇÕES' : 'PUBLICAR SOLUÇÃO' %>
-                    </button>
-                    <a href="/admin/servicos" class="btn-premium" style="background: #E2E8F0; color: #475569;">CANCELAR</a>
-                </div>
-            </form>
+            </div>
         </div>
-    </main>
+    </div>
 
     <script>
         function generateSlug(text) {

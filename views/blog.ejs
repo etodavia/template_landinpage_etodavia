@@ -2,8 +2,55 @@
 <html lang="pt-BR">
 <head>
     <%- include('partials/head-tags') %>
+    <style>
+        .blog-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .blog-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 50px rgba(10, 17, 40, 0.12);
+            border-color: var(--accent-red);
+        }
+        .blog-card-img {
+            height: 240px;
+            position: relative;
+            overflow: hidden;
+        }
+        .blog-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.8s ease;
+        }
+        .blog-card:hover .blog-card-img img {
+            transform: scale(1.1);
+        }
+        .blog-category-tag {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--accent-red);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 2;
+        }
+    </style>
 </head>
-<body style="background: var(--bg-sand);">
+<body style="background: #fafafa;">
+    <%- settings.custom_body_code || '' %>
     <%- include('partials/header') %>
     <%- include('partials/page-hero', { 
         pageTitle: settings.blog_hero_title || 'Insights & <em>Estratégia</em>',
@@ -12,35 +59,32 @@
 
     <main style="padding: 100px 0;">
         <div class="container">
-            <div style="margin-bottom: 60px;" data-reveal="left">
-                <span class="section-label">Blog Corporativo</span>
-                <h2 style="font-size: 3.2rem; color: var(--navy-blue); line-height: 1; letter-spacing: -2px;">
-                    Últimos <em>Artigos & Insights</em>
+            <header style="margin-bottom: 70px; text-align: center;" data-reveal="up">
+                <span class="section-label" style="margin: 0 auto 15px;">Pensamento Estratégico</span>
+                <h2 style="font-size: clamp(2.5rem, 5vw, 3.5rem); color: var(--navy-blue); line-height: 1; letter-spacing: -2px; font-weight: 800;">
+                    Conhecimento que <em>gera valor</em>
                 </h2>
-            </div>
+            </header>
 
-            <!-- Blog Grid (3 Colunas) -->
-            <div class="blog-grid" style="gap: 30px;">
+            <div class="blog-grid" style="gap: 40px;">
                 <% posts.forEach(post => { %>
-                    <article data-reveal="up" style="background: white; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.05); transition: 0.4s;" onmouseover="this.style.transform='translateY(-10px)'" onmouseout="this.style.transform='translateY(0)'">
-                        <div style="height: 200px; position: relative;">
-                            <img src="<%= post.imagem %>" alt="<%= post.titulo %>" style="width: 100%; height: 100%; object-fit: cover;">
-                            <div style="position: absolute; top: 15px; left: 15px; background: var(--accent-red); color: white; padding: 6px 12px; border-radius: 50px; font-size: 0.65rem; font-weight: 800; letter-spacing: 1px;">
-                                <%= post.categoria %>
-                            </div>
+                    <article class="blog-card" data-reveal="up">
+                        <div class="blog-card-img">
+                            <span class="blog-category-tag"><%= post.categoria %></span>
+                            <img src="<%= post.imagem %>" alt="<%= post.titulo %>">
                         </div>
-                        <div style="padding: 30px;">
-                            <div style="font-size: 0.75rem; color: #888; margin-bottom: 10px; font-weight: 600;">
-                                <%= post.data %>
+                        <div style="padding: 35px; flex-grow: 1; display: flex; flex-direction: column;">
+                            <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <i class="ri-calendar-line"></i> <%= post.data %>
                             </div>
-                            <h3 style="font-size: 1.4rem; color: var(--navy-blue); line-height: 1.2; margin-bottom: 15px; height: 3.4rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">
+                            <h3 style="font-size: 1.5rem; color: var(--navy-blue); line-height: 1.25; margin-bottom: 18px; font-weight: 800;">
                                 <%= post.titulo %>
                             </h3>
-                            <p style="color: #666; line-height: 1.5; margin-bottom: 25px; font-size: 0.85rem; height: 3.8rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical;">
+                            <p style="color: #666; line-height: 1.6; margin-bottom: 30px; font-size: 0.95rem; flex-grow: 1; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical;">
                                 <%= post.resumo %>
                             </p>
-                            <a href="/blog/<%= post.slug %>" style="text-decoration: none; color: var(--navy-blue); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
-                                LER ARTIGO <i class="ri-arrow-right-line"></i>
+                            <a href="/blog/<%= post.slug %>" style="text-decoration: none; color: var(--navy-blue); font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; gap: 10px; border-top: 1px solid #f0f0f0; padding-top: 20px;">
+                                CONTINUAR LENDO <i class="ri-arrow-right-up-line" style="background: var(--accent-red); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;"></i>
                             </a>
                         </div>
                     </article>
@@ -49,19 +93,25 @@
         </div>
     </main>
 
-    <!-- Newsletter Section -->
-    <section style="padding: 100px 0; background: var(--navy-blue); color: white; margin-top: 50px;">
-        <div class="container" style="text-align: center;">
-            <div data-reveal>
-                <h2 style="font-size: 2.8rem; margin-bottom: 25px;">
-                    <%= settings.blog_page_newsletter_title || 'Inscreva-se em nossa Mailing.' %>
+    <!-- Newsletter Premium Section -->
+    <section style="padding: 120px 0; background: var(--navy-blue); position: relative; overflow: hidden;">
+        <!-- Decorativo -->
+        <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: var(--accent-red); opacity: 0.05; border-radius: 50%;"></div>
+        
+        <div class="container">
+            <div style="max-width: 800px; margin: 0 auto; text-align: center; background: rgba(255,255,255,0.03); padding: 60px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px);" data-reveal="up">
+                <h2 style="font-size: clamp(2rem, 4vw, 3rem); color: white; margin-bottom: 20px; font-weight: 800; line-height: 1.1;">
+                    <%= settings.blog_page_newsletter_title || 'Assine nossa curadoria.' %>
                 </h2>
-                <p style="font-size: 1.1rem; opacity: 0.7; max-width: 600px; margin: 0 auto 40px;">
-                    <%= settings.blog_page_newsletter_text || 'Receba conteúdos exclusivos sobre gestão e liderança diretamente no seu e-mail.' %>
+                <p style="font-size: 1.1rem; color: rgba(255,255,255,0.6); margin-bottom: 40px;">
+                    <%= settings.blog_page_newsletter_text || 'Receba insights exclusivos sobre capital humano e gestão diretamente em sua caixa de entrada.' %>
                 </p>
-                <form action="/api/newsletter" method="POST" style="max-width: 500px; margin: 0 auto; display: flex; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 50px;">
-                    <input type="email" placeholder="Seu melhor e-mail" style="flex: 1; border: none; background: transparent; color: white; padding-left: 20px; outline: none;">
-                    <button style="background: var(--accent-red); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 800; cursor: pointer;">Inscrever</button>
+                <form id="blogNewsForm" style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                    <input type="text" name="nome" placeholder="Seu nome" required style="flex: 1; min-width: 250px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 18px 25px; color: white; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='var(--accent-red)'">
+                    <input type="email" name="email" placeholder="Seu melhor e-mail" required style="flex: 1; min-width: 250px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 18px 25px; color: white; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='var(--accent-red)'">
+                    <button type="submit" style="background: var(--accent-red); color: white; border: none; padding: 18px 40px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; letter-spacing: 1px;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        INSCREVER AGORA
+                    </button>
                 </form>
             </div>
         </div>
@@ -72,16 +122,56 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
         gsap.utils.toArray("[data-reveal]").forEach(el => {
-            let config = {
-                scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
-                opacity: 0, duration: 1.4, ease: "power4.out"
-            };
-            const direction = el.getAttribute('data-reveal');
-            if (direction === 'left') config.x = -80;
-            else if (direction === 'right') config.x = 80;
-            else config.y = 50;
-            gsap.from(el, config);
+            gsap.from(el, {
+                scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none none" },
+                opacity: 0,
+                y: 30,
+                x: el.getAttribute('data-reveal') === 'left' ? -40 : (el.getAttribute('data-reveal') === 'right' ? 40 : 0),
+                duration: 1,
+                ease: "power2.out"
+            });
         });
+
+        // Lógica Newsletter Blog
+        const blogNewsForm = document.getElementById('blogNewsForm');
+        if (blogNewsForm) {
+            blogNewsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const nomeInput = blogNewsForm.querySelector('input[name="nome"]');
+                const emailInput = blogNewsForm.querySelector('input[name="email"]');
+                const btn = blogNewsForm.querySelector('button');
+                
+                if (!emailInput.value || !nomeInput.value) return;
+                
+                btn.disabled = true;
+                const originalText = btn.innerText;
+                btn.innerText = 'Processando...';
+
+                try {
+                    const response = await fetch('/api/newsletter', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            nome: nomeInput.value,
+                            email: emailInput.value 
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        alert('Inscrição realizada com sucesso! Bem-vindo à nossa curadoria.');
+                        nomeInput.value = '';
+                        emailInput.value = '';
+                    } else {
+                        alert('Houve um erro ao processar sua inscrição. Tente novamente.');
+                    }
+                } catch (err) {
+                    alert('Erro de conexão com o servidor.');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            });
+        }
     </script>
 </body>
 </html>

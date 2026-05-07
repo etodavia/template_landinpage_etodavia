@@ -4,6 +4,7 @@
     <%- include('partials/head-tags') %>
 </head>
 <body style="background: var(--bg-sand);">
+    <%- settings.custom_body_code || '' %>
     <%- include('partials/header') %>
 
     <main>
@@ -74,40 +75,63 @@
                             <% }) %>
                         </div>
                     </div>
+                              <!-- Map Integrated -->
+                    <div style="margin-top: 20px; height: 350px; border-radius: 24px; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.05);" data-reveal="up">
+                        <iframe src="<%= settings.contact_map_url || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.1973656114175!2d-46.65860718502222!3d-23.561349184683057!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da563797%3A0x7337220556133f99!2sAv.%20Paulista%2C%20S%C3%A3o%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1625500000000!5m2!1spt-BR!2sbr' %>" width="100%" height="100%" style="border:0; filter: grayscale(1) contrast(1.1);" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
                 </div>
 
                 <!-- Right: Clean Minimalist Form -->
-                <div data-reveal="right">
-                    <form id="contact-form" style="display: flex; flex-direction: column; gap: 50px;">
-                        <h3 style="font-size: 2.2rem; color: var(--navy-blue); letter-spacing: -1px; margin-bottom: 10px;"><%- settings.contact_form_title || 'Diga <em>Olá</em>' %></h3>
-                        
-                        <div class="contact-form-grid">
-                            <div style="display: flex; flex-direction: column; gap: 10px;">
-                                <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">NOME COMPLETO</label>
-                                <input type="text" placeholder="Seu nome aqui" required style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s;" onfocus="this.style.borderColor='var(--navy-blue)'" onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'">
+                <div data-reveal="right" style="display: flex; flex-direction: column;">
+                    <form id="contact-form" style="display: flex; flex-direction: column; gap: 40px; background: white; padding: 50px; border-radius: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.05); height: 100%; justify-content: space-between;">
+                        <div>
+                            <h3 style="font-size: 2.2rem; color: var(--navy-blue); letter-spacing: -1px; margin-bottom: 30px;"><%- settings.contact_form_title || 'Diga <em>Olá</em>' %></h3>
+                            
+                            <% 
+                                let formFields = [];
+                                try { 
+                                    formFields = JSON.parse(settings.contact_form_fields || '[]'); 
+                                } catch(e) { formFields = []; }
+
+                                if (formFields.length === 0) {
+                                    formFields = [
+                                        { label: 'NOME COMPLETO', type: 'text', required: true, placeholder: 'Seu nome aqui' },
+                                        { label: 'WHATSAPP', type: 'tel', required: true, placeholder: '(11) 99999-9999' },
+                                        { label: 'E-MAIL', type: 'email', required: true, placeholder: 'email@exemplo.com' },
+                                        { label: 'SUA MENSAGEM', type: 'textarea', required: true, placeholder: 'Como podemos ajudar você?' }
+                                    ];
+                                }
+                            %>
+
+                            <div style="display: flex; flex-direction: column; gap: 30px;">
+                                <% formFields.forEach(field => { %>
+                                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                                        <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px; text-transform: uppercase;">
+                                            <%= field.label %> <%= field.required ? '*' : '' %>
+                                        </label>
+                                        
+                                        <% if (field.type === 'textarea') { %>
+                                            <textarea name="<%= field.label.toLowerCase().replace(/\W/g, '_') %>" 
+                                                placeholder="<%= field.placeholder || 'Sua resposta...' %>" 
+                                                <%= field.required ? 'required' : '' %> 
+                                                style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s; min-height: 220px; resize: none;" 
+                                                onfocus="this.style.borderColor='var(--navy-blue)'" 
+                                                onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'"></textarea>
+                                        <% } else { %>
+                                            <input type="<%= field.type %>" 
+                                                name="<%= field.label.toLowerCase().replace(/\W/g, '_') %>" 
+                                                placeholder="<%= field.placeholder || 'Sua resposta...' %>" 
+                                                <%= field.required ? 'required' : '' %> 
+                                                style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s;" 
+                                                onfocus="this.style.borderColor='var(--navy-blue)'" 
+                                                onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'">
+                                        <% } %>
+                                    </div>
+                                <% }) %>
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 10px;">
-                                <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">E-MAIL</label>
-                                <input type="email" placeholder="email@exemplo.com" required style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s;" onfocus="this.style.borderColor='var(--navy-blue)'" onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'">
-                            </div>
                         </div>
 
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">TEMA DE INTERESSE</label>
-                            <select style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; cursor: pointer; color: #555;">
-                                <option value="">Selecione uma opção</option>
-                                <option value="rh">Consultoria de RH</option>
-                                <option value="lideranca">Liderança</option>
-                                <option value="processos">Processos</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
-                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--navy-blue); letter-spacing: 1px;">SUA MENSAGEM</label>
-                            <textarea placeholder="Como podemos ajudar você?" required style="border: none; border-bottom: 1px solid rgba(10, 17, 40, 0.2); padding: 15px 0; font-size: 1.1rem; outline: none; background: transparent; transition: 0.3s; min-height: 120px; resize: none;" onfocus="this.style.borderColor='var(--navy-blue)'" onblur="this.style.borderColor='rgba(10, 17, 40, 0.2)'"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn-pill-large" style="background: var(--navy-blue); color: white; border: none; width: 100%; justify-content: center; margin-top: 10px;">
+                        <button type="submit" class="btn-pill-large" style="background: var(--navy-blue); color: white; border: none; width: 100%; justify-content: center; margin-top: 30px;">
                             Enviar Mensagem <div class="icon-blue-circle" style="background: var(--accent-red); color: white;"><i class="ri-arrow-right-line"></i></div>
                         </button>
                     </form>
@@ -115,11 +139,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Full Width Map (Minimalist) -->
-    <section data-reveal style="height: 450px; width: 100%; filter: grayscale(1) invert(0.05) contrast(1.1); margin-bottom: -10px;">
-        <iframe src="<%= settings.contact_map_url || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.1973656114175!2d-46.65860718502222!3d-23.561349184683057!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da563797%3A0x7337220556133f99!2sAv.%20Paulista%2C%20S%C3%A3o%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1625500000000!5m2!1spt-BR!2sbr' %>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-    </section>
 
     <%- include('partials/footer') %>
 
@@ -136,6 +155,73 @@
             else config.y = 50;
             gsap.from(el, config);
         });
+
+        // Lógica de Envio do Formulário de Contato
+        const contactForm = document.getElementById('contact-form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = contactForm.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = 'Enviando...';
+
+                const formData = new FormData(contactForm);
+                const data = {
+                    nome: '',
+                    email: '',
+                    telefone: '',
+                    mensagem: ''
+                };
+                
+                let fieldsCollected = [];
+                
+                formData.forEach((value, key) => {
+                    const k = key.toLowerCase();
+                    if (k.includes('nome')) data.nome = value;
+                    else if (k.includes('email') || k.includes('e_mail')) data.email = value;
+                    else if (k.includes('telef') || k.includes('whatsapp') || k.includes('celular')) data.telefone = value;
+                    else if (k.includes('mensag')) data.mensagem = value;
+                    else {
+                        fieldsCollected.push(`${key}: ${value}`);
+                    }
+                });
+
+                // Se a mensagem estiver vazia mas tivermos campos extras, usamos os campos extras como mensagem
+                if (!data.mensagem && fieldsCollected.length > 0) {
+                    data.mensagem = fieldsCollected.join('\n');
+                } else if (fieldsCollected.length > 0) {
+                    data.mensagem += '\n\n---\nOutras informações:\n' + fieldsCollected.join('\n');
+                }
+
+                // Fallback de segurança para garantir que campos obrigatórios tenham valor
+                if (!data.nome) data.nome = 'Cliente do Site';
+                if (!data.mensagem) data.mensagem = '(Sem mensagem enviada)';
+
+                try {
+                    const response = await fetch('/api/leads', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert('Mensagem enviada com sucesso! Em breve entraremos em contato.');
+                        contactForm.reset();
+                    } else {
+                        alert('Erro ao enviar: ' + (result.msg || 'Tente novamente mais tarde.'));
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Falha na conexão com o servidor. Verifique sua internet.');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            });
+        }
     </script>
 </body>
 </html>

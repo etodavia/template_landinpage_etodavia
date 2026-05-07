@@ -3,57 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/main.css">
+    <title><%= title %> | ARQUÊΔ</title>
+    <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <style>
-        :root {
-            --admin-marinho: #000033;
-            --admin-light: #F4F4F9;
-            --accent-red: #D62828;
-        }
-        body { background: var(--admin-light); display: flex; padding: 0; margin:0; min-height: 100vh; font-family: 'Inter Tight', sans-serif; }
-        
-        /* Main Content */
-        main { flex: 1; padding: 3rem 4rem; overflow-y: auto; overflow-x: hidden; min-height: 100vh; position: relative; }
-        
-        @media (max-width: 992px) {
-            main { padding: 5rem 1rem 2rem; }
-            .config-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
-            .page-header h1 { font-size: 1.4rem !important; }
-        }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-        .page-header h1 { font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0; }
-
-        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; }
-        .config-card { background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); }
-        .config-card h3 { font-size: 1.1rem; color: var(--admin-marinho); margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; font-weight: 800; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }
-
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; font-size: 0.75rem; font-weight: 800; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #eee; outline: none; transition: 0.3s; font-family: inherit; font-size: 0.9rem;
-        }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--admin-marinho); box-shadow: 0 0 0 4px rgba(0,0,51,0.05); }
-
-        .btn-save { background: var(--admin-marinho); color: white; border: none; padding: 18px 45px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 0.95rem; width: 100%; transition: 0.3s; margin-top: 10px; }
-        .btn-save:hover { background: var(--accent-red); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(214, 40, 40, 0.2); }
-
-        .alert { padding: 15px; border-radius: 12px; margin-bottom: 25px; font-weight: 600; font-size: 0.9rem; text-align: center; }
-        .alert-success { background: #ecfdf5; color: #059669; }
-        .alert-error { background: #fef2f2; color: #dc2626; }
-
-        .tab-title { opacity: 0.5; font-size: 0.7rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.5rem; display: block; }
-
-        .footer-sig { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd; font-size: 0.75rem; opacity: 0.4; display: flex; justify-content: space-between; font-weight: 600; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <%- include('../partials/admin-sidebar') %>
-
-    <main>
-        <%- include('../partials/admin-header') %>
-        <div style="padding: 3rem 4rem;">
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            <div class="admin-content-scroll">
+                <div style="padding: 2.5rem 4rem;">
             <div style="margin-bottom: 2rem;">
                 <h1 style="font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0;">Configurações do Sistema</h1>
             </div>
@@ -181,12 +143,12 @@
             </div>
         </form>
 
-        <div class="footer-sig">
-            <div>CENTRAL DE CONFIGURAÇÕES ARQUÊ</div>
-            <div>PROJETO PROTEGIDO POR AGÊNCIA E-TODAVIA</div>
-        </div>
-    </main>
-
+                </div> <!-- padding -->
+                <%- include('../partials/admin-footer') %>
+            </div> <!-- admin-content-scroll -->
+        </div> <!-- admin-main -->
+    </div> <!-- admin-app -->
+</body>
     <script>
         // Check for success message in URL
         const urlParams = new URLSearchParams(window.location.search);

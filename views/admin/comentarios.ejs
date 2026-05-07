@@ -3,83 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/main.css">
+    <title><%= title %> | ARQUÊΔ</title>
+    <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <style>
-        :root { --admin-marinho: #000033; --admin-light: #F4F4F9; --accent-red: #D62828; }
-        body { background: var(--admin-light); display: flex; padding: 0; margin:0; min-height: 100vh; font-family: 'Inter Tight', sans-serif; }
-        main { flex: 1; padding: 3rem 4rem; overflow-y: auto; overflow-x: hidden; min-height: 100vh; position: relative; }
-        @media (max-width: 992px) {
-            main { padding: 5rem 1rem 2rem; }
-            .page-header h1 { font-size: 1.4rem !important; }
-            .comment-card { padding: 1rem !important; }
-        }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-        .page-header h1 { font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; }
-
-        .comment-card { background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px; border-left: 5px solid #ddd; }
-        .comment-card.approved { border-left-color: #059669; }
-        .comment-card.pending { border-left-color: #f59e0b; }
-
-        .comment-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .comment-info h3 { font-size: 1rem; color: var(--admin-marinho); margin: 0; }
-        .comment-info span { font-size: 0.75rem; color: #888; font-weight: 600; }
-        .comment-body { font-size: 0.95rem; color: #444; line-height: 1.5; margin: 10px 0; }
-        
-        .comment-actions { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-approve { background: #059669; color: white; border: none; padding: 8px 20px; border-radius: 50px; font-weight: 700; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
-        .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 8px 20px; border-radius: 50px; font-weight: 700; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
-        .btn-approve:hover { opacity: 0.8; }
-        .badge { padding: 4px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
-        .badge-pending { background: #fffbeb; color: #b45309; }
-        .badge-approved { background: #ecfdf5; color: #059669; }
-
-        .footer-sig { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd; font-size: 0.75rem; opacity: 0.4; display: flex; justify-content: space-between; font-weight: 600; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <%- include('../partials/admin-sidebar') %>
-    <main>
-        <div class="page-header">
-            <h1>Moderação de Comentários</h1>
-        </div>
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            <div class="admin-content-scroll">
+                <div style="padding: 2.5rem 4rem;">
+                    <header style="margin-bottom: 40px;">
+                        <h1 style="font-size: 2.2rem; margin: 0;">Moderação de <em>Comentários</em></h1>
+                        <p style="color: #888; font-size: 0.95rem; margin-top: 5px;">Gerencie as interações dos leitores nos artigos do blog.</p>
+                    </header>
 
-        <div class="comments-list">
-            <% if (comentarios.length === 0) { %>
-                <div style="text-align: center; padding: 4rem; opacity: 0.5;">
-                    <i class="ri-chat-4-line" style="font-size: 3rem;"></i>
-                    <p>Nenhum comentário enviado ainda.</p>
-                </div>
-            <% } %>
-
-            <% comentarios.forEach(c => { %>
-                <div class="comment-card <%= c.aprovado ? 'approved' : 'pending' %>">
-                    <div class="comment-header">
-                        <div class="comment-info">
-                            <h3><%= c.nome %> <span class="badge <%= c.aprovado ? 'badge-approved' : 'badge-pending' %>"><%= c.aprovado ? 'Aprovado' : 'Pendente' %></span></h3>
-                            <span><%= c.email %> • Post: <%= c.post_id %> • <%= new Date(c.created_at).toLocaleDateString('pt-BR') %></span>
-                        </div>
-                    </div>
-                    <div class="comment-body">"<%= c.comentario %>"</div>
-                    <div class="comment-actions">
-                        <% if (!c.aprovado) { %>
-                            <form action="/admin/comentarios/aprovar/<%= c.id %>" method="POST">
-                                <button type="submit" class="btn-approve"><i class="ri-check-line"></i> APROVAR</button>
-                            </form>
+                    <div class="comments-list">
+                        <% if (comentarios.length === 0) { %>
+                            <div style="text-align: center; padding: 80px; background: white; border-radius: 30px; border: 1px solid #f0f0f0; color: #aaa;">
+                                <i class="ri-chat-4-line" style="font-size: 3rem; display: block; margin-bottom: 15px; opacity: 0.2;"></i>
+                                <p>Nenhum comentário enviado ainda.</p>
+                            </div>
+                        <% } else { %>
+                            <div style="display: grid; gap: 20px;">
+                                <% comentarios.forEach(c => { %>
+                                    <div style="background: white; padding: 25px; border-radius: 20px; border: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                <h4 style="margin: 0; color: var(--admin-marinho);"><%= c.nome %></h4>
+                                                <span style="font-size: 0.7rem; color: #aaa;"><%= c.email %></span>
+                                                <span style="font-size: 0.7rem; color: #666; background: #f8fafc; padding: 2px 8px; border-radius: 4px;">ID Post: <%= c.post_id %></span>
+                                            </div>
+                                            <p style="margin: 0; color: #444; font-size: 0.9rem; line-height: 1.5;"><%= c.comentario %></p>
+                                            <div style="margin-top: 15px;">
+                                                <span style="font-size: 0.7rem; color: <%= c.aprovado ? '#10b981' : '#f59e0b' %>; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+                                                    <%= c.aprovado ? '✓ PUBLICADO' : '● AGUARDANDO APROVAÇÃO' %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; gap: 8px;">
+                                            <% if (!c.aprovado) { %>
+                                                <form action="/admin/comentarios/aprovar/<%= c.id %>" method="POST" style="display: inline;">
+                                                    <button type="submit" class="btn-action" style="background: #ecfdf5; color: #10b981; border: none; padding: 8px 15px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; cursor: pointer;">APROVAR</button>
+                                                </form>
+                                            <% } %>
+                                            <form action="/admin/comentarios/delete/<%= c.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Excluir comentário permanentemente?')">
+                                                <button type="submit" class="btn-action" style="background: #fff1f2; color: #e11d48; border: none; padding: 8px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; cursor: pointer;"><i class="ri-delete-bin-line"></i></button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
                         <% } %>
-                        <form action="/admin/comentarios/delete/<%= c.id %>" method="POST" onsubmit="return confirm('Excluir este comentário permanentemente?')">
-                            <button type="submit" class="btn-delete"><i class="ri-delete-bin-line"></i> EXCLUIR</button>
-                        </form>
                     </div>
                 </div>
-            <% }) %>
+                <%- include('../partials/admin-footer') %>
+            </div>
         </div>
-
-        <div class="footer-sig">
-            <div>ARQUÊ GESTÃO Admin v1.2</div>
-            <div>PROJETO PROTEGIDO POR AGÊNCIA E-TODAVIA</div>
-        </div>
-    </main>
+    </div>
 </body>
 </html>

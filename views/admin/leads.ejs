@@ -3,151 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/main.css">
+    <title><%= title %> | ARQUÊΔ</title>
+    <link rel="stylesheet" href="/css/admin.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <style>
-        :root {
-            --admin-marinho: #000033;
-            --admin-light: #F4F4F9;
-            --accent-red: #D62828;
-        }
-        body { background: var(--admin-light); display: flex; padding: 0; margin:0; min-height: 100vh; font-family: 'Inter Tight', sans-serif; }
-        
-        /* O Estilo da Sidebar (Aside) agora é gerenciado pelo componente partials/admin-sidebar.ejs */
-
-        /* Main Content */
-        main { flex: 1; padding: 3rem 4rem; overflow-y: auto; overflow-x: hidden; min-height: 100vh; position: relative; }
-        
-        @media (max-width: 992px) {
-            main { padding: 5rem 1rem 2rem; }
-        }
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-        .page-header h1 { font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0; }
-
-        /* Table Design */
-        .table-container {
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
-            overflow: hidden;
-        }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #fcfcfc; padding: 1.2rem 1.5rem; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #888; border-bottom: 1px solid #eee; }
-        td { padding: 1.2rem 1.5rem; font-size: 0.9rem; color: var(--admin-marinho); border-bottom: 1px solid #f9f9f9; vertical-align: middle; }
-        
-        tr:hover td { background: #fafafa; }
-
-        /* Action Buttons */
-        .btn-action {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            font-size: 1.1rem;
-            transition: 0.3s;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-email { background: #eef2ff; color: #4338ca; }
-        .btn-email:hover { background: #4338ca; color: white; }
-        
-        .btn-whatsapp { background: #ecfdf5; color: #059669; }
-        .btn-whatsapp:hover { background: #059669; color: white; }
-        
-        .btn-delete { background: #fef2f2; color: #dc2626; }
-        .btn-delete:hover { background: #dc2626; color: white; }
-
-        .btn-export {
-            background: var(--admin-marinho);
-            color: white;
-            padding: 12px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: 0.3s;
-        }
-        .btn-export:hover { background: var(--accent-red); transform: translateY(-2px); }
-
-        .footer-sig { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #ddd; font-size: 0.75rem; opacity: 0.4; display: flex; justify-content: space-between; font-weight: 600; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <%- include('../partials/admin-sidebar') %>
-    <main>
-        <%- include('../partials/admin-header') %>
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
         
-        <div style="padding: 3rem 4rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 1.8rem; color: var(--admin-marinho); font-weight: 800; margin: 0;">Gestão de Leads</h1>
-                <a href="#" id="exportCsv" class="btn-export"><i class="ri-download-2-line"></i> EXPORTAR LISTA (CSV)</a>
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            <div class="admin-content-scroll">
+                <div style="padding: 2.5rem 4rem;">
+                    <div class="card-cms">
+                        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
+                            <div>
+                                <h1 style="font-size: 2.2rem; margin: 0;">Gestão de <em>Leads</em></h1>
+                                <p class="subtitle" style="color: #888; font-size: 0.95rem; margin-top: 5px;">Contatos e oportunidades capturadas através dos formulários do site.</p>
+                            </div>
+                            <a href="#" id="exportCsv" class="btn-premium" style="background: var(--admin-marinho); color: white; border: none; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;"><i class="ri-download-2-line"></i> EXPORTAR CSV</a>
+                        </header>
+
+                        <%- include('../partials/admin-alerts') %>
+
+                        <div class="table-responsive">
+                            <table id="leadsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Lead / Contato</th>
+                                        <th>Mensagem / Interesse</th>
+                                        <th>Data</th>
+                                        <th style="width: 150px; text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if(leads && leads.length > 0) { %>
+                                        <% leads.forEach(lead => { %>
+                                            <tr>
+                                                <td>
+                                                    <strong style="color: var(--admin-marinho); display: block;"><%= lead.nome %></strong>
+                                                    <span style="font-size: 0.75rem; color: #666;"><%= lead.email %></span><br>
+                                                    <span style="font-size: 0.75rem; color: #666;"><%= lead.telefone %></span>
+                                                </td>
+                                                <td>
+                                                    <p style="font-size: 0.85rem; color: #444; line-height: 1.4; margin: 0; max-width: 400px;"><%= lead.mensagem %></p>
+                                                </td>
+                                                <td>
+                                                    <span style="font-size: 0.8rem; font-weight: 600; color: #333;"><%= new Date(lead.created_at).toLocaleDateString('pt-BR') %></span>
+                                                    <div style="font-size: 0.7rem; opacity: 0.5;"><%= new Date(lead.created_at).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}) %></div>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                                        <a href="mailto:<%= lead.email %>?subject=Contato ARQUÊ GESTÃO&body=Olá <%= lead.nome %>," class="btn-action" style="background: #e0f2fe; color: #0284c7; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="Responder"><i class="ri-mail-line"></i></a>
+                                                        <a href="https://wa.me/55<%= lead.telefone.replace(/\D/g,'') %>?text=Olá%20<%= encodeURIComponent(lead.nome) %>%2C%20vi%20seu%20contato%20no%20site%20da%20ARQUÊ%20GESTÃO." target="_blank" class="btn-action" style="background: #dcfce7; color: #16a34a; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="WhatsApp"><i class="ri-whatsapp-line"></i></a>
+                                                        <form action="/admin/leads/delete/<%= lead.id %>" method="POST" onsubmit="return confirm('Excluir este lead permanentemente?');" style="display: inline;">
+                                                            <button type="submit" class="btn-action" style="background: #fff1f2; color: #e11d48; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer;" title="Remover"><i class="ri-delete-bin-line"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr><td colspan="4" style="text-align: center; padding: 80px; color: #aaa; background: #f8fafc; border-radius: 20px; border: 2px dashed #eee;">Nenhum lead capturado ainda.</td></tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <%- include('../partials/admin-footer') %>
             </div>
-
-        <div class="table-container">
-            <table id="leadsTable">
-                <thead>
-                    <tr>
-                        <th>Lead / Contato</th>
-                        <th>Mensagem / Interesse</th>
-                        <th>Data</th>
-                        <th style="text-align: right;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if(leads && leads.length > 0) { %>
-                        <% leads.forEach(lead => { %>
-                            <tr>
-                                <td>
-                                    <div style="font-weight: 800; color: var(--admin-marinho);"><%= lead.nome %></div>
-                                    <div style="font-size: 0.75rem; opacity: 0.6;"><%= lead.email %></div>
-                                    <div style="font-size: 0.75rem; opacity: 0.6;"><%= lead.telefone %></div>
-                                </td>
-                                <td style="max-width: 300px;">
-                                    <div style="font-size: 0.85rem; line-height: 1.4;"><%= lead.mensagem %></div>
-                                </td>
-                                <td>
-                                    <div style="font-size: 0.8rem; font-weight: 600;"><%= new Date(lead.created_at).toLocaleDateString('pt-BR') %></div>
-                                    <div style="font-size: 0.7rem; opacity: 0.5;"><%= new Date(lead.created_at).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}) %></div>
-                                </td>
-                                <td style="text-align: right;">
-                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                        <a href="mailto:<%= lead.email %>?subject=Contato ARQUÊ GESTÃO&body=Olá <%= lead.nome %>," class="btn-action btn-email" title="Responder por E-mail">
-                                            <i class="ri-mail-line"></i>
-                                        </a>
-                                        <a href="https://wa.me/55<%= lead.telefone.replace(/\D/g,'') %>?text=Olá%20<%= encodeURIComponent(lead.nome) %>%2C%20vi%20seu%20contato%20no%20site%20da%20ARQUÊ%20GESTÃO." target="_blank" class="btn-action btn-whatsapp" title="Falar no WhatsApp">
-                                            <i class="ri-whatsapp-line"></i>
-                                        </a>
-                                        <form action="/admin/leads/delete/<%= lead.id %>" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este lead?');" style="display: inline;">
-                                            <button type="submit" class="btn-action btn-delete" title="Excluir Lead">
-                                                <i class="ri-delete-bin-line"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        <% }) %>
-                    <% } else { %>
-                        <tr><td colspan="4" style="text-align: center; padding: 5rem; opacity: 0.4;">Nenhum lead capturado ainda.</td></tr>
-                    <% } %>
-                </tbody>
-            </table>
         </div>
-
-        <div class="footer-sig">
-            <div>ARQUÊ GESTÃO Admin v1.2</div>
-            <div>FEITO PELA E-TODAVIA AGÊNCIA CRIATIVA</div>
-        </div>
-    </main>
+    </div>
 
     <script>
-        // Função para Exportar CSV
         document.getElementById('exportCsv').addEventListener('click', function(e) {
             e.preventDefault();
             let csv = 'Nome,Email,Telefone,Mensagem,Data\n';
@@ -156,11 +86,12 @@
             rows.forEach(row => {
                 const cols = row.querySelectorAll('td');
                 if(cols.length > 1) {
-                    const nome = cols[0].querySelector('div:first-child').innerText;
-                    const email = cols[0].querySelectorAll('div')[1].innerText;
-                    const tel = cols[0].querySelectorAll('div')[2].innerText;
+                    const nome = cols[0].querySelector('strong').innerText;
+                    const spans = cols[0].querySelectorAll('span');
+                    const email = spans[0].innerText;
+                    const tel = spans[1].innerText;
                     const msg = cols[1].innerText.replace(/,/g, ';');
-                    const data = cols[2].querySelector('div:first-child').innerText;
+                    const data = cols[2].querySelector('span').innerText;
                     csv += `"${nome}","${email}","${tel}","${msg}","${data}"\n`;
                 }
             });

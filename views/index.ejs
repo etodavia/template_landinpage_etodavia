@@ -32,7 +32,7 @@
         <section class="hero">
             <div class="hero-content">
                 <h1 data-reveal>
-                    <%- settings.home_hero_title || 'Lidere Negócios com Confiança.' %>
+                    <%- settings.home_hero_title || 'Lidere Negócios com <em>Confiança</em>.' %>
                 </h1>
                 <p data-reveal>
                     <%- settings.home_hero_description || 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.' %>
@@ -56,7 +56,7 @@
                     <div data-reveal="left">
                         <span class="section-label">NOSSA ESSÊNCIA</span>
                         <h2 style="font-size: 3.5rem; line-height: 1; letter-spacing: -3px; margin-bottom: 25px; color: var(--navy-blue);">
-                            <%- settings.about_title || 'Sinergia Pura entre Pessoas e Resultados.' %>
+                            <%- settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.' %>
                         </h2>
                         <p style="font-size: 1.2rem; color: #555; margin-bottom: 40px; line-height: 1.6;">
                             <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação. Nossa abordagem sistêmica conecta os pontos invisíveis que transformam ambientes de trabalho em centros de excelência.' %>
@@ -236,60 +236,110 @@
                 .style-navy:hover { background: rgba(255,255,255,0.1); border-color: <%= settings.benefits_color || 'var(--accent-red)' %>; }
 
                 /* Swiper Optimization: Mobile First */
-                .benefitsSwiper { pointer-events: all; }
+                .benefitsSwiper { pointer-events: all; width: 100%; }
                 
                 @media (min-width: 1024px) {
                     .benefitsSwiper .swiper-wrapper {
-                        display: grid;
-                        grid-template-columns: repeat(2, 1fr);
-                        gap: 40px;
+                        display: grid !important;
+                        grid-template-columns: repeat(2, 1fr) !important;
+                        gap: 30px !important;
+                        width: 100% !important;
+                        transform: none !important;
                     }
-                    <% if (bItems.length > 2) { %>
-                        .benefitsSwiper .swiper-wrapper { grid-template-columns: repeat(4, 1fr); }
+                    <% if (bItems.length >= 3) { %>
+                        .benefitsSwiper .swiper-wrapper { grid-template-columns: repeat(3, 1fr) !important; }
                     <% } %>
-                    .benefitsSwiper .swiper-slide { width: auto !important; height: auto !important; }
-                    .beneficios-pagination { display: none; }
-                    .benefitsSwiper { overflow: visible; }
+                    <% if (bItems.length >= 4) { %>
+                        .benefitsSwiper .swiper-wrapper { grid-template-columns: repeat(4, 1fr) !important; }
+                    <% } %>
+                    .benefitsSwiper .swiper-slide { 
+                        width: auto !important; 
+                        height: auto !important; 
+                        margin: 0 !important;
+                    }
+                    .beneficios-pagination { display: none !important; }
+                    .benefitsSwiper { overflow: visible !important; }
                 }
             </style>
         </section>
 
         <!-- BLOG -->
-        <section id="blog" style="background: var(--navy-blue); color: white; padding: 60px 0;">
+        <style>
+            .blogSwiper { padding-bottom: 50px; }
+            .blog-card {
+                background: white; 
+                color: var(--navy-blue); 
+                padding: 20px; 
+                border-radius: 24px; 
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                transition: 0.3s;
+                border: 1px solid rgba(0,0,0,0.05);
+            }
+            .blog-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+            .blog-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 20px; }
+            .blog-card h4 { font-size: 1.15rem; line-height: 1.3; margin-bottom: 12px; font-weight: 800; }
+            .blog-card p { font-size: 0.85rem; color: #666; line-height: 1.5; margin-bottom: 20px; flex-grow: 1; }
+            .blog-card .btn-read { text-decoration: none; color: var(--navy-blue); font-weight: 900; font-size: 0.75rem; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
+            
+            .blog-pagination { bottom: 0 !important; }
+            .blog-pagination .swiper-pagination-bullet-active { background: white !important; }
+
+            @media (min-width: 1024px) {
+                .blogSwiper .swiper-wrapper {
+                    display: grid !important;
+                    grid-template-columns: repeat(4, 1fr) !important;
+                    gap: 25px !important;
+                }
+                .blogSwiper .swiper-slide { width: auto !important; height: auto !important; margin-right: 0 !important; }
+                .blog-pagination { display: none; }
+                .blogSwiper { overflow: visible; padding-bottom: 0; }
+            }
+        </style>
+        <section id="blog" style="background: var(--navy-blue); color: white; padding: 100px 0;">
             <div class="container">
-                <div style="margin-bottom: 40px;" data-reveal="left">
-                    <span class="section-label" style="color: white; opacity: 0.6;">Insights</span>
-                    <h2 style="font-size: 2.6rem; color: white;">
-                        <%- settings.blog_section_title || 'Últimos <em>Artigos</em>' %>
-                    </h2>
-                    <p style="opacity: 0.6; color: white; margin-top: 10px;"><%= settings.blog_section_text %></p>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px;">
+                    <div data-reveal="left">
+                        <span class="section-label" style="color: white; opacity: 0.6;">Insights</span>
+                        <h2 style="font-size: 3.2rem; color: white;">
+                            <%- settings.blog_section_title || 'Últimos <em>Artigos</em>' %>
+                        </h2>
+                        <p style="opacity: 0.6; color: white; margin-top: 10px; max-width: 500px;"><%= settings.blog_section_text %></p>
+                    </div>
+                    <div data-reveal="right" class="desktop-only">
+                        <a href="/blog" class="btn-pill-large" style="border: 1px solid rgba(255,255,255,0.2); color: white; background: transparent;">
+                            VER TODOS <div class="icon-blue-circle" style="background: white; color: var(--navy-blue);"><i class="ri-arrow-right-line"></i></div>
+                        </a>
+                    </div>
                 </div>
-                <!-- ... resto do blog ... -->
-                <% if (posts && posts.length > 0) { %>
-                    <!-- Post em Destaque -->
-                    <div class="blog-featured-card" data-reveal="right">
-                        <div style="height: 280px;">
-                            <img src="<%= posts[0].imagem %>" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <div style="padding: 40px; display: flex; flex-direction: column; justify-content: center;">
-                            <div style="font-size: 0.75rem; letter-spacing: 1px; color: #888; margin-bottom: 12px;"><%= posts[0].categoria.toUpperCase() %> • <%= posts[0].data %></div>
-                            <h3 style="font-size: 1.8rem; margin-bottom: 15px; line-height: 1.2;"><%= posts[0].titulo %></h3>
-                            <p style="font-size: 0.9rem; color: #555; margin-bottom: 20px;"><%= posts[0].resumo %></p>
-                            <a href="/blog/<%= posts[0].slug %>" style="text-decoration: none; color: #008080; font-weight: 700; font-size: 0.9rem;">Saiba mais <i class="ri-arrow-right-line"></i></a>
-                        </div>
-                    </div>
-                    <!-- Blog Grid Dinâmico (Restantes) -->
-                    <div class="blog-grid">
-                        <% posts.slice(1,4).forEach(post => { %>
-                            <div style="background: white; color: var(--navy-blue); padding: 20px; border-radius: 18px;" data-reveal="up">
-                                <img src="<%= post.imagem %>" style="width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 15px;">
-                                <h4 style="font-size: 1.1rem; line-height: 1.3; margin-bottom: 8px;"><%= post.titulo %></h4>
-                                <p style="font-size: 0.8rem; color: #777;"><%= post.resumo %></p>
-                                <a href="/blog/<%= post.slug %>" style="text-decoration: none; color: var(--navy-blue); font-weight: 800; font-size: 0.8rem; margin-top: 10px; display: inline-block;">LER MAIS</a>
+
+                <div class="swiper blogSwiper">
+                    <div class="swiper-wrapper">
+                        <% if (posts && posts.length > 0) { %>
+                            <% posts.slice(0, 4).forEach(post => { %>
+                                <div class="swiper-slide">
+                                    <div class="blog-card" data-reveal="up">
+                                        <img src="<%= post.imagem %>" alt="<%= post.titulo %>">
+                                        <div style="font-size: 0.65rem; font-weight: 900; color: #888; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;"><%= post.categoria %></div>
+                                        <h4><%= post.titulo %></h4>
+                                        <p><%= post.resumo %></p>
+                                        <a href="/blog/<%= post.slug %>" class="btn-read">LER ARTIGO <i class="ri-arrow-right-line"></i></a>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="swiper-slide" style="width: 100%;">
+                                <p style="text-align: center; opacity: 0.5; padding: 40px;">Nenhum artigo publicado ainda.</p>
                             </div>
-                        <% }); %>
+                        <% } %>
                     </div>
-                <% } %>
+                    <div class="swiper-pagination blog-pagination"></div>
+                </div>
+
+                <div style="margin-top: 40px; text-align: center;" class="mobile-only">
+                    <a href="/blog" style="color: white; text-decoration: none; font-weight: 800; font-size: 0.9rem;">Ver todos os artigos <i class="ri-arrow-right-line"></i></a>
+                </div>
             </div>
         </section>
 
@@ -345,9 +395,10 @@
                         <%- settings.newsletter_section_title || 'Atualize sua <em>Inteligência</em> de RH.' %>
                     </h2>
                     <p style="opacity: 0.7; margin-bottom: 1.5rem;"><%= settings.newsletter_section_text %></p>
-                    <form class="newsletter-form" style="max-width: 450px; margin: 0 auto; display: flex; gap: 8px; background: rgba(255,255,255,0.1); padding: 8px; border-radius: 50px;">
-                        <input type="email" placeholder="Seu e-mail" style="flex: 1; border: none; background: transparent; color: white; padding-left: 15px; outline: none; font-size: 0.9rem;">
-                        <button style="background: var(--accent-red); color: white; border: none; padding: 12px 25px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 0.85rem;">Assinar</button>
+                    <form class="newsletter-form" style="max-width: 600px; margin: 0 auto; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);">
+                        <input type="text" name="nome" placeholder="Seu nome" required style="flex: 1; min-width: 200px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: white; padding: 15px 25px; border-radius: 50px; outline: none; font-size: 0.9rem;">
+                        <input type="email" name="email" placeholder="Seu melhor e-mail" required style="flex: 1; min-width: 200px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: white; padding: 15px 25px; border-radius: 50px; outline: none; font-size: 0.9rem;">
+                        <button type="submit" style="background: var(--accent-red); color: white; border: none; padding: 15px 35px; border-radius: 50px; font-weight: 800; cursor: pointer; font-size: 0.85rem; transition: 0.3s; width: 100%; max-width: 180px;">INSCREVER</button>
                     </form>
                 </div>
             </div>
@@ -408,6 +459,59 @@
                 1024: { enabled: false } // Desativar carrossel no desktop (usar grid)
             }
         });
+
+        // Blog Swiper (Mobile/Tablet Only)
+        const blogSwiper = new Swiper('.blogSwiper', {
+            slidesPerView: 1.2,
+            spaceBetween: 20,
+            centeredSlides: false,
+            pagination: { el: ".blog-pagination", clickable: true },
+            breakpoints: {
+                768: { slidesPerView: 2.2 },
+                1024: { enabled: false } // Desativar no desktop
+            }
+        });
+
+        // Lógica Newsletter
+        const newsForm = document.querySelector('.newsletter-form');
+        if (newsForm) {
+            newsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const nomeInput = newsForm.querySelector('input[name="nome"]');
+                const emailInput = newsForm.querySelector('input[name="email"]');
+                const btn = newsForm.querySelector('button');
+                
+                if (!emailInput.value || !nomeInput.value) return;
+                
+                btn.disabled = true;
+                const originalText = btn.innerText;
+                btn.innerText = '...';
+
+                try {
+                    const response = await fetch('/api/newsletter', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            nome: nomeInput.value,
+                            email: emailInput.value 
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        alert('Inscrição realizada com sucesso!');
+                        nomeInput.value = '';
+                        emailInput.value = '';
+                    } else {
+                        alert('Erro ao assinar newsletter.');
+                    }
+                } catch (err) {
+                    alert('Falha na conexão.');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            });
+        }
     </script>
 </body>
 </html>

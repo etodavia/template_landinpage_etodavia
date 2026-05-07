@@ -5,6 +5,11 @@
             <div class="topbar-left">
                 <span><i class="ri-map-pin-line"></i> <%= settings.endereco %></span>
             </div>
+            <% if (settings.header_strip_text) { %>
+            <div class="topbar-center" style="font-weight: 700; letter-spacing: 0.5px;">
+                <%= settings.header_strip_text %>
+            </div>
+            <% } %>
             <div class="topbar-right" style="display: flex; gap: 15px;">
                 <% 
                     const socialIconsMap = {

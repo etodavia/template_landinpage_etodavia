@@ -8,34 +8,16 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
-        .stat-card::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 6px; background: var(--primary); }
-        .stat-card.red::after { background: var(--accent); }
-        
-        .stat-card h3 { font-size: 0.6rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
-        .stat-card p { font-size: 2.2rem; font-weight: 900; color: var(--primary); margin: 0; letter-spacing: -0.05em; }
-        
-        .chart-box { background: white; padding: 40px; border-radius: 30px; border: 1px solid var(--border); margin-top: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
-    </style>
 </head>
-<body style="display: flex;">
-    <%- include('../partials/admin-sidebar') %>
-
-    <main style="flex: 1; min-height: 100vh; overflow-x: hidden; background: #F8FAFC;">
-        <%- include('../partials/admin-header') %>
+<body>
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
         
-        <div style="padding: 40px;">
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            
+            <div class="admin-content-scroll">
+                <div style="padding: 2.5rem 4rem;">
             <div style="margin-bottom: 40px;">
                 <h1 style="font-size: 2rem; margin: 0; color: #000033;">Cockpit de <em>Inteligência</em></h1>
                 <p class="subtitle" style="margin: 5px 0 0; opacity: 0.6;">Monitoramento de tráfego e conversões do ecossistema ARQUÊΔ.</p>
@@ -92,11 +74,11 @@
         </div>
         <% } %>
 
-        <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; opacity: 0.5; font-size: 0.6rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">
-            <div>ARQUÊ GESTÃO • GOVERNANÇA v1.5</div>
-            <div>© 2026 E-TODAVIA • PROPRIEDADE TÉCNICA</div>
-        </footer>
-    </main>
+            </div> <!-- padding -->
+            <%- include('../partials/admin-footer') %>
+        </div> <!-- admin-content-scroll -->
+    </div> <!-- admin-main -->
+</div> <!-- admin-app -->
 
     <script>
         const chartEl = document.getElementById('leadsChart');
@@ -109,10 +91,10 @@
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels.length ? labels : ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                labels: labels.length ? labels : ['Aguardando Dados'],
                 datasets: [{
-                    label: 'Leads',
-                    data: values.length ? values : [12, 19, 15, 25, 22, 30],
+                    label: 'Conversões Totais',
+                    data: values.length ? values : [0],
                     borderColor: '#0A1128',
                     backgroundColor: 'rgba(10, 17, 40, 0.03)',
                     borderWidth: 4,

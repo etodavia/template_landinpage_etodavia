@@ -3,75 +3,62 @@
 <head>
     <%- include('partials/head-tags') %>
     <style>
-        .service-page-header {
-            background: var(--bg-sand);
-            padding: 160px 0 100px;
-            position: relative;
-            overflow: hidden;
+        .article-content {
+            font-size: 1.15rem;
+            line-height: 1.85;
+            color: #2d3436;
+        }
+        .article-content p { margin-bottom: 25px; }
+        .article-content h2, .article-content h3 { 
+            color: var(--navy-blue); 
+            margin-top: 45px; 
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            margin: 40px 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
 
-        .service-meta-label {
-            display: inline-block;
+        /* Redes Sociais Flutuantes - Mobile Friendly */
+        .hero-social-float {
+            position: absolute;
+            left: 3%;
+            bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10;
+        }
+        .hero-social-float a {
+            width: 40px;
+            height: 40px;
             background: white;
             color: var(--navy-blue);
-            padding: 8px 24px;
-            border-radius: 100px;
-            font-weight: 800;
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: 0.3s;
         }
-
-        .service-page-title {
-            font-size: clamp(3rem, 8vw, 5.5rem);
-            line-height: 0.9;
-            color: var(--navy-blue);
-            letter-spacing: -5px;
-            margin-bottom: 40px;
-        }
-
-        .service-intro-text {
-            font-size: 1.4rem;
-            line-height: 1.5;
-            color: #555;
-            max-width: 700px;
-            border-left: 6px solid var(--accent-red);
-            padding-left: 30px;
+        .hero-social-float a:hover {
+            background: var(--accent-red);
+            color: white;
+            transform: translateY(-5px);
         }
 
         .service-layout-grid {
             display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 100px;
-            padding: 100px 0;
+            grid-template-columns: 1fr 380px;
+            gap: 80px;
         }
 
-        .main-service-img {
-            width: 100%;
-            height: 600px;
-            object-fit: cover;
-            border-radius: 40px;
-            margin-bottom: 60px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
-        }
-
-        .content-body h2, .content-body h3 {
-            font-size: 2.8rem;
-            color: var(--navy-blue);
-            letter-spacing: -2px;
-            margin: 60px 0 30px;
-        }
-
-        .content-body p {
-            font-size: 1.15rem;
-            line-height: 1.8;
-            color: #444;
-            margin-bottom: 30px;
-        }
-
-        /* Sidebar Refinement */
         .service-aside {
             position: sticky;
             top: 120px;
@@ -81,160 +68,149 @@
         .action-card {
             background: var(--navy-blue);
             color: white;
-            padding: 50px;
-            border-radius: 40px;
-            margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .action-card h4 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            line-height: 1.1;
-            letter-spacing: -1px;
-        }
-
-        .action-card p {
-            font-size: 1rem;
-            opacity: 0.7;
-            margin-bottom: 35px;
-        }
-
-        .btn-wa-service {
-            background: white;
-            color: var(--navy-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 20px;
-            border-radius: 100px;
-            text-decoration: none;
-            font-weight: 800;
-            transition: 0.4s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .btn-wa-service:hover {
-            transform: scale(1.05);
-            background: var(--accent-red);
-            color: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(10,17,40,0.15);
         }
 
         .feature-list {
             list-style: none;
             padding: 0;
+            margin: 30px 0;
         }
-
         .feature-list li {
-            padding: 20px 0;
-            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            font-size: 0.9rem;
             font-weight: 600;
-            color: var(--navy-blue);
         }
+        .feature-list i { color: var(--accent-red); font-size: 1.2rem; }
 
-        .feature-list i {
-            color: var(--accent-red);
-            font-size: 1.4rem;
-        }
-
-        /* Print and Global Helpers */
         @media (max-width: 1024px) {
             .service-layout-grid { grid-template-columns: 1fr; gap: 60px; }
-            .service-page-title { font-size: 3.5rem; letter-spacing: -2px; }
-            .main-service-img { height: 400px; }
-        }
-
-        .no-print { .no-print { display: block; } }
-        @media print {
-            .no-print { display: none !important; }
-            .container { max-width: 100% !important; }
-            .service-page-header { padding: 40px 0; }
+            .service-aside { position: relative; top: 0; }
+            .hero-social-float {
+                left: 15px;
+                bottom: 40px;
+                gap: 10px;
+            }
+            .hero-social-float a {
+                width: 34px;
+                height: 34px;
+                font-size: 0.9rem;
+            }
+            .post-hero {
+                padding-left: 65px !important;
+                padding-bottom: 40px !important;
+            }
         }
     </style>
 </head>
-<body>
+<body style="background: #fafafa;">
+    <%- settings.custom_body_code || '' %>
     <%- include('partials/header') %>
 
     <main>
-        <!-- CABEÇALHO DINÂMICO DO SERVIÇO -->
-        <%- include('partials/page-hero', { 
-            pageTitle: service.titulo,
-            image: service.imagem
-        }) %>
-
-        <div class="container" style="margin-top: 100px;">
-            <div data-reveal style="margin-bottom: 60px;">
-                <div class="service-intro-text">
-                    <%= service.resumo %>
-                </div>
+        <!-- Hero Section -->
+        <section class="post-hero" style="position: relative; height: 65vh; min-height: 480px; display: flex; align-items: flex-end; overflow: hidden; background: #000; padding-left: 10%; padding-bottom: 60px;">
+            <img src="<%= service.imagem %>" alt="<%= service.titulo %>" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;">
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(10,17,40,0.95) 0%, rgba(10,17,40,0.3) 100%);"></div>
+            
+            <!-- Ícones Sociais Flutuantes -->
+            <div class="hero-social-float">
+                <a href="#"><i class="ri-facebook-fill"></i></a>
+                <a href="#"><i class="ri-twitter-x-fill"></i></a>
+                <a href="#"><i class="ri-linkedin-fill"></i></a>
+                <a href="https://wa.me/<%= settings.whatsapp %>"><i class="ri-whatsapp-line"></i></a>
             </div>
 
-    <main class="container">
-        <div class="service-layout-grid">
-            <!-- CONTEÚDO PRINCIPAL -->
-            <article>
-                <div style="height: 0px;"></div>
-                
-                <div class="content-body" data-reveal>
-                    <%- service.conteudo %>
-                    
-                    <h3>Abordagem de <em>Alta Performance</em></h3>
-                    <p>
-                        Na ARQUÊΔ, não entregamos apenas soluções pontuais. Nossa metodologia para <strong><%= service.titulo %></strong> baseia-se em uma visão sistêmica que conecta o capital humano aos resultados financeiros. Mapeamos gargalos, treinamos lideranças e redesenhamos fluxos para que sua empresa opere em sua máxima potência.
-                    </p>
-
-                    <!-- Formulário de Conversão Contextual -->
-                    <div class="no-print" style="margin-top: 80px; padding: 60px; border-radius: 40px; background: white; border: 1px solid #eee; box-shadow: 0 20px 50px rgba(0,0,0,0.02);">
-                        <h4 style="font-size: 2rem; color: var(--navy-blue); margin-bottom: 30px; letter-spacing: -1px;">Dúvidas sobre este serviço?</h4>
-                        <form action="/api/leads" method="POST" class="contact-form-grid" style="gap: 20px;">
-                            <input type="hidden" name="assunto" value="Interesse: <%= service.titulo %>">
-                            <input type="text" name="nome" placeholder="Seu Nome" required style="padding: 18px; border-radius: 15px; border: 1px solid #ddd; outline: none;">
-                            <input type="email" name="email" placeholder="Seu E-mail Profissional" required style="padding: 18px; border-radius: 15px; border: 1px solid #ddd; outline: none;">
-                            <textarea name="mensagem" placeholder="Como podemos ajudar sua operação hoje?" style="grid-column: span 2; padding: 18px; border-radius: 15px; border: 1px solid #ddd; height: 120px; outline: none;"></textarea>
-                            <button type="submit" class="btn-wa-service" style="grid-column: span 2; background: var(--navy-blue); color: white; border: none; cursor: pointer;">SOLICITAR CONSULTA TÉCNICA</button>
-                        </form>
-                    </div>
+            <div class="container" style="position: relative; z-index: 2; margin: 0;">
+                <div data-reveal="left">
+                    <span class="badge" style="background: var(--accent-red); color: white; padding: 6px 18px; border-radius: 4px; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; display: inline-block;">
+                        Especialidade
+                    </span>
+                    <h1 style="color: white; font-size: clamp(2.5rem, 6vw, 4.8rem); font-weight: 800; line-height: 1; letter-spacing: -3px; max-width: 850px;">
+                        <% if (service.titulo.includes('<em>')) { %>
+                            <%- service.titulo %>
+                        <% } else { %>
+                            <% 
+                                const words = service.titulo.split(' ');
+                                if (words.length > 1) {
+                                    const lastWord = words.pop();
+                                    const rest = words.join(' ');
+                            %>
+                                <%= rest %> <em><%= lastWord %></em>
+                            <% } else { %>
+                                <%= service.titulo %>
+                            <% } %>
+                        <% } %>
+                    </h1>
                 </div>
-            </article>
+            </div>
+        </section>
 
-            <!-- BARRA LATERAL -->
-            <aside class="service-aside no-print" data-reveal="right">
-                <div class="action-card">
-                    <h4>Agende sua <br> <em>Conexão.</em></h4>
-                    <p>Fale diretamente com um de nossos consultores seniores sobre este serviço.</p>
-                    <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-wa-service">
-                        <i class="ri-whatsapp-line"></i> CONVERSAR AGORA
-                    </a>
+        <section style="padding: 80px 0;">
+            <div class="container">
+                <div class="service-layout-grid">
+                    
+                    <!-- Coluna Principal -->
+                    <div class="article-content" data-reveal="up">
+                        <div style="background: #f8f8f6; border-left: 8px solid var(--accent-red); padding: 45px; border-radius: 20px; margin-bottom: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+                            <p style="margin-bottom: 0; font-size: 1.3rem; font-weight: 700; color: var(--navy-blue); line-height: 1.6;">
+                                <%= service.resumo %>
+                            </p>
+                        </div>
 
-                    <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;">
-                        <span style="font-size: 0.7rem; font-weight: 800; opacity: 0.5; letter-spacing: 1px;">COMPARTILHAR</span>
-                        <div style="display: flex; gap: 15px; margin-top: 15px;">
-                            <a href="https://linkedin.com/sharing/share-offsite/?url=<%= encodeURIComponent('https://arquegestao.com.br/servicos/' + service.slug) %>" target="_blank" style="color: white; font-size: 1.4rem;"><i class="ri-linkedin-fill"></i></a>
-                            <a href="https://wa.me/?text=<%= encodeURIComponent(service.titulo + ' - https://arquegestao.com.br/servicos/' + service.slug) %>" target="_blank" style="color: white; font-size: 1.4rem;"><i class="ri-whatsapp-line"></i></a>
+                        <div class="content-body">
+                            <%- service.conteudo %>
+                            
+                            <h3>Nossa Abordagem <em>Diferenciada</em></h3>
+                            <p>
+                                Na ARQUÊΔ, não entregamos apenas consultoria técnica. Nossa metodologia para <strong><%= service.titulo %></strong> baseia-se em uma visão sistêmica que conecta o capital humano aos resultados financeiros da operação.
+                            </p>
+                            <p>
+                                Mapeamos gargalos invisíveis, treinamos lideranças para a alta performance e redesenhamos fluxos estratégicos para que sua empresa opere em sua máxima potência competitiva.
+                            </p>
+                        </div>
+
+                        <!-- Caixa de Utilidade (PDF) -->
+                        <div style="background: #f4f4f2; padding: 40px; border-radius: 30px; display: flex; align-items: center; justify-content: space-between; margin-top: 60px;" class="no-print">
+                            <div>
+                                <span style="font-size: 0.75rem; font-weight: 800; letter-spacing: 1px; color: var(--navy-blue); display: block; margin-bottom: 12px;">UTILIDADE:</span>
+                                <button onclick="window.print()" style="background: var(--navy-blue); color: white; border: none; padding: 18px 35px; border-radius: 50px; font-weight: 800; display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                                    <i class="ri-printer-line"></i> IMPRIMIR ESCOPO
+                                </button>
+                            </div>
+                            <a href="/servicos" style="text-decoration: none; color: var(--navy-blue); font-weight: 800; display: flex; align-items: center; gap: 10px; font-size: 0.95rem;">
+                                <i class="ri-arrow-left-line"></i> TODAS AS ESPECIALIDADES
+                            </a>
                         </div>
                     </div>
-                </div>
 
-                <div style="padding: 0 20px;">
-                    <h5 style="font-size: 0.8rem; font-weight: 800; color: #aaa; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">Diferenciais</h5>
-                    <ul class="feature-list">
-                        <li><i class="ri-check-double-line"></i> Visão Sistêmica</li>
-                        <li><i class="ri-check-double-line"></i> Foco em Resultado</li>
-                        <li><i class="ri-check-double-line"></i> Mentoria Senior</li>
-                        <li><i class="ri-check-double-line"></i> Metodologia Própria</li>
-                    </ul>
+                    <!-- Sidebar -->
+                    <aside class="service-aside no-print" data-reveal="right">
+                        <div class="action-card">
+                            <h4 style="font-weight: 800; font-size: 1.6rem; margin-bottom: 15px;">Fale com um <br><em>Estrategista.</em></h4>
+                            <p style="margin-bottom: 30px; line-height: 1.5; color: rgba(255,255,255,0.7);">Estamos prontos para entender seu cenário e propor soluções sob medida para sua gestão.</p>
+                            
+                            <a href="https://wa.me/<%= settings.whatsapp %>" style="background: white; color: var(--navy-blue); display: flex; align-items: center; justify-content: center; gap: 10px; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: 800; transition: 0.3s;">
+                                <i class="ri-whatsapp-line"></i> WHATSAPP DIRETO
+                            </a>
 
-                    <button onclick="window.print()" style="margin-top: 40px; width: 100%; padding: 15px; border-radius: 100px; border: 1px solid #ddd; background: white; color: #666; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        <i class="ri-printer-line"></i> IMPRIMIR ESCOPO
-                    </button>
+                            <ul class="feature-list">
+                                <li><i class="ri-checkbox-circle-fill"></i> Atendimento Senior</li>
+                                <li><i class="ri-checkbox-circle-fill"></i> Diagnóstico Ágil</li>
+                                <li><i class="ri-checkbox-circle-fill"></i> Foco em ROI</li>
+                            </ul>
+                        </div>
+                    </aside>
+
                 </div>
-            </aside>
-        </div>
+            </div>
+        </section>
     </main>
 
     <%- include('partials/footer') %>
@@ -242,15 +218,14 @@
     <script>
         gsap.registerPlugin(ScrollTrigger);
         gsap.utils.toArray("[data-reveal]").forEach(el => {
-            let config = {
+            gsap.from(el, {
                 scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" },
-                opacity: 0, duration: 1.6, ease: "expo.out"
-            };
-            const dir = el.getAttribute('data-reveal');
-            if (dir === 'up') config.y = 100;
-            else if (dir === 'right') config.x = 80;
-            else config.y = 40;
-            gsap.from(el, config);
+                opacity: 0,
+                y: 30,
+                x: el.getAttribute('data-reveal') === 'right' ? 50 : (el.getAttribute('data-reveal') === 'left' ? -50 : 0),
+                duration: 1,
+                ease: "power2.out"
+            });
         });
     </script>
 </body>

@@ -8,61 +8,65 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
-<body style="display: flex;">
-    <%- include('../partials/admin-sidebar') %>
-    
-    <main>
-        <div class="card-cms">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
-                <div>
-                    <h1>Gestão de <em>Equipe</em></h1>
-                    <p class="subtitle">Controle o capital humano e a autoridade exibida no site.</p>
+<body>
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            <div class="admin-content-scroll">
+                <div style="padding: 2.5rem 4rem;">
+                    <div class="card-cms">
+                        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
+                            <div>
+                                <h1 style="font-size: 2.2rem; margin: 0;">Gestão de <em>Equipe</em></h1>
+                                <p class="subtitle" style="color: #888; font-size: 0.95rem; margin-top: 5px;">Controle o capital humano e a autoridade exibida no site.</p>
+                            </div>
+                            <a href="/admin/equipe/novo" class="btn-premium" style="background: #0A1128; color: white; border: none; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(10,17,40,0.2);"><i class="ri-user-add-line"></i> ADICIONAR MEMBRO</a>
+                        </header>
+
+                        <%- include('../partials/admin-alerts') %>
+
+                        <div class="table-responsive">
+                            <% if (equipe.length === 0) { %>
+                                <div style="text-align: center; color: #aaa; padding: 80px; background: #f8fafc; border-radius: 20px; border: 2px dashed #eee;">
+                                    Nenhum membro cadastrado na equipe.
+                                </div>
+                            <% } else { %>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 80px;">Foto</th>
+                                            <th>Nome do Consultor</th>
+                                            <th>Cargo / Especialidade</th>
+                                            <th style="width: 150px; text-align: right;">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% equipe.forEach(member => { %>
+                                            <tr>
+                                                <td><img src="<%= member.imagem %>" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.05);"></td>
+                                                <td><strong style="color: var(--admin-marinho);"><%= member.nome %></strong></td>
+                                                <td><span style="font-size: 0.85rem; color: #666;"><%= member.funcao %></span></td>
+                                                <td style="text-align: right;">
+                                                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                                                        <a href="/admin/equipe/editar/<%= member.id %>" class="btn-action" style="background: #f0f0f0; color: #333; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="Editar"><i class="ri-pencil-line"></i></a>
+                                                        <form action="/admin/equipe/delete/<%= member.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Excluir este membro da equipe?')">
+                                                            <button type="submit" class="btn-action" style="background: #fff0f0; color: #d62828; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer;" title="Remover"><i class="ri-delete-bin-line"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    </tbody>
+                                </table>
+                            <% } %>
+                        </div>
+                    </div>
                 </div>
-                <a href="/admin/equipe/novo" class="btn-premium btn-accent"><i class="ri-user-add-line"></i> ADICIONAR MEMBRO</a>
-            </header>
-
-            <%- include('../partials/admin-alerts') %>
-
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 80px;">Avatar</th>
-                            <th>Nome do Consultor</th>
-                            <th>Função Estratégica</th>
-                            <th style="width: 80px; text-align: center;">Ordem</th>
-                            <th style="width: 120px;">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% if (members.length === 0) { %>
-                            <tr>
-                                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 60px;">Nenhum membro cadastrado.</td>
-                            </tr>
-                        <% } %>
-                        <% members.forEach(m => { %>
-                            <tr>
-                                <td>
-                                    <img src="<%= m.imagem || '/img/placeholder-user.png' %>" 
-                                         style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid #F1F5F9;">
-                                </td>
-                                <td><strong style="color: var(--primary);"><%= m.nome %></strong></td>
-                                <td><span style="font-weight: 600; color: #666;"><%= m.funcao %></span></td>
-                                <td style="text-align: center;"><span style="background: #F1F5F9; padding: 4px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 800;"><%= m.ordem %></span></td>
-                                <td>
-                                    <div class="actions">
-                                        <a href="/admin/equipe/editar/<%= m.id %>" class="btn-action btn-edit" title="Refinar"><i class="ri-pencil-line"></i></a>
-                                        <form action="/admin/equipe/delete/<%= m.id %>" method="POST" onsubmit="return confirm('Remover este consultor?')">
-                                            <button type="submit" class="btn-action btn-delete" title="Excluir"><i class="ri-delete-bin-line"></i></button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        <% }) %>
-                    </tbody>
-                </table>
+                <%- include('../partials/admin-footer') %>
             </div>
         </div>
-    </main>
+    </div>
 </body>
 </html>

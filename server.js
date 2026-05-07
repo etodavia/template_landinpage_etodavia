@@ -220,8 +220,8 @@ const app = express();
 
 // Security and Parsers
 app.use(helmet({ contentSecurityPolicy: false }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // EJS Config
 app.set('view engine', 'ejs');
@@ -487,10 +487,12 @@ app.post('/admin/conteudo', upload.fields([
 
     try {
         await pool.execute(`UPDATE configuracoes_globais SET ${sets} WHERE id = 1`, values);
-        res.redirect('/admin/conteudo?success=1');
+        const activeTab = req.body.active_tab || '';
+        res.redirect(`/admin/conteudo?success=1${activeTab ? '&tab=' + activeTab : ''}`);
     } catch (e) { 
         console.error('❌ CMS SAVE ERROR:', e);
-        res.redirect('/admin/conteudo?error=1'); 
+        const activeTab = req.body.active_tab || '';
+        res.redirect(`/admin/conteudo?error=1${activeTab ? '&tab=' + activeTab : ''}`); 
     }
 });
 

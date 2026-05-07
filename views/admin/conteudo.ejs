@@ -108,6 +108,7 @@
             </nav>
 
             <form id="cmsForm" action="/admin/conteudo" method="POST" class="cms-content" enctype="multipart/form-data">
+                <input type="hidden" name="active_tab" id="activeTabInput" value="<%= (locals.userRole !== 'superadmin') ? 'tab-identidade' : 'tab-licenciamento' %>">
                 <div style="max-width: 900px; margin: 0 auto;">
                     <%- include('../partials/admin-alerts') %>
                 </div>
@@ -840,6 +841,10 @@ Contato|/contato"><%= settings.site_menu %></textarea>
             
             const activePanel = document.getElementById(tabId);
             if(activePanel) activePanel.classList.add('active');
+
+            // Sincronizar campo oculto para persistência no redirect
+            const hiddenInput = document.getElementById('activeTabInput');
+            if(hiddenInput) hiddenInput.value = tabId;
         }
 
         // Roteamento de Aba via URL (Licenciamento Elite)

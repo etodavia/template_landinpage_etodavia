@@ -158,6 +158,36 @@ async function setupDB() {
 
         console.log('✅ DATABASE: Postagens, Serviços e Newsletter (CMS) Prontos.');
 
+        // Tabela de Diferenciais (Substituindo JSON para maior estabilidade)
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS diferenciais (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                titulo VARCHAR(255),
+                texto TEXT,
+                icone VARCHAR(100),
+                ordem INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        // Migração Opcional: Se a tabela diferenciais estiver vazia e houver dados no JSON antigo
+        const [difExists] = await pool.execute('SELECT id FROM diferenciais LIMIT 1');
+        if (difExists.length === 0) {
+            const [rows] = await pool.execute('SELECT benefits_items FROM configuracoes_globais WHERE id = 1');
+            if (rows[0] && rows[0].benefits_items) {
+                try {
+                    const items = JSON.parse(rows[0].benefits_items);
+                    for (const item of items) {
+                        if (item.title || item.text) {
+                            await pool.execute('INSERT INTO diferenciais (titulo, texto, icone) VALUES (?, ?, ?)', 
+                                [item.title, item.text, item.icon || 'ri-star-line']);
+                        }
+                    }
+                    console.log('✅ DATABASE: Migração de Diferenciais concluída.');
+                } catch(e) { console.error('⚠️ Erro na migração de diferenciais:', e.message); }
+            }
+        }
+
         // Inserir Dados Iniciais se estiver vazio
         const [postsExist] = await pool.execute('SELECT id FROM posts LIMIT 1');
         if (postsExist.length === 0) {
@@ -290,8 +320,11 @@ app.get('/', async (req, res) => {
     let services = [];
     let team = [];
     let testimonials = [];
+    let diferenciais = [];
 
     try {
+        // Consultar Diferenciais (Nova Tabela)
+        [diferenciais] = await pool.execute('SELECT * FROM diferenciais ORDER BY ordem ASC, created_at ASC');
         // Consultar Posts (com fallback)
         try {
             [posts] = await pool.execute('SELECT * FROM posts WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 4');
@@ -326,7 +359,8 @@ app.get('/', async (req, res) => {
             posts,
             services,
             team,
-            testimonials
+            testimonials,
+            diferenciais
         });
     } catch (e) { 
         console.error('❌ CRITICAL HOME ROUTE ERROR:', e);
@@ -410,11 +444,19 @@ app.get('/blog/:slug', async (req, res) => {
 });
 
 // CMS ADMIN ROUTES
-app.get('/admin/conteudo', (req, res) => res.render('admin/conteudo', { 
-    title: 'Editor Global (CMS)', 
-    success: req.query.success,
-    activeTab: req.query.tab || ''
-}));
+app.get('/admin/conteudo', async (req, res) => {
+    try {
+        const [diferenciais] = await pool.execute('SELECT * FROM diferenciais ORDER BY ordem ASC, created_at ASC');
+        res.render('admin/conteudo', { 
+            title: 'Editor Global (CMS)', 
+            success: req.query.success,
+            activeTab: req.query.tab || '',
+            diferenciais
+        });
+    } catch (e) {
+        res.render('admin/conteudo', { title: 'Editor Global (CMS)', diferenciais: [] });
+    }
+});
 app.post('/admin/conteudo', upload.fields([
     { name: 'hero_image_file', maxCount: 1 }, 
     { name: 'about_image_file', maxCount: 1 },
@@ -487,6 +529,22 @@ app.post('/admin/conteudo', upload.fields([
 
     try {
         await pool.execute(`UPDATE configuracoes_globais SET ${sets} WHERE id = 1`, values);
+        
+        // Sincronizar nova tabela de Diferenciais se houver dados
+        if (req.body.benefits_items) {
+            try {
+                const items = JSON.parse(req.body.benefits_items);
+                // Limpar atuais e reinserir (método mais simples e seguro para este volume de dados)
+                await pool.execute('DELETE FROM diferenciais');
+                for (const item of items) {
+                    if (item.title || item.text) {
+                        await pool.execute('INSERT INTO diferenciais (titulo, texto, icone) VALUES (?, ?, ?)', 
+                            [item.title, item.text, item.icon || 'ri-star-line']);
+                    }
+                }
+            } catch (err) { console.error('❌ ERROR SYNCING DIFERENCIAIS TABLE:', err); }
+        }
+
         const activeTab = req.body.active_tab || '';
         res.redirect(`/admin/conteudo?success=1${activeTab ? '&tab=' + activeTab : ''}`);
     } catch (e) { 

@@ -127,8 +127,6 @@
 
         <!-- DIFERENCIAIS E BENEFÍCIOS (HUB MODULAR) -->
         <% 
-            let bItems = [];
-            try { bItems = JSON.parse(settings.benefits_items || '[]'); } catch(e) { bItems = []; }
             const activeTemplate = settings.benefits_template || 'style-glass';
         %>
         <section id="diferenciais" style="padding: 100px 0; background: <%= activeTemplate === 'style-navy' ? 'var(--navy-blue)' : 'white' %>; overflow: hidden;">
@@ -150,19 +148,19 @@
                 <!-- Carousel Hub (Swiper) -->
                 <div class="swiper benefitsSwiper" style="padding: 20px 5px 60px; overflow: visible;">
                     <div class="swiper-wrapper">
-                        <% bItems.forEach((b, idx) => { %>
-                            <% if (b.title || b.text) { %>
+                        <% if (locals.diferenciais && diferenciais.length > 0) { %>
+                            <% diferenciais.forEach((b, idx) => { %>
                                 <div class="swiper-slide">
                                     <div class="benefit-card <%= activeTemplate %>" data-reveal="up" style="height: 100%;">
                                         <div class="benefit-icon-box">
-                                            <i class="<%= b.icon || 'ri-check-double-line' %>"></i>
+                                            <i class="<%= b.icone || 'ri-check-double-line' %>"></i>
                                         </div>
-                                        <h3 class="benefit-card-title"><%= b.title %></h3>
-                                        <p class="benefit-card-text"><%= b.text %></p>
+                                        <h3 class="benefit-card-title"><%= b.titulo %></h3>
+                                        <p class="benefit-card-text"><%= b.texto %></p>
                                     </div>
                                 </div>
-                            <% } %>
-                        <% }) %>
+                            <% }) %>
+                        <% } %>
                     </div>
                     <!-- Paginação ativa no Mobile/Tablet -->
                     <div class="swiper-pagination beneficios-pagination" style="bottom: 0;"></div>
@@ -246,10 +244,10 @@
                         width: 100% !important;
                         transform: none !important;
                     }
-                    <% if (bItems.length >= 3) { %>
+                    <% if (locals.diferenciais && diferenciais.length >= 3) { %>
                         .benefitsSwiper .swiper-wrapper { grid-template-columns: repeat(3, 1fr) !important; }
                     <% } %>
-                    <% if (bItems.length >= 4) { %>
+                    <% if (locals.diferenciais && diferenciais.length >= 4) { %>
                         .benefitsSwiper .swiper-wrapper { grid-template-columns: repeat(4, 1fr) !important; }
                     <% } %>
                     .benefitsSwiper .swiper-slide { 

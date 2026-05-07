@@ -494,7 +494,11 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                         
                         <% 
                             let bItems = [];
-                            try { bItems = JSON.parse(settings.benefits_items || '[]'); } catch(e) { bItems = []; }
+                            if (locals.diferenciais && diferenciais.length > 0) {
+                                bItems = diferenciais.map(d => ({ icon: d.icone, title: d.titulo, text: d.texto }));
+                            } else {
+                                try { bItems = JSON.parse(settings.benefits_items || '[]'); } catch(e) { bItems = []; }
+                            }
                             while(bItems.length < 4) bItems.push({ icon: '', title: '', text: '' });
                         %>
                         <input type="hidden" name="benefits_items" id="benefitsData">

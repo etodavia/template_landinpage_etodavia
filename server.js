@@ -144,6 +144,16 @@ async function setupDB() {
             )
         `);
         await pool.execute(`
+            CREATE TABLE IF NOT EXISTS beneficios (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                icone VARCHAR(100) DEFAULT 'ri-checkbox-circle-line',
+                titulo VARCHAR(255),
+                texto TEXT,
+                ordem INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        await pool.execute(`
             CREATE TABLE IF NOT EXISTS newsletter (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 email VARCHAR(100) UNIQUE NOT NULL,
@@ -320,8 +330,11 @@ app.get('/', async (req, res) => {
     let services = [];
     let team = [];
     let testimonials = [];
+    let beneficios = [];
 
     try {
+        // Consultar Benefícios
+        [beneficios] = await pool.execute('SELECT * FROM beneficios ORDER BY ordem ASC, created_at ASC');
 
         // Consultar Posts (com fallback)
         try {
@@ -357,11 +370,12 @@ app.get('/', async (req, res) => {
             posts,
             services,
             team,
-            testimonials
+            testimonials,
+            beneficios
         });
     } catch (e) { 
         console.error('❌ CRITICAL HOME ROUTE ERROR:', e);
-        res.render('index', { title: 'Home | ARQUÊ', posts: [], services: [], team: [], testimonials: [] }); 
+        res.render('index', { title: 'Home | ARQUÊ', posts: [], services: [], team: [], testimonials: [], beneficios: [] }); 
     }
 });
 
@@ -443,13 +457,15 @@ app.get('/blog/:slug', async (req, res) => {
 // CMS ADMIN ROUTES
 app.get('/admin/conteudo', async (req, res) => {
     try {
+        const [beneficios] = await pool.execute('SELECT * FROM beneficios ORDER BY ordem ASC, created_at ASC');
         res.render('admin/conteudo', { 
             title: 'Editor Global (CMS)', 
             success: req.query.success,
-            activeTab: req.query.tab || ''
+            activeTab: req.query.tab || '',
+            beneficios
         });
     } catch (e) {
-        res.render('admin/conteudo', { title: 'Editor Global (CMS)' });
+        res.render('admin/conteudo', { title: 'Editor Global (CMS)', beneficios: [] });
     }
 });
 app.post('/admin/conteudo', upload.fields([
@@ -486,7 +502,7 @@ app.post('/admin/conteudo', upload.fields([
         'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'home_hero_card_title',
         'home_hero_card_subtitle', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
         'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
-        'social_links', 'hero_overlay_color',
+        'social_links', 'beneficios_json', 'hero_overlay_color',
         'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields'
@@ -525,6 +541,19 @@ app.post('/admin/conteudo', upload.fields([
     try {
         await pool.execute(`UPDATE configuracoes_globais SET ${sets} WHERE id = 1`, values);
         
+        // Sincronizar nova tabela de Benefícios (Estrutura Nova)
+        if (req.body.beneficios_json) {
+            try {
+                const items = JSON.parse(req.body.beneficios_json);
+                await pool.execute('DELETE FROM beneficios');
+                for (const item of items) {
+                    if (item.titulo || item.texto) {
+                        await pool.execute('INSERT INTO beneficios (icone, titulo, texto) VALUES (?, ?, ?)', 
+                            [item.icone || 'ri-checkbox-circle-line', item.titulo, item.texto]);
+                    }
+                }
+            } catch (err) { console.error('❌ ERROR SYNCING BENEFICIOS TABLE:', err); }
+        }
 
 
         const activeTab = req.body.active_tab || '';

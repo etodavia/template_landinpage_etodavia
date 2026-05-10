@@ -66,6 +66,26 @@
 </head>
 <body>
     <div class="admin-app">
+        <datalist id="iconSuggestions">
+            <option value="ri-rocket-line">Foguete (Agilidade/Lançamento)</option>
+            <option value="ri-medal-line">Medalha (Qualidade/Excelência)</option>
+            <option value="ri-shield-check-line">Escudo (Segurança/Confiança)</option>
+            <option value="ri-team-line">Time (Colaboração/Pessoas)</option>
+            <option value="ri-customer-service-2-line">Atendimento (Suporte/SAC)</option>
+            <option value="ri-global-line">Globo (Internacional/Abrangência)</option>
+            <option value="ri-lightbulb-line">Lâmpada (Inovação/Ideias)</option>
+            <option value="ri-honour-line">Honra (Ética/Valores)</option>
+            <option value="ri-focus-2-line">Foco (Objetividade/Precisão)</option>
+            <option value="ri-briefcase-line">Maleta (Gestão/Corporativo)</option>
+            <option value="ri-line-chart-line">Gráfico (Resultados/Crescimento)</option>
+            <option value="ri-thumb-up-line">Like (Satisfação/Aprovação)</option>
+            <option value="ri-user-star-line">Estrela (Exclusividade/VIP)</option>
+            <option value="ri-service-line">Serviço (Manutenção/Especialidade)</option>
+            <option value="ri-shake-hands-line">Parceria/Acordo</option>
+            <option value="ri-timer-line">Relógio (Pontualidade/Prazo)</option>
+            <option value="ri-award-line">Prêmio (Reconhecimento)</option>
+            <option value="ri-check-line">Check (Conclusão)</option>
+        </datalist>
         <%- include('../partials/admin-sidebar') %>
         
         <div class="admin-main">
@@ -92,6 +112,7 @@
                 <div class="tab-link" onclick="switchTab('tab-home-hero')"><i class="ri-flashlight-line"></i> <span>Hero</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-sobre')"><i class="ri-user-3-line"></i> <span>Sobre</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-servicos')"><i class="ri-service-line"></i> <span>Serviços</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-beneficios')"><i class="ri-heart-pulse-line"></i> <span>Benefícios</span></div>
 
                 <div class="tab-link" onclick="switchTab('tab-home-artigos')"><i class="ri-article-line"></i> <span>Artigos</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-depoimentos')"><i class="ri-chat-quote-line"></i> <span>Depoimentos</span></div>
@@ -455,6 +476,31 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                 </div>
 
 
+                <!-- HOME: BENEFÍCIOS -->
+                <div id="tab-home-beneficios" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Gestão de Benefícios (Iconbox)</h3></div>
+                    <div style="margin-top: 30px;">
+                        <h4 style="font-size: 0.85rem; font-weight: 900; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; border-bottom: 2px solid #F1F5F9; padding-bottom: 15px;">
+                            <i class="ri-list-check-3" style="color: var(--accent);"></i> Hub de Benefícios Dinâmico
+                        </h4>
+                        <input type="hidden" name="beneficios_json" id="beneficiosJsonData">
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <p class="field-note" style="margin: 0;">Adicione quantos benefícios desejar. Cada um terá um ícone, título e uma frase curta.</p>
+                            <button type="button" onclick="addNewBeneficio()" class="btn-premium" style="background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.75rem;">
+                                <i class="ri-add-line"></i> ADICIONAR
+                            </button>
+                        </div>
+
+                        <div id="beneficios-dynamic-list" style="display: flex; flex-direction: column; gap: 15px;">
+                            <!-- Renderizado via JS -->
+                        </div>
+
+                        <button type="button" onclick="addNewBeneficio()" class="btn-premium" style="margin-top: 25px; background: var(--navy-blue); color: white; border: none; padding: 15px 30px; border-radius: 15px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center;">
+                            <i class="ri-add-circle-line"></i> ADICIONAR NOVO BENEFÍCIO
+                        </button>
+                    </div>
+                </div>
                 <!-- HOME: ARTIGOS -->
                 <div id="tab-home-artigos" class="tab-panel">
                     <div class="section-header"><h3>Home Page » Seção Artigos</h3></div>
@@ -843,9 +889,89 @@ Contato|/contato"><%= settings.site_menu %></textarea>
             });
             document.getElementById('diferenciaisData').value = JSON.stringify(differentials);
 
+            // Consolidação JSON do Hub de Benefícios
+            document.getElementById('beneficiosJsonData').value = JSON.stringify(beneficiosList);
+
             // Consolidação JSON do Editor de Formulário
             document.getElementById('contact_form_fields_json').value = JSON.stringify(formFields);
         });
+
+        // --- EDITOR DE BENEFÍCIOS DINÂMICO ---
+        let beneficiosList = [];
+        try {
+            beneficiosList = JSON.parse(`<%- JSON.stringify(locals.beneficios || []) %>`);
+        } catch(e) { beneficiosList = []; }
+
+        function renderBeneficios() {
+            const container = document.getElementById('beneficios-dynamic-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (beneficiosList.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; background: #F8FAFC; border-radius: 20px; border: 2px dashed #E2E8F0; color: #94A3B8; font-weight: 600;">Nenhum benefício cadastrado.</div>';
+            }
+
+            beneficiosList.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'dynamic-item-card';
+                div.style = "background: white; padding: 25px; border-radius: 22px; border: 1px solid #E2E8F0; display: grid; grid-template-columns: 120px 1.5fr 3fr 50px; gap: 20px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02);";
+                div.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+                        <div class="icon-preview-box" style="width: 55px; height: 55px; background: #F1F5F9; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--accent);">
+                            <i class="${item.icone || 'ri-checkbox-circle-line'}"></i>
+                        </div>
+                        <div style="position: relative; width: 100%;">
+                            <input type="text" value="${item.icone || 'ri-checkbox-circle-line'}" 
+                                oninput="updateBeneficioValue(${index}, 'icone', this.value); updateIconInCard(this)" 
+                                placeholder="ri-icon" list="iconSuggestions" 
+                                style="width: 100%; font-size: 0.7rem; padding: 8px; border-radius: 8px; border: 1px solid #E2E8F0; background: #FFF; font-family: monospace; cursor: pointer;"
+                                onclick="this.value = '';" onblur="if(this.value == '') this.value = '${item.icone || 'ri-checkbox-circle-line'}'"
+                                title="Clique para ver sugestões ou digite o nome do ícone">
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 0.7rem; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px;">Título</label>
+                        <input type="text" value="${item.titulo || ''}" oninput="updateBeneficioValue(${index}, 'titulo', this.value)" placeholder="Ex: Suporte 24h" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; font-size: 0.9rem; color: var(--primary);">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="font-size: 0.7rem; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px;">Descrição Curta</label>
+                        <textarea oninput="updateBeneficioValue(${index}, 'texto', this.value)" placeholder="Descreva o benefício..." style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; height: 75px; font-size: 0.85rem; resize: none; color: #475569; line-height: 1.5;">${item.texto || ''}</textarea>
+                    </div>
+                    <button type="button" onclick="removeBeneficio(${index})" style="background: #FEE2E2; color: #EF4444; border: none; width: 45px; height: 45px; border-radius: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;" onmouseover="this.style.background='#FECACA'" onmouseout="this.style.background='#FEE2E2'"><i class="ri-delete-bin-line"></i></button>
+                `;
+                container.appendChild(div);
+            });
+            syncBeneficiosJson();
+        }
+
+        window.updateIconInCard = function(input) {
+            const preview = input.closest('div.dynamic-item-card').querySelector('.icon-preview-box i');
+            preview.className = input.value || 'ri-star-line';
+        };
+
+        window.updateBeneficioValue = function(index, key, value) {
+            beneficiosList[index][key] = value;
+            syncBeneficiosJson();
+        };
+
+        window.syncBeneficiosJson = function() {
+            document.getElementById('beneficiosJsonData').value = JSON.stringify(beneficiosList);
+        };
+
+        window.addNewBeneficio = function() {
+            beneficiosList.push({ icone: 'ri-checkbox-circle-line', titulo: '', texto: '' });
+            renderBeneficios();
+        };
+
+        window.removeBeneficio = function(index) {
+            if(confirm('Tem certeza que deseja remover este benefício?')) {
+                beneficiosList.splice(index, 1);
+                renderBeneficios();
+            }
+        };
+
+        // Iniciar renderização
+        renderBeneficios();
 
         // --- EDITOR DE FORMULÁRIO DINÂMICO ---
         let formFields = [];
@@ -903,26 +1029,6 @@ Contato|/contato"><%= settings.site_menu %></textarea>
         renderFormFields();
     </script>
 
-    <!-- LISTA DE SUGESTÕES DE ÍCONES (REMIX ICON) -->
-    <datalist id="iconSuggestions">
-        <option value="ri-rocket-line">Foguete (Agilidade/Lançamento)</option>
-        <option value="ri-medal-line">Medalha (Qualidade/Excelência)</option>
-        <option value="ri-shield-check-line">Escudo (Segurança/Confiança)</option>
-        <option value="ri-team-line">Time (Colaboração/Pessoas)</option>
-        <option value="ri-customer-service-2-line">Atendimento (Suporte/SAC)</option>
-        <option value="ri-global-line">Globo (Internacional/Abrangência)</option>
-        <option value="ri-lightbulb-line">Lâmpada (Inovação/Ideias)</option>
-        <option value="ri-honour-line">Honra (Ética/Valores)</option>
-        <option value="ri-focus-2-line">Foco (Objetividade/Precisão)</option>
-        <option value="ri-briefcase-line">Maleta (Gestão/Corporativo)</option>
-        <option value="ri-line-chart-line">Gráfico (Resultados/Crescimento)</option>
-        <option value="ri-thumb-up-line">Like (Satisfação/Aprovação)</option>
-        <option value="ri-user-star-line">Estrela (Exclusividade/VIP)</option>
-        <option value="ri-service-line">Serviço (Manutenção/Especialidade)</option>
-        <option value="ri-shake-hands-line">Aperto de Mão (Parceria/Acordo)</option>
-        <option value="ri-timer-line">Relógio (Pontualidade/Prazo)</option>
-        <option value="ri-money-dollar-circle-line">Cifrão (Economia/Custo-benefício)</option>
-        <option value="ri-leaf-line">Folha (Sustentabilidade/Ecológico)</option>
-    </datalist>
+    <!-- LISTA DE SUGESTÕES DE ÍCONES (REMOVIDA DAQUI) -->
 </body>
 </html>

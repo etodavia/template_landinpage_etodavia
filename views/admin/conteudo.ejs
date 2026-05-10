@@ -92,7 +92,7 @@
                 <div class="tab-link" onclick="switchTab('tab-home-hero')"><i class="ri-flashlight-line"></i> <span>Hero</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-sobre')"><i class="ri-user-3-line"></i> <span>Sobre</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-servicos')"><i class="ri-service-line"></i> <span>Serviços</span></div>
-                <div class="tab-link" onclick="switchTab('tab-home-beneficios')"><i class="ri-star-line"></i> <span>Benefícios</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-diferenciais')"><i class="ri-medal-line"></i> <span>Diferenciais</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-artigos')"><i class="ri-article-line"></i> <span>Artigos</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-depoimentos')"><i class="ri-chat-quote-line"></i> <span>Depoimentos</span></div>
                 <div class="tab-link" onclick="switchTab('tab-home-newsletter')"><i class="ri-mail-send-line"></i> <span>Newsletter</span></div>
@@ -108,7 +108,7 @@
             </nav>
 
             <form id="cmsForm" action="/admin/conteudo" method="POST" class="cms-content" enctype="multipart/form-data">
-                <input type="hidden" name="active_tab" id="activeTabInput" value="<%= (locals.userRole !== 'superadmin') ? 'tab-identidade' : 'tab-licenciamento' %>">
+                <input type="hidden" name="active_tab" id="activeTabInput" value="<%= (locals.activeTab) ? locals.activeTab : ((locals.userRole !== 'superadmin') ? 'tab-identidade' : 'tab-licenciamento') %>">
                 <div style="max-width: 900px; margin: 0 auto;">
                     <%- include('../partials/admin-alerts') %>
                 </div>
@@ -454,9 +454,9 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     </div>
                 </div>
 
-                <!-- HOME: BENEFICIOS -->
-                <div id="tab-home-beneficios" class="tab-panel">
-                    <div class="section-header"><h3>Home Page » Seção Diferenciais & Benefícios</h3></div>
+                <!-- HOME: DIFERENCIAIS -->
+                <div id="tab-home-diferenciais" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Seção Diferenciais & Estratégia</h3></div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Título Base (Impacto)</label>
@@ -485,7 +485,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                     <!-- Hub de Diferenciais -->
                     <div style="margin-top: 50px;">
                         <h4 style="font-size: 0.85rem; font-weight: 900; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; border-bottom: 2px solid #F1F5F9; padding-bottom: 15px;">
-                            <i class="ri-grid-line" style="color: var(--accent);"></i> Arquitetura de Diferenciais (Até 4 Itens)
+                            <i class="ri-grid-line" style="color: var(--accent);"></i> Arquitetura de Diferenciais (Hub de Valor)
                         </h4>
                         <p class="field-note" style="margin-bottom: 25px;">
                             <i class="ri-information-line"></i> Use as classes do <strong>Remix Icon</strong> (ex: <code>ri-focus-2-line</code>). 
@@ -501,14 +501,14 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                             }
                             while(bItems.length < 4) bItems.push({ icon: '', title: '', text: '' });
                         %>
-                        <input type="hidden" name="benefits_items" id="benefitsData">
+                        <input type="hidden" name="benefits_items" id="diferenciaisData">
 
                         <div class="social-slots-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px;">
                             <% bItems.forEach((item, idx) => { %>
-                                <div class="benefit-slot-item" style="background: #F8FAFC; padding: 25px; border-radius: 25px; border: 1px solid #E2E8F0; transition: 0.3s;">
+                                <div class="diferencial-slot-item" style="background: #F8FAFC; padding: 25px; border-radius: 25px; border: 1px solid #E2E8F0; transition: 0.3s;">
                                     <div style="display: flex; flex-direction: column; gap: 15px;">
                                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                                            <label style="font-size: 0.65rem; font-weight: 900; color: #94A3B8; text-transform: uppercase;">Diferencial <%= idx + 1 %></label>
+                                            <label style="font-size: 0.65rem; font-weight: 900; color: #94A3B8; text-transform: uppercase;">Diferencial Corporativo <%= idx + 1 %></label>
                                             <i class="ri-medal-line" style="color: #E2E8F0; font-size: 1.2rem;"></i>
                                         </div>
                                         <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -518,7 +518,7 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                                     <i class="<%= item.icon || 'ri-star-line' %>"></i>
                                                 </div>
                                                 <div style="flex: 1; position: relative;">
-                                                    <input type="text" class="b-item-icon" list="iconSuggestions" placeholder="Digite a classe (ex: ri-rocket-line)" value="<%= item.icon %>" style="width: 100%; padding: 12px; padding-right: 35px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;" oninput="updateIconPreview(this)">
+                                                    <input type="text" class="d-item-icon" list="iconSuggestions" placeholder="Digite a classe (ex: ri-rocket-line)" value="<%= item.icon %>" style="width: 100%; padding: 12px; padding-right: 35px; border-radius: 12px; border: 1px solid #E2E8F0; font-size: 0.85rem;" oninput="updateIconPreview(this)">
                                                     <button type="button" onclick="this.previousElementSibling.value=''; updateIconPreview(this.previousElementSibling)" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #f1f5f9; border: none; color: #94a3b8; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;"><i class="ri-close-line"></i></button>
                                                 </div>
                                             </div>
@@ -526,12 +526,12 @@ Contato|/contato"><%= settings.site_menu %></textarea>
 
                                         <div style="display: flex; flex-direction: column; gap: 8px;">
                                             <label style="font-size: 0.7rem; font-weight: 800; color: #475569;">TÍTULO DO CARD</label>
-                                            <input type="text" class="b-item-title" placeholder="Ex: Qualidade Superior" value="<%= item.title %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; font-size: 0.9rem;">
+                                            <input type="text" class="d-item-title" placeholder="Ex: Qualidade Superior" value="<%= item.title %>" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 700; font-size: 0.9rem;">
                                         </div>
 
                                         <div style="display: flex; flex-direction: column; gap: 8px;">
                                             <label style="font-size: 0.7rem; font-weight: 800; color: #475569;">TEXTO DESCRITIVO</label>
-                                            <textarea class="b-item-text" placeholder="Descreva o benefício aqui..." style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; height: 90px; font-size: 0.85rem;"><%= item.text %></textarea>
+                                            <textarea class="d-item-text" placeholder="Descreva o diferencial aqui..." style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; height: 90px; font-size: 0.85rem;"><%= item.text %></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -916,17 +916,17 @@ Contato|/contato"><%= settings.site_menu %></textarea>
             document.getElementById('socialLinksData').value = JSON.stringify(slots);
 
             // Hub de Diferenciais: Consolidação JSON
-            const benefits = [];
-            document.querySelectorAll('.benefit-slot-item').forEach(item => {
-                const icon = item.querySelector('.b-item-icon').value.trim();
-                const title = item.querySelector('.b-item-title').value.trim();
-                const text = item.querySelector('.b-item-text').value.trim();
+            const differentials = [];
+            document.querySelectorAll('.diferencial-slot-item').forEach(item => {
+                const icon = item.querySelector('.d-item-icon').value.trim();
+                const title = item.querySelector('.d-item-title').value.trim();
+                const text = item.querySelector('.d-item-text').value.trim();
                 
                 if (icon || title || text) {
-                    benefits.push({ icon, title, text });
+                    differentials.push({ icon, title, text });
                 }
             });
-            document.getElementById('benefitsData').value = JSON.stringify(benefits);
+            document.getElementById('diferenciaisData').value = JSON.stringify(differentials);
 
             // Consolidação JSON do Editor de Formulário
             document.getElementById('contact_form_fields_json').value = JSON.stringify(formFields);

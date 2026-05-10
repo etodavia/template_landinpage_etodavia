@@ -64,13 +64,18 @@ async function setupDB() {
             'license_pdf VARCHAR(255)', 'license_auth_code VARCHAR(255)',
             'admin_primary_color VARCHAR(20) DEFAULT "#0A1128"', 'admin_accent_color VARCHAR(20) DEFAULT "#D62828"', 
             'admin_logo VARCHAR(255)', 'admin_header_logo VARCHAR(255)',
-            'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT'
+            'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT',
+            'benefits_icon_bg VARCHAR(50)', 'benefits_icon_color VARCHAR(50)', 'benefits_title_color VARCHAR(50)', 'benefits_text_color VARCHAR(50)'
         ];
         for (const col of columns) {
             try {
                 await pool.execute(`ALTER TABLE configuracoes_globais ADD COLUMN ${col}`);
                 console.log(`✅ DATABASE: Coluna [${col.split(' ')[0]}] provisionada.`);
-            } catch (e) { /* Coluna existente ou erro ignorável */ }
+            } catch (e) { 
+                if (e.code !== 'ER_DUP_COLUMN_NAMES' && e.errno !== 1060) {
+                    console.error(`❌ DATABASE: Erro ao provisionar coluna [${col.split(' ')[0]}]:`, e.message);
+                }
+            }
         }
         console.log('✅ DATABASE: Estrutura de Configurações Sincronizada.');
 
@@ -457,15 +462,21 @@ app.get('/blog/:slug', async (req, res) => {
 // CMS ADMIN ROUTES
 app.get('/admin/conteudo', async (req, res) => {
     try {
+        const [rows] = await pool.execute('SELECT * FROM configuracoes_globais WHERE id = 1');
+        const settings = rows[0] || {};
         const [beneficios] = await pool.execute('SELECT * FROM beneficios ORDER BY ordem ASC, created_at ASC');
+        
         res.render('admin/conteudo', { 
             title: 'Editor Global (CMS)', 
             success: req.query.success,
+            error: req.query.error,
             activeTab: req.query.tab || '',
+            settings,
             beneficios
         });
     } catch (e) {
-        res.render('admin/conteudo', { title: 'Editor Global (CMS)', beneficios: [] });
+        console.error('❌ CMS GET ERROR:', e);
+        res.render('admin/conteudo', { title: 'Editor Global (CMS)', settings: {}, beneficios: [] });
     }
 });
 app.post('/admin/conteudo', upload.fields([
@@ -485,6 +496,7 @@ app.post('/admin/conteudo', upload.fields([
     { name: 'admin_header_logo_file', maxCount: 1 }
 ]), async (req, res) => {
     let updateData = { ...req.body };
+    console.log('📥 REQ.BODY COMPLETO:', Object.keys(req.body));
     
     // Whitelist de colunas válidas no banco para evitar erros de SQL
     const validColumns = [
@@ -502,7 +514,8 @@ app.post('/admin/conteudo', upload.fields([
         'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'home_hero_card_title',
         'home_hero_card_subtitle', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
         'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
-        'social_links', 'benefits_title', 'benefits_text', 'beneficios_json', 'hero_overlay_color',
+        'social_links', 'benefits_title', 'benefits_text', 'beneficios_json', 
+        'hero_overlay_color',
         'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields'
@@ -554,21 +567,24 @@ app.post('/admin/conteudo', upload.fields([
 
     // 2. FILTRAGEM E UPDATE DAS CONFIGURAÇÕES GLOBAIS
     const filteredData = {};
-    Object.keys(updateData).forEach(key => {
-        // Removemos 'beneficios_json' daqui pois ele é tratado acima separadamente
-        if (validColumns.includes(key) && key !== 'beneficios_json' && updateData[key] !== undefined) {
+    validColumns.forEach(key => {
+        // Ignoramos beneficios_json que já foi tratado, e só pegamos o que existe no updateData
+        if (key !== 'beneficios_json' && updateData[key] !== undefined) {
             filteredData[key] = updateData[key];
         }
     });
 
     const fields = Object.keys(filteredData);
+    console.log('🔍 Campos Finais para SQL:', fields);
+    
     if(fields.length === 0) return res.redirect('/admin/conteudo?success=1');
     
-    const sets = fields.map(f => `${f} = ?`).join(', ');
+    const sets = fields.map(f => `\`${f}\` = ?`).join(', ');
     const values = Object.values(filteredData);
 
     try {
-        await pool.execute(`UPDATE configuracoes_globais SET ${sets} WHERE id = 1`, values);
+        const sql = `UPDATE configuracoes_globais SET ${sets} WHERE id = 1`;
+        await pool.query(sql, values);
         const activeTab = req.body.active_tab || '';
         res.redirect(`/admin/conteudo?success=1${activeTab ? '&tab=' + activeTab : ''}`);
     } catch (e) { 

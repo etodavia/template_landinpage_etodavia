@@ -10,8 +10,5 @@
 <% } %>
 
 <% if (urlParams.has('error') || locals.error) { %>
-    <div class="admin-alert-error" style="background: #FFEBEE; color: #C62828; padding: 20px 30px; border-radius: 18px; margin-bottom: 30px; display: flex; align-items: center; gap: 12px; font-weight: 700; border: 1px solid #FFCDD2; animation: slideDown 0.5s ease-out;">
-        <i class="ri-error-warning-fill" style="font-size: 1.4rem;"></i> 
-        <span><%= locals.errorMessage || 'Ocorreu um erro ao processar a solicitação.' %></span>
-    </div>
+    <!-- Erro ocultado a pedido do usuário -->
 <% } %>

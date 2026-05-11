@@ -33,7 +33,7 @@ html, body {
 }
 
 main {
-    margin-bottom: 100px; /* Gap global entre conteúdo e rodapé */
+    margin-bottom: 0; /* Gap global entre conteúdo e rodapé removido */
 }
 
 .header-wrapper {

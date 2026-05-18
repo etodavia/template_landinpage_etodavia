@@ -163,14 +163,18 @@
                     <div class="form-grid">
                         <% 
                             const colors = [
-                                { label: 'Navy Blue', name: 'color_marinho', value: settings.color_marinho || '#0A1128' },
-                                { label: 'Areia', name: 'color_areia', value: settings.color_areia || '#F7F7F4' },
-                                { label: 'Vermelho de Destaque', name: 'color_vermelho', value: settings.color_vermelho || '#D62828' },
+                                { label: 'Navy Blue (Global)', name: 'color_marinho', value: settings.color_marinho || '#0A1128' },
+                                { label: 'Areia (Global)', name: 'color_areia', value: settings.color_areia || '#F7F7F4' },
+                                { label: 'Destaque / Botões', name: 'color_vermelho', value: settings.color_vermelho || '#D62828' },
                                 { label: 'Cor do Texto', name: 'color_texto', value: settings.color_texto || '#333333' },
                                 { label: 'Fundo do Cabeçalho', name: 'color_header', value: settings.color_header || '#FFFFFF' },
                                 { label: 'Texto do Cabeçalho', name: 'color_header_text', value: settings.color_header_text || '#333333' },
                                 { label: 'Fundo do Rodapé', name: 'color_footer', value: settings.color_footer || '#0A1128' },
-                                { label: 'Texto do Rodapé', name: 'color_footer_text', value: settings.color_footer_text || '#FFFFFF' }
+                                { label: 'Texto do Rodapé', name: 'color_footer_text', value: settings.color_footer_text || '#FFFFFF' },
+                                { label: 'Fundo Seção Sobre', name: 'color_about_bg', value: settings.color_about_bg || '#F7F7F4' },
+                                { label: 'Fundo Seção Blog', name: 'color_blog_bg', value: settings.color_blog_bg || '#0A1128' },
+                                { label: 'Texto Seção Blog', name: 'color_blog_text', value: settings.color_blog_text || '#FFFFFF' },
+                                { label: 'Fundo Contato/News', name: 'color_contact_bg', value: settings.color_contact_bg || '#F7F7F4' }
                             ]
                         %>
 
@@ -188,6 +192,38 @@
                                 </div>
                             </div>
                         <% }) %>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 40px;"><h3>Tipografia & Fontes Globais</h3></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Fonte dos Títulos (Destaques/Itálicos)</label>
+                            <select name="font_title" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 500;">
+                                <% 
+                                    const titleFonts = [
+                                        'Playfair Display', 'Lora', 'Cinzel', 'Cormorant Garamond', 'Outfit', 'Inter Tight', 'Montserrat'
+                                    ];
+                                    const currentTitleFont = settings.font_title || 'Playfair Display';
+                                %>
+                                <% titleFonts.forEach(font => { %>
+                                    <option value="<%= font %>" <%= font === currentTitleFont ? 'selected' : '' %>><%= font %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fonte do Texto Principal (Leitura)</label>
+                            <select name="font_body" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; font-weight: 500;">
+                                <% 
+                                    const bodyFonts = [
+                                        'Inter Tight', 'Inter', 'Roboto', 'Open Sans', 'Montserrat', 'Lora'
+                                    ];
+                                    const currentBodyFont = settings.font_body || 'Inter Tight';
+                                %>
+                                <% bodyFonts.forEach(font => { %>
+                                    <option value="<%= font %>" <%= font === currentBodyFont ? 'selected' : '' %>><%= font %></option>
+                                <% }) %>
+                            </select>
+                        </div>
                     </div>
                 </div>
 

@@ -71,7 +71,10 @@ async function setupDB() {
             'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT',
             'benefits_icon_bg VARCHAR(50)', 'benefits_icon_color VARCHAR(50)', 'benefits_title_color VARCHAR(50)', 'benefits_text_color VARCHAR(50)',
             'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT',
-            'license_expiry_date VARCHAR(50)', 'license_stripe_url VARCHAR(512)', 'license_stripe_payment_code VARCHAR(255)'
+            'license_expiry_date VARCHAR(50)', 'license_stripe_url VARCHAR(512)', 'license_stripe_payment_code VARCHAR(255)',
+            'font_title VARCHAR(100) DEFAULT "Playfair Display"', 'font_body VARCHAR(100) DEFAULT "Inter Tight"',
+            'color_about_bg VARCHAR(20) DEFAULT "#F7F7F4"', 'color_blog_bg VARCHAR(20) DEFAULT "#0A1128"',
+            'color_blog_text VARCHAR(20) DEFAULT "#FFFFFF"', 'color_contact_bg VARCHAR(20) DEFAULT "#F7F7F4"'
         ];
         for (const col of columns) {
             try {
@@ -587,7 +590,8 @@ app.post('/admin/conteudo', upload.fields([
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields',
         'login_bg_color', 'login_card_bg', 'login_btn_bg', 'login_btn_text', 'login_label_email', 'login_label_password', 'login_title', 'login_logo',
         'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
-        'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code'
+        'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code',
+        'font_title', 'font_body', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg'
     ];
 
     // Processar Uploads

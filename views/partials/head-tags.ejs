@@ -12,6 +12,17 @@
 <meta property="og:description" content="<%= locals.description || '' %>">
 <meta property="og:type" content="website">
 
+<% 
+    const fontTitleVal = settings.font_title || 'Playfair Display';
+    const fontBodyVal = settings.font_body || 'Inter Tight';
+    const fontsList = [];
+    if (fontTitleVal) fontsList.push(`family=${fontTitleVal.replace(/ /g, '+')}:ital,wght@1,400;1,700`);
+    if (fontBodyVal) fontsList.push(`family=${fontBodyVal.replace(/ /g, '+')}:wght@400;600;700;800`);
+    const fontsQuery = fontsList.join('&');
+%>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?<%= fontsQuery %>&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/main.css?v=<%= Date.now() %>">
 <style>
     :root {
@@ -23,11 +34,22 @@
         --bg-footer: <%= settings.color_footer || '#0A1128' %>;
         --text-header: <%= settings.color_header_text || settings.color_texto || '#333333' %>;
         --text-footer: <%= settings.color_footer_text || '#FFFFFF' %>;
+
+        /* Fontes Dinâmicas */
+        --font-serif: '<%= fontTitleVal %>', serif;
+        --font-main: '<%= fontBodyVal %>', sans-serif;
+
+        /* Cores de Seções e Páginas */
+        --bg-about: <%= settings.color_about_bg || settings.color_areia || '#F7F7F4' %>;
+        --bg-blog: <%= settings.color_blog_bg || settings.color_marinho || '#0A1128' %>;
+        --text-blog: <%= settings.color_blog_text || '#FFFFFF' %>;
+        --bg-contact: <%= settings.color_contact_bg || settings.color_areia || '#F7F7F4' %>;
     }
 
     body {
         margin: 0;
         padding: 0;
+        font-family: var(--font-main);
     }
 </style>
 <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">

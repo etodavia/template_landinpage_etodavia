@@ -1,3 +1,178 @@
+<%
+    let showLicensePopup = false;
+    let daysDiff = null;
+    let expired = false;
+    let formattedDateStr = '';
+    
+    if (settings.license_expiry_date) {
+        try {
+            const expiry = new Date(settings.license_expiry_date + 'T23:59:59');
+            const today = new Date();
+            // Zeramos as horas para comparar apenas os dias
+            expiry.setHours(0,0,0,0);
+            today.setHours(0,0,0,0);
+            
+            const diffTime = expiry - today;
+            daysDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Mostrar pop-up se faltar 30 dias ou menos, ou se já tiver vencido
+            if (daysDiff <= 30) {
+                showLicensePopup = true;
+                expired = daysDiff < 0;
+            }
+            
+            // Formatar data em formato pt-BR (DD/MM/AAAA)
+            const parts = settings.license_expiry_date.split('-');
+            if (parts.length === 3) {
+                formattedDateStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+        } catch(e) {
+            console.error('Erro ao processar data da licença:', e);
+        }
+    }
+%>
+
+<% if (showLicensePopup) { %>
+    <div id="license-warning-popup" class="license-popup-alert <%= expired ? 'expired' : '' %>" style="display: flex; align-items: center; justify-content: space-between; gap: 20px; background: <%= expired ? 'linear-gradient(135deg, #7f1d1d, #991b1b)' : 'linear-gradient(135deg, #0f172a, #1e293b)' %>; color: white; padding: 12px 30px; border-bottom: 2px solid <%= expired ? '#ef4444' : 'var(--admin-accent-color, #D62828)' %>; position: relative; z-index: 1001; animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1); font-family: 'Inter', sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+        <div style="display: flex; align-items: center; gap: 15px; text-align: left;">
+            <div style="background: <%= expired ? 'rgba(255,255,255,0.15)' : 'rgba(214, 40, 40, 0.15)' %>; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: <%= expired ? '#fff' : '#f87171' %>; flex-shrink: 0;">
+                <i class="<%= expired ? 'ri-error-warning-fill' : 'ri-time-line' %>"></i>
+            </div>
+            <div>
+                <h5 style="margin: 0; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: white;"><%= expired ? '🚨 LICENÇA EXPIRADA' : '⏳ AVISO DE MANUTENÇÃO & SUPORTE' %></h5>
+                <p style="margin: 2px 0 0; font-size: 0.7rem; opacity: 0.9; font-weight: 500; color: #f1f5f9;">
+                    <% if (expired) { %>
+                        A licença anual do seu ecossistema ARQUÊΔ expirou em <strong><%= formattedDateStr %></strong>. Entre em contato com a <strong>E-TODAVIA</strong> para regularizar.
+                    <% } else { %>
+                        A licença anual do seu ecossistema vence dia <strong><%= formattedDateStr %></strong> (restam apenas <strong><%= daysDiff %> dias</strong> para garantir suporte ativo).
+                    <% } %>
+                </p>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+            <!-- BOTÃO RENOVAR (STRIPE URL CONFIGURADO PELO SUPERADMIN) -->
+            <a href="<%= settings.license_stripe_url || '#' %>" target="_blank" style="background: <%= expired ? 'white' : 'var(--admin-accent-color, #D62828)' %>; color: <%= expired ? '#991b1b' : 'white' %>; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.65rem; font-weight: 850; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; outline: none;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+                <i class="ri-stripe-line" style="font-size: 0.85rem;"></i> RENOVAR
+            </a>
+            
+            <!-- BOTÃO ATIVAR (ABRE POPUP DE CÓDIGO) -->
+            <button onclick="openActivationModal()" style="background: rgba(255, 255, 255, 0.15); color: white; border: 1px solid rgba(255, 255, 255, 0.25); padding: 8px 16px; border-radius: 8px; font-size: 0.65rem; font-weight: 850; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.3s; outline: none;" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='none'">
+                <i class="ri-key-2-line"></i> ATIVAR
+            </button>
+            
+            <!-- FECHAR AVISO -->
+            <button onclick="document.getElementById('license-warning-popup').style.display='none'" style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1.1rem; opacity: 0.7; transition: 0.3s; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; outline: none; margin-left: 5px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE ATIVAÇÃO DE LICENÇA -->
+    <div id="license-activation-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); z-index: 10002; align-items: center; justify-content: center; font-family: 'Inter', sans-serif;">
+        <div style="background: white; border-radius: 24px; padding: 40px; width: 90%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); text-align: center; border: 1px solid #f1f5f9; animation: modalZoom 0.3s cubic-bezier(0.16, 1, 0.3, 1); position: relative;">
+            <button onclick="closeActivationModal()" style="position: absolute; top: 20px; right: 20px; background: #f8fafc; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; font-size: 1.2rem; transition: 0.3s; outline: none;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+                <i class="ri-close-line"></i>
+            </button>
+            
+            <div style="background: rgba(214, 40, 40, 0.05); width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--admin-accent-color, #D62828); margin: 0 auto 20px;">
+                <i class="ri-shield-keyhole-line"></i>
+            </div>
+            
+            <h3 style="margin: 0 0 10px; font-size: 1.3rem; font-weight: 800; color: #0f172a;">Ativar Ecossistema</h3>
+            <p style="margin: 0 0 25px; font-size: 0.8rem; color: #64748b; line-height: 1.5; text-align: center;">Digite o <strong>Código do Pagamento Stripe</strong> recebido no seu recibo ou e-mail de confirmação para renovar a licença do ecossistema.</p>
+            
+            <div style="text-align: left; margin-bottom: 25px;">
+                <label style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: #64748b; letter-spacing: 1px; display: block; margin-bottom: 8px;">Código do Pagamento Stripe</label>
+                <input type="text" id="activation-code-input" placeholder="Ex: ch_3Mt... ou pi_3Mt..." style="width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 0.95rem; font-weight: 700; color: #0f172a; outline: none; transition: 0.3s; text-align: center; letter-spacing: 0.5px; box-sizing: border-box;" onfocus="this.style.borderColor='var(--admin-accent-color, #D62828)'" onblur="this.style.borderColor='#e2e8f0'">
+                <div id="activation-error-msg" style="color: #ef4444; font-size: 0.7rem; font-weight: 700; margin-top: 8px; display: none;"></div>
+            </div>
+            
+            <button onclick="submitActivationCode()" id="submit-activation-btn" style="width: 100%; background: #0f172a; color: white; border: none; padding: 15px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(15,23,42,0.15);" onmouseover="this.style.background='#1e293b'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#0f172a'; this.style.transform='none'">
+                <i class="ri-checkbox-circle-fill"></i> ATIVAR SISTEMA
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function openActivationModal() {
+            document.getElementById('license-activation-modal').style.display = 'flex';
+            document.getElementById('activation-code-input').focus();
+        }
+
+        function closeActivationModal() {
+            document.getElementById('license-activation-modal').style.display = 'none';
+            document.getElementById('activation-error-msg').style.display = 'none';
+            document.getElementById('activation-code-input').value = '';
+        }
+
+        async function submitActivationCode() {
+            const input = document.getElementById('activation-code-input');
+            const code = input.value.trim();
+            const errorMsg = document.getElementById('activation-error-msg');
+            const btn = document.getElementById('submit-activation-btn');
+            
+            if (!code) {
+                errorMsg.innerText = 'Por favor, digite o código de ativação.';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            // Alterar botão para carregamento
+            const originalHTML = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> VERIFICANDO...';
+            errorMsg.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/licenca/ativar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    btn.style.background = '#22c55e';
+                    btn.innerHTML = '<i class="ri-checkbox-circle-fill"></i> SUCESSO!';
+                    
+                    alert('✨ Ecossistema ativado com sucesso! Licença estendida por +1 ano (Vencimento: ' + result.expiryDate.split('-').reverse().join('/') + ').');
+                    window.location.reload();
+                } else {
+                    throw new Error(result.error || 'Código inválido.');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+                errorMsg.innerText = err.message || 'Erro ao processar ativação.';
+                errorMsg.style.display = 'block';
+                input.style.borderColor = '#ef4444';
+            }
+        }
+    </script>
+
+    <style>
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes modalZoom {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .license-popup-alert {
+            box-sizing: border-box;
+        }
+        .ri-spin {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+<% } %>
+
 <header class="admin-top-header" style="background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f8fafc; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
     <div style="display: flex; align-items: center; gap: 20px;">
         <button class="menu-toggle-btn" onclick="toggleAdminMenu()" style="background: #f1f5f9; border: none; width: 40px; height: 40px; border-radius: 10px; font-size: 1.4rem; color: #0f172a; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;">

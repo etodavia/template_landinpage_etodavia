@@ -66,7 +66,8 @@ async function setupDB() {
             'admin_logo VARCHAR(255)', 'admin_header_logo VARCHAR(255)',
             'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT',
             'benefits_icon_bg VARCHAR(50)', 'benefits_icon_color VARCHAR(50)', 'benefits_title_color VARCHAR(50)', 'benefits_text_color VARCHAR(50)',
-            'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT'
+            'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT',
+            'license_expiry_date VARCHAR(50)', 'license_stripe_url VARCHAR(512)', 'license_stripe_payment_code VARCHAR(255)'
         ];
         for (const col of columns) {
             try {
@@ -460,6 +461,34 @@ app.get('/blog/:slug', async (req, res) => {
     } catch (e) { res.redirect('/blog'); }
 });
 
+// Rota de ativação manual de licença
+app.post('/api/licenca/ativar', async (req, res) => {
+    const { code } = req.body;
+    if (!code) {
+        return res.status(400).json({ success: false, error: 'Código de ativação é obrigatório.' });
+    }
+
+    try {
+        const [rows] = await pool.execute('SELECT license_stripe_payment_code FROM configuracoes_globais WHERE id = 1');
+        const settings = rows[0] || {};
+        
+        if (code.trim() === (settings.license_stripe_payment_code || '').trim()) {
+            // Estender licença por 1 ano (365 dias) a partir de hoje
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            const expiryDateStr = nextYear.toISOString().split('T')[0];
+
+            await pool.execute('UPDATE configuracoes_globais SET license_expiry_date = ? WHERE id = 1', [expiryDateStr]);
+            return res.json({ success: true, expiryDate: expiryDateStr });
+        } else {
+            return res.status(400).json({ success: false, error: 'Código de pagamento Stripe inválido. Verifique o código e tente novamente.' });
+        }
+    } catch (e) {
+        console.error('Erro ao ativar licença:', e);
+        return res.status(500).json({ success: false, error: 'Erro interno ao processar ativação.' });
+    }
+});
+
 // CMS ADMIN ROUTES
 app.get('/admin/conteudo', async (req, res) => {
     try {
@@ -520,7 +549,8 @@ app.post('/admin/conteudo', upload.fields([
         'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields',
-        'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code'
+        'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
+        'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code'
     ];
 
     // Processar Uploads

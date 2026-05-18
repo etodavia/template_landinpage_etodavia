@@ -797,6 +797,27 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                     <% } %>
                                 </div>
                             </div>
+
+                            <div style="margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                                <div class="form-group">
+                                    <label>Data de Vencimento da Licença</label>
+                                    <input type="date" name="license_expiry_date" value="<%= settings.license_expiry_date || '' %>" style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; color: var(--primary);">
+                                    <p class="field-note" style="margin-top: 10px;"><i class="ri-information-line"></i> Configure a data de expiração da licença anual.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label>Link de Assinatura do Stripe (Recorrência)</label>
+                                    <input type="url" name="license_stripe_url" value="<%= settings.license_stripe_url || '' %>" placeholder="Ex: https://buy.stripe.com/..." style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; color: var(--primary);">
+                                    <p class="field-note" style="margin-top: 10px;"><i class="ri-link"></i> Cole o link direto do Stripe Checkout ou Stripe Pricing Table.</p>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 20px; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 20px;">
+                                <div class="form-group full">
+                                    <label>Código de Pagamento Stripe Ativo (Para Liberação)</label>
+                                    <input type="text" name="license_stripe_payment_code" value="<%= settings.license_stripe_payment_code || '' %>" placeholder="Ex: ch_3Mt... ou pi_3Mt..." style="width: 100%; max-width: 450px; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; color: var(--primary);">
+                                    <p class="field-note" style="margin-top: 10px;"><i class="ri-stripe-line"></i> Cole aqui o ID de pagamento/cobrança retirado do seu painel do Stripe após a renovação. O cliente deverá digitar exatamente este código para ativar a licença.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

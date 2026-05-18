@@ -106,6 +106,7 @@
                 <div class="tab-link" onclick="switchTab('tab-seo')"><i class="ri-search-line"></i> <span>SEO & Marketing</span></div>
                 <% if (locals.userRole === 'superadmin') { %>
                 <div class="tab-link" onclick="switchTab('tab-admin-branding')" style="color: #4338ca;"><i class="ri-palette-line"></i> <span>Branding do Painel</span></div>
+                <div class="tab-link" onclick="switchTab('tab-login-branding')" style="color: #ea580c;"><i class="ri-login-box-line"></i> <span>Customizar Login</span></div>
                 <% } %>
 
                 <div class="tab-category-header">Home Page</div>
@@ -816,6 +817,84 @@ Contato|/contato"><%= settings.site_menu %></textarea>
                                     <label>Código de Pagamento Stripe Ativo (Para Liberação)</label>
                                     <input type="text" name="license_stripe_payment_code" value="<%= settings.license_stripe_payment_code || '' %>" placeholder="Ex: ch_3Mt... ou pi_3Mt..." style="width: 100%; max-width: 450px; padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; color: var(--primary);">
                                     <p class="field-note" style="margin-top: 10px;"><i class="ri-stripe-line"></i> Cole aqui o ID de pagamento/cobrança retirado do seu painel do Stripe após a renovação. O cliente deverá digitar exatamente este código para ativar a licença.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CUSTOMIZAR PÁGINA DE LOGIN (WHITE LABEL) -->
+                <div id="tab-login-branding" class="tab-panel">
+                    <div class="section-header"><h3>Customização da Página de Login <span style="background: #ea580c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem;">EXCLUSIVO SUPER ADMIN</span></h3></div>
+                    <p style="font-size: 0.8rem; color: #64748B; margin-bottom: 30px;">Personalize a experiência visual da página de login (/admin/login) do seu cliente. Modifique o título, os rótulos de campos, as cores de fundo do formulário e o botão.</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Logo de Login (Substitui o ícone padrão de pulso)</label>
+                            <input type="file" name="login_logo_file" accept="image/*">
+                            <input type="hidden" name="login_logo" value="<%= settings.login_logo %>">
+                            <p class="field-note"><i class="ri-information-line"></i> Envie uma logo horizontal ou quadrada para a tela de login.</p>
+                            <% if (settings.login_logo) { %> <img src="<%= settings.login_logo %>" class="img-preview" style="background: #EEEEEE; padding: 10px; max-height: 80px; object-fit: contain;"> <% } %>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Título Superior de Login</label>
+                            <input type="text" name="login_title" value="<%= settings.login_title || 'ARQUÊΔ CMS' %>" placeholder="Ex: ARQUÊΔ CMS">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Texto do Botão de Enviar</label>
+                            <input type="text" name="login_btn_text" value="<%= settings.login_btn_text || 'ACESSAR GOVERNANÇA' %>" placeholder="Ex: ACESSAR GOVERNANÇA">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rótulo do Campo de E-mail</label>
+                            <input type="text" name="login_label_email" value="<%= settings.login_label_email || 'Credencial de Acesso' %>" placeholder="Ex: Credencial de Acesso">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rótulo do Campo de Senha</label>
+                            <input type="text" name="login_label_password" value="<%= settings.login_label_password || 'Assinatura de Segurança' %>" placeholder="Ex: Assinatura de Segurança">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cor de Fundo da Página (Fundo Geral)</label>
+                            <div class="color-field-container">
+                                <div class="color-swatch-wrapper">
+                                    <div class="color-swatch-preview" style="background-color: <%= settings.login_bg_color || '#0A1128' %>"></div>
+                                    <input type="color" class="color-input-hidden" name="login_bg_color" value="<%= settings.login_bg_color || '#0A1128' %>">
+                                </div>
+                                <div class="color-info-wrapper">
+                                    <span class="color-name-label">Fundo Login</span>
+                                    <input type="text" class="color-hex-input" value="<%= (settings.login_bg_color || '#0A1128').toUpperCase() %>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cor de Fundo do Card (Formulário)</label>
+                            <div class="color-field-container">
+                                <div class="color-swatch-wrapper">
+                                    <div class="color-swatch-preview" style="background-color: <%= settings.login_card_bg || '#FFFFFF' %>"></div>
+                                    <input type="color" class="color-input-hidden" name="login_card_bg" value="<%= settings.login_card_bg || '#FFFFFF' %>">
+                                </div>
+                                <div class="color-info-wrapper">
+                                    <span class="color-name-label">Card Login</span>
+                                    <input type="text" class="color-hex-input" value="<%= (settings.login_card_bg || '#FFFFFF').toUpperCase() %>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cor do Botão Acessar</label>
+                            <div class="color-field-container">
+                                <div class="color-swatch-wrapper">
+                                    <div class="color-swatch-preview" style="background-color: <%= settings.login_btn_bg || '#0A1128' %>"></div>
+                                    <input type="color" class="color-input-hidden" name="login_btn_bg" value="<%= settings.login_btn_bg || '#0A1128' %>">
+                                </div>
+                                <div class="color-info-wrapper">
+                                    <span class="color-name-label">Botão Login</span>
+                                    <input type="text" class="color-hex-input" value="<%= (settings.login_btn_bg || '#0A1128').toUpperCase() %>">
                                 </div>
                             </div>
                         </div>

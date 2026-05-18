@@ -64,6 +64,10 @@ async function setupDB() {
             'license_pdf VARCHAR(255)', 'license_auth_code VARCHAR(255)',
             'admin_primary_color VARCHAR(20) DEFAULT "#0A1128"', 'admin_accent_color VARCHAR(20) DEFAULT "#D62828"', 
             'admin_logo VARCHAR(255)', 'admin_header_logo VARCHAR(255)',
+            'login_bg_color VARCHAR(20) DEFAULT "#0A1128"', 'login_card_bg VARCHAR(20) DEFAULT "#FFFFFF"', 
+            'login_btn_bg VARCHAR(20) DEFAULT "#0A1128"', 'login_btn_text VARCHAR(255) DEFAULT "ACESSAR GOVERNANÇA"',
+            'login_label_email VARCHAR(255) DEFAULT "Credencial de Acesso"', 'login_label_password VARCHAR(255) DEFAULT "Assinatura de Segurança"',
+            'login_title VARCHAR(255) DEFAULT "ARQUÊΔ CMS"', 'login_logo VARCHAR(255)',
             'contact_form_fields TEXT', 'header_strip_text TEXT', 'beneficios_json TEXT',
             'benefits_icon_bg VARCHAR(50)', 'benefits_icon_color VARCHAR(50)', 'benefits_title_color VARCHAR(50)', 'benefits_text_color VARCHAR(50)',
             'meta_title_home VARCHAR(255)', 'meta_description_home TEXT', 'facebook_pixel TEXT', 'google_analytics TEXT',
@@ -252,10 +256,10 @@ async function setupDB() {
                 ['Super Admin ET', 'superadmin@etodavia.com', hashedSuper, 'superadmin']);
         }
 
-        if (!userEmails.includes('admin@arquegestao.com')) {
-            const hashedAdmin = await bcrypt.hash('Arque.2026*', 10);
+        if (!userEmails.includes('admin@agenciaetodavia.com.br')) {
+            const hashedAdmin = await bcrypt.hash('123654*', 10);
             await pool.execute('INSERT INTO usuarios (nome, email, senha, nivel) VALUES (?, ?, ?, ?)', 
-                ['Admin Arquê', 'admin@arquegestao.com', hashedAdmin, 'admin']);
+                ['Vcadmin', 'admin@agenciaetodavia.com.br', hashedAdmin, 'admin']);
         }
 
         console.log('✅ DATABASE: Usuários (Super/Admin) sincronizados/atualizados.');
@@ -323,10 +327,41 @@ app.use((req, res, next) => {
 app.use(async (req, res, next) => {
     try {
         const [rows] = await pool.execute('SELECT * FROM configuracoes_globais WHERE id = 1 LIMIT 1');
-        res.locals.settings = rows[0] || { whatsapp: '5511999999999', cnpj: '00.000.000/0001-00' };
+        const settings = rows[0] || { whatsapp: '5511999999999', cnpj: '00.000.000/0001-00' };
+        
+        // Verificação de Status da Licença (Carência de 30 dias / Expirada)
+        let licenseStatus = 'active'; // active, grace, expired
+        let daysOverdue = 0;
+        
+        if (settings.license_expiry_date) {
+            const expiryDate = new Date(settings.license_expiry_date);
+            const currentDate = new Date();
+            
+            // Zerar as horas para comparação correta de datas
+            expiryDate.setHours(0, 0, 0, 0);
+            currentDate.setHours(0, 0, 0, 0);
+            
+            if (currentDate > expiryDate) {
+                const diffTime = Math.abs(currentDate - expiryDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                daysOverdue = diffDays;
+                
+                if (diffDays <= 30) {
+                    licenseStatus = 'grace'; // Período de carência (1 a 30 dias de atraso)
+                } else {
+                    licenseStatus = 'expired'; // Suspenso (mais de 30 dias de atraso)
+                }
+            }
+        }
+        
+        res.locals.settings = settings;
+        res.locals.licenseStatus = licenseStatus;
+        res.locals.daysOverdue = daysOverdue;
         next();
     } catch (err) {
         res.locals.settings = { whatsapp: '5511999999999', cnpj: '00.000.000/0001-00' };
+        res.locals.licenseStatus = 'active';
+        res.locals.daysOverdue = 0;
         next();
     }
 });
@@ -523,7 +558,8 @@ app.post('/admin/conteudo', upload.fields([
     { name: 'license_qr_code_file', maxCount: 1 },
     { name: 'license_pdf_file', maxCount: 1 },
     { name: 'admin_logo_file', maxCount: 1 },
-    { name: 'admin_header_logo_file', maxCount: 1 }
+    { name: 'admin_header_logo_file', maxCount: 1 },
+    { name: 'login_logo_file', maxCount: 1 }
 ]), async (req, res) => {
     let updateData = { ...req.body };
     console.log('📥 REQ.BODY COMPLETO:', Object.keys(req.body));
@@ -549,6 +585,7 @@ app.post('/admin/conteudo', upload.fields([
         'hero_overlay_opacity', 'contact_phone', 'contact_email', 'address_full', 'contact_map_url',
         'contact_form_title', 'contact_form_recipient', 'license_qr_code', 'license_nf_data',
         'license_pdf', 'license_auth_code', 'admin_primary_color', 'admin_accent_color', 'admin_logo', 'admin_header_logo', 'contact_form_fields',
+        'login_bg_color', 'login_card_bg', 'login_btn_bg', 'login_btn_text', 'login_label_email', 'login_label_password', 'login_title', 'login_logo',
         'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
         'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code'
     ];
@@ -558,7 +595,8 @@ app.post('/admin/conteudo', upload.fields([
         'hero_image', 'about_image', 'about_hero_image', 
         'services_hero_image', 'blog_hero_image', 'contact_hero_image',
         'about_story_image', 'logo', 'logo_white', 'favicon', 
-        'license_qr_code', 'license_pdf', 'admin_logo', 'admin_header_logo'
+        'license_qr_code', 'license_pdf', 'admin_logo', 'admin_header_logo',
+        'login_logo'
     ];
 
     fileFields.forEach(field => {

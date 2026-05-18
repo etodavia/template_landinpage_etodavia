@@ -39,8 +39,8 @@
             <canvas id="leadsChart" height="40" data-chart='<%- JSON.stringify(chartData) %>'></canvas>
         </div>
 
-        <!-- AUTENTICAÇÃO DE PROPRIEDADE (CERTIFICADO DIGITAL - VISÍVEL APENAS PARA SUPERADMIN) -->
-        <% if (locals.userRole === 'superadmin') { %>
+        <!-- AUTENTICAÇÃO DE PROPRIEDADE (CERTIFICADO DIGITAL - VISÍVEL PARA SUPERADMIN E ADMIN) -->
+        <% if (locals.userRole === 'superadmin' || locals.userRole === 'admin') { %>
         <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
             <div style="background: white; padding: 30px; border-radius: 24px; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
                 <h4 style="font-size: 0.65rem; font-weight: 900; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px;">Autenticação Digital</h4>

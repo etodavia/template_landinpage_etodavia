@@ -1,3 +1,26 @@
+<% if (locals.licenseStatus === 'grace') { %>
+    <div class="license-banner grace" style="background: #E65100; color: white; padding: 12px 20px; font-size: 0.85rem; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 99999; position: relative; font-family: 'Inter', sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <i class="ri-error-warning-line" style="font-size: 1.1rem;"></i>
+        <span>⚠️ AVISO DE MANUTENÇÃO: A licença anual da plataforma expirou há <%= locals.daysOverdue %> dias. Regularize no painel para evitar suspensão (Carência: <%= locals.daysOverdue %>/30 dias).</span>
+    </div>
+<% } else if (locals.licenseStatus === 'expired') { %>
+    <div class="license-banner expired" style="background: #D62828; color: white; padding: 16px 20px; font-size: 0.9rem; font-weight: 800; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; z-index: 999999; position: fixed; top: 0; left: 0; width: 100%; font-family: 'Inter', sans-serif; box-shadow: 0 5px 25px rgba(214,40,40,0.4); text-transform: uppercase; letter-spacing: 0.5px;">
+        <i class="ri-spam-3-line" style="font-size: 1.3rem; animation: pulse 1s infinite alternate;"></i>
+        <span>🚨 PLATAFORMA SUSPENSA: A licença anual deste website expirou há <%= locals.daysOverdue %> dias. Regularize no Painel Administrativo e pague a renovação para restabelecer o site.</span>
+    </div>
+    <style>
+        body { margin-top: 55px !important; }
+        @media (max-width: 768px) {
+            body { margin-top: 75px !important; }
+            .license-banner.expired { font-size: 0.75rem; padding: 12px; }
+        }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
+        }
+    </style>
+<% } %>
+
 <div class="header-wrapper">
     <% if (settings.show_topbar == 1) { %>
     <div class="topbar" style="background: var(--navy-blue); color: white; padding: 10px 0; font-size: 0.75rem;">

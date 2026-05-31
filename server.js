@@ -828,7 +828,7 @@ app.post('/admin/conteudo', upload.fields([
         'blog_section_title', 'blog_section_text', 'testimonial_section_title', 'newsletter_section_title',
         'newsletter_section_text', 'services_page_description', 'blog_page_newsletter_title',
         'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'home_hero_card_title',
-        'home_hero_card_subtitle', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
+        'home_hero_card_subtitle', 'home_hero_button_text', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
         'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
         'social_links', 'benefits_title', 'benefits_text', 'beneficios_json', 
         'hero_overlay_color',
@@ -838,7 +838,7 @@ app.post('/admin/conteudo', upload.fields([
         'login_bg_color', 'login_card_bg', 'login_btn_bg', 'login_btn_text', 'login_label_email', 'login_label_password', 'login_title', 'login_logo',
         'header_strip_text', 'meta_title_home', 'meta_description_home', 'meta_keywords', 'facebook_pixel', 'google_analytics', 'pinterest_pixel', 'linkedin_pixel', 'custom_head_code', 'custom_body_code',
         'license_expiry_date', 'license_stripe_url', 'license_stripe_payment_code', 'template_version',
-        'font_title', 'font_body', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg',
+        'font_title', 'font_body', 'color_hero_button', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg',
         'benefits_color', 'benefits_text_color', 'benefits_title_color', 'benefits_icon_bg', 'benefits_icon_color', 'benefits_card_title_color', 'benefits_card_text_color', 'benefits_card_bg',
         'admin_tutorial_video', 'admin_tutorial_image'
     ];

@@ -38,8 +38,9 @@
                     <%- settings.home_hero_description || 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.' %>
                 </p>
                 <div data-reveal style="display: flex; justify-content: flex-start;">
-                    <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px;">
-                        Agendar Consultoria <div class="icon-blue-circle" style="background: var(--accent-red); color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                    <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                        <%= settings.home_hero_button_text || 'Agendar Consultoria' %> 
+                        <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
                     </a>
                 </div>
             </div>

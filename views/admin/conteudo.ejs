@@ -172,7 +172,8 @@
                             const colors = [
                                 { label: 'Navy Blue (Global)', name: 'color_marinho', value: settings.color_marinho || '#0A1128' },
                                 { label: 'Areia (Global)', name: 'color_areia', value: settings.color_areia || '#F7F7F4' },
-                                { label: 'Destaque / Botões', name: 'color_vermelho', value: settings.color_vermelho || '#D62828' },
+                                { label: 'Destaque / Botões Globais', name: 'color_vermelho', value: settings.color_vermelho || '#D62828' },
+                                { label: 'Cor do Botão Hero', name: 'color_hero_button', value: settings.color_hero_button || '' },
                                 { label: 'Cor do Texto', name: 'color_texto', value: settings.color_texto || '#333333' },
                                 { label: 'Fundo do Cabeçalho', name: 'color_header', value: settings.color_header || '#FFFFFF' },
                                 { label: 'Texto do Cabeçalho', name: 'color_header_text', value: settings.color_header_text || '#333333' },
@@ -455,6 +456,10 @@
                             <label>Título de Impacto</label>
                             <input type="text" name="home_hero_title" value="<%= settings.home_hero_title %>">
                             <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Texto do Botão Hero</label>
+                            <input type="text" name="home_hero_button_text" value="<%= settings.home_hero_button_text || 'Agendar Consultoria' %>">
                         </div>
                         <div class="form-group full">
                             <label>Descrição Secundária</label>

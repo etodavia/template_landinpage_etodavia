@@ -16,6 +16,12 @@
         const heroDesktop = settings.hero_image || "/img/hero_optimo.png";
         const heroTablet = settings.hero_image_tablet || heroDesktop;
         const heroMobile = settings.hero_image_mobile || heroTablet;
+        const heroText = (value, fallback) => String(value || '').trim() || fallback;
+        const homeHeroTitle = heroText(settings.home_hero_title, 'Lidere Negócios com <em>Confiança</em>.');
+        const homeHeroDescription = heroText(settings.home_hero_description, 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.');
+        const homeHeroButtonText = heroText(settings.home_hero_button_text, 'Agendar Consultoria');
+        const homeHeroCardTitle = heroText(settings.home_hero_card_title, 'Sua empresa em <em>Crescimento</em>.');
+        const homeHeroCardSubtitle = heroText(settings.home_hero_card_subtitle, 'Experiência Estratégica');
     %>
     <style>
         .hero { 
@@ -34,21 +40,21 @@
         <section id="home" class="hero responsive-bg" style="--responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>');">
             <div class="hero-content">
                 <h1 data-reveal>
-                    <%- settings.home_hero_title || 'Lidere Negócios com <em>Confiança</em>.' %>
+                    <%- homeHeroTitle %>
                 </h1>
                 <p data-reveal>
-                    <%- settings.home_hero_description || 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.' %>
+                    <%- homeHeroDescription %>
                 </p>
                 <div data-reveal style="display: flex; justify-content: flex-start;">
                     <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
-                        <%= settings.home_hero_button_text || 'Agendar Consultoria' %> 
+                        <%= homeHeroButtonText %> 
                         <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
                     </a>
                 </div>
             </div>
             <div class="floating-card" data-reveal style="bottom: 30px;">
-                <h4><%- settings.home_hero_card_title || 'Sua empresa em <em>Crescimento</em>.' %></h4>
-                <a href="/servicos"><%= settings.home_hero_card_subtitle || 'Experiência Estratégica' %> <i class="ri-arrow-right-line"></i></a>
+                <h4><%- homeHeroCardTitle %></h4>
+                <a href="/servicos"><%= homeHeroCardSubtitle %> <i class="ri-arrow-right-line"></i></a>
             </div>
         </section>
 

@@ -505,7 +505,7 @@
                         </div>
                         <div class="form-group">
                             <label>Título de Impacto</label>
-                            <input type="text" name="home_hero_title" value="<%= settings.home_hero_title %>">
+                            <textarea name="home_hero_title" style="min-height: 90px;"><%= settings.home_hero_title || 'Lidere Negócios com <em>Confiança</em>.' %></textarea>
                             <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
                         </div>
                         <div class="form-group">
@@ -514,16 +514,16 @@
                         </div>
                         <div class="form-group full">
                             <label>Descrição Secundária</label>
-                            <textarea name="home_hero_description"><%= settings.home_hero_description %></textarea>
+                            <textarea name="home_hero_description"><%= settings.home_hero_description || 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.' %></textarea>
                         </div>
                         <div class="form-group">
                             <label>Card Flutuante: Título</label>
-                            <input type="text" name="home_hero_card_title" value="<%= settings.home_hero_card_title %>">
+                            <input type="text" name="home_hero_card_title" value="<%= settings.home_hero_card_title || 'Sua empresa em <em>Crescimento</em>.' %>">
                             <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
                         </div>
                         <div class="form-group">
                             <label>Card Flutuante: Subtítulo (Link)</label>
-                            <input type="text" name="home_hero_card_subtitle" value="<%= settings.home_hero_card_subtitle %>">
+                            <input type="text" name="home_hero_card_subtitle" value="<%= settings.home_hero_card_subtitle || 'Experiência Estratégica' %>">
                         </div>
                     </div>
                 </div>

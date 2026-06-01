@@ -167,7 +167,9 @@
     <%- include('partials/header') %>
     <%- include('partials/page-hero', { 
         pageTitle: settings.about_hero_title || 'Nossa <em>História</em>',
-        image: settings.about_hero_image || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1600'
+        image: settings.about_hero_image || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1600',
+        imageTablet: settings.about_hero_image_tablet,
+        imageMobile: settings.about_hero_image_mobile
     }) %>
     <main>
         <!-- MODERN STORY SECTION -->

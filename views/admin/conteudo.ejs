@@ -126,6 +126,10 @@
                 <div class="tab-link" onclick="switchTab('tab-home-contato')"><i class="ri-contacts-book-2-line"></i> <span>Contato Home</span></div>
 
 
+                <div class="tab-category-header">PÃ¡ginas Internas</div>
+                <div class="tab-link" onclick="switchTab('tab-page-sobre')"><i class="ri-building-4-line"></i> <span>PÃ¡gina Sobre</span></div>
+                <div class="tab-link" onclick="switchTab('tab-page-servicos')"><i class="ri-service-line"></i> <span>PÃ¡gina ServiÃ§os</span></div>
+                <div class="tab-link" onclick="switchTab('tab-page-contato')"><i class="ri-customer-service-2-line"></i> <span>PÃ¡gina Contato</span></div>
 
                 <div class="tab-category-header">Estrutura</div>
                 <div class="tab-link" onclick="switchTab('tab-footer')"><i class="ri-layout-bottom-line"></i> <span>Rodapé</span></div>
@@ -439,10 +443,24 @@
                     <div class="section-header"><h3>Home Page » Seção Hero</h3></div>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Imagem de Fundo (1200x900px recomendado)</label>
+                            <label>Imagem de Fundo - Desktop (1600x900px recomendado)</label>
                             <input type="file" name="hero_image_file" accept="image/*">
                             <input type="hidden" name="hero_image" value="<%= settings.hero_image %>">
                             <% if (settings.hero_image) { %> <img src="<%= settings.hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Imagem de Fundo - Tablet (1200x900px opcional)</label>
+                            <input type="file" name="hero_image_tablet_file" accept="image/*">
+                            <input type="hidden" name="hero_image_tablet" value="<%= settings.hero_image_tablet %>">
+                            <% if (settings.hero_image_tablet) { %> <img src="<%= settings.hero_image_tablet %>" class="img-preview"> <% } %>
+                            <p class="field-note"><i class="ri-tablet-line"></i> Se ficar vazio, usa a imagem de desktop.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Imagem de Fundo - Mobile (900x1200px opcional)</label>
+                            <input type="file" name="hero_image_mobile_file" accept="image/*">
+                            <input type="hidden" name="hero_image_mobile" value="<%= settings.hero_image_mobile %>">
+                            <% if (settings.hero_image_mobile) { %> <img src="<%= settings.hero_image_mobile %>" class="img-preview"> <% } %>
+                            <p class="field-note"><i class="ri-smartphone-line"></i> Ideal para corte vertical no celular.</p>
                         </div>
                         <div class="form-group">
                             <label>Cor da Sobreposição (Overlay)</label>
@@ -585,11 +603,23 @@
                             <input type="text" name="about_hero_title" value="<%= settings.about_hero_title %>">
                             <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para o estilo itálico serifado.</p>
                         </div>
-                        <div class="form-group full">
-                            <label>Hero: Imagem de Fundo</label>
+                        <div class="form-group">
+                            <label>Hero: Imagem Desktop</label>
                             <input type="file" name="about_hero_image_file" accept="image/*">
                             <input type="hidden" name="about_hero_image" value="<%= settings.about_hero_image %>">
                             <% if (settings.about_hero_image) { %> <img src="<%= settings.about_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Tablet</label>
+                            <input type="file" name="about_hero_image_tablet_file" accept="image/*">
+                            <input type="hidden" name="about_hero_image_tablet" value="<%= settings.about_hero_image_tablet %>">
+                            <% if (settings.about_hero_image_tablet) { %> <img src="<%= settings.about_hero_image_tablet %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Mobile</label>
+                            <input type="file" name="about_hero_image_mobile_file" accept="image/*">
+                            <input type="hidden" name="about_hero_image_mobile" value="<%= settings.about_hero_image_mobile %>">
+                            <% if (settings.about_hero_image_mobile) { %> <img src="<%= settings.about_hero_image_mobile %>" class="img-preview"> <% } %>
                         </div>
 
                         <div class="section-header" style="margin-top: 30px;"><h4>A Nossa História (Grid Assimétrico)</h4></div>
@@ -648,10 +678,22 @@
                             <input type="text" name="services_hero_title" value="<%= settings.services_hero_title %>">
                         </div>
                         <div class="form-group">
-                            <label>Hero: Imagem</label>
+                            <label>Hero: Imagem Desktop</label>
                             <input type="file" name="services_hero_image_file" accept="image/*">
                             <input type="hidden" name="services_hero_image" value="<%= settings.services_hero_image %>">
                             <% if (settings.services_hero_image) { %> <img src="<%= settings.services_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Tablet</label>
+                            <input type="file" name="services_hero_image_tablet_file" accept="image/*">
+                            <input type="hidden" name="services_hero_image_tablet" value="<%= settings.services_hero_image_tablet %>">
+                            <% if (settings.services_hero_image_tablet) { %> <img src="<%= settings.services_hero_image_tablet %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Mobile</label>
+                            <input type="file" name="services_hero_image_mobile_file" accept="image/*">
+                            <input type="hidden" name="services_hero_image_mobile" value="<%= settings.services_hero_image_mobile %>">
+                            <% if (settings.services_hero_image_mobile) { %> <img src="<%= settings.services_hero_image_mobile %>" class="img-preview"> <% } %>
                         </div>
                         <div class="form-group full">
                             <label>Narrativa Introdutória</label>
@@ -700,10 +742,22 @@
                             <input type="text" name="contact_hero_title" value="<%= settings.contact_hero_title %>">
                         </div>
                         <div class="form-group">
-                            <label>Hero: Imagem</label>
+                            <label>Hero: Imagem Desktop</label>
                             <input type="file" name="contact_hero_image_file" accept="image/*">
                             <input type="hidden" name="contact_hero_image" value="<%= settings.contact_hero_image %>">
                             <% if (settings.contact_hero_image) { %> <img src="<%= settings.contact_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Tablet</label>
+                            <input type="file" name="contact_hero_image_tablet_file" accept="image/*">
+                            <input type="hidden" name="contact_hero_image_tablet" value="<%= settings.contact_hero_image_tablet %>">
+                            <% if (settings.contact_hero_image_tablet) { %> <img src="<%= settings.contact_hero_image_tablet %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Mobile</label>
+                            <input type="file" name="contact_hero_image_mobile_file" accept="image/*">
+                            <input type="hidden" name="contact_hero_image_mobile" value="<%= settings.contact_hero_image_mobile %>">
+                            <% if (settings.contact_hero_image_mobile) { %> <img src="<%= settings.contact_hero_image_mobile %>" class="img-preview"> <% } %>
                         </div>
                         <div class="form-group full">
                             <label>Narrativa de Atendimento</label>

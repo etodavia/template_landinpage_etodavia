@@ -1,4 +1,10 @@
-<section class="page-hero" style="background: linear-gradient(rgba(10, 17, 40, 0.4), rgba(10, 17, 40, 0.8)), url('<%= locals.image || "/img/hero_optimo.png" %>') center/cover;">
+<%
+    const pageHeroDesktop = locals.image || "/img/hero_optimo.png";
+    const pageHeroTablet = locals.imageTablet || pageHeroDesktop;
+    const pageHeroMobile = locals.imageMobile || pageHeroTablet;
+    const pageHeroOverlay = 'linear-gradient(rgba(10, 17, 40, 0.4), rgba(10, 17, 40, 0.8))';
+%>
+<section class="page-hero responsive-bg" style="--responsive-bg-desktop: <%= pageHeroOverlay %>, url('<%= pageHeroDesktop %>'); --responsive-bg-tablet: <%= pageHeroOverlay %>, url('<%= pageHeroTablet %>'); --responsive-bg-mobile: <%= pageHeroOverlay %>, url('<%= pageHeroMobile %>');">
     <div class="container">
         <div class="page-hero-content">
             <span class="section-label" data-reveal style="color: white; opacity: 0.6;">Consultoria Boutique Sistema</span>

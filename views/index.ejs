@@ -13,11 +13,13 @@
             return `${r}, ${g}, ${b}`;
         }
         const overlayStyle = `linear-gradient(rgba(${hexToRgb(oColor)}, ${oOpacity}), rgba(${hexToRgb(oColor)}, ${oOpacity}))`;
+        const heroDesktop = settings.hero_image || "/img/hero_optimo.png";
+        const heroTablet = settings.hero_image_tablet || heroDesktop;
+        const heroMobile = settings.hero_image_mobile || heroTablet;
     %>
     <style>
         .hero { 
             height: 85vh; 
-            background: <%= overlayStyle %>, url('<%= settings.hero_image || "/img/hero_optimo.png" %>') center/cover no-repeat;
             margin-top: 0 !important;
             border-top: none !important;
         }
@@ -29,7 +31,7 @@
 
     <main>
         <!-- HERO IMPACTO -->
-        <section id="home" class="hero">
+        <section id="home" class="hero responsive-bg" style="--responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>');">
             <div class="hero-content">
                 <h1 data-reveal>
                     <%- settings.home_hero_title || 'Lidere Negócios com <em>Confiança</em>.' %>

@@ -257,6 +257,25 @@ section { padding: 100px 0; }
     font-style: italic;
 }
 
+.responsive-bg {
+    background-image: var(--responsive-bg-desktop) !important;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+@media (max-width: 1024px) {
+    .responsive-bg {
+        background-image: var(--responsive-bg-tablet, var(--responsive-bg-desktop)) !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .responsive-bg {
+        background-image: var(--responsive-bg-mobile, var(--responsive-bg-tablet, var(--responsive-bg-desktop))) !important;
+    }
+}
+
 /* FOOTER PREMIUM - DARK MODE */
 footer {
     background: var(--bg-footer);

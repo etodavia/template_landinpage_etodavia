@@ -194,13 +194,25 @@
     </div>
     <div class="admin-top-actions" style="display: flex; align-items: center; gap: 15px;">
         <% if (locals.title.includes('Editor') || locals.title.includes('CMS')) { %>
-            <button type="submit" form="cmsForm" class="btn-premium" style="background: #0f172a; color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);">
+            <button type="button" onclick="submitCmsFormFromHeader()" class="btn-premium" style="background: #0f172a; color: white; border: none; padding: 10px 25px; border-radius: 50px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);">
                 <i class="ri-save-3-fill"></i> SALVAR <span class="desktop-only">ALTERAÇÕES</span>
             </button>
         <% } %>
         <a href="/admin/perfil" style="background: #f8fafc; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 1.3rem; transition: 0.3s;"><i class="ri-user-settings-fill"></i></a>
     </div>
 </header>
+
+<script>
+    window.submitCmsFormFromHeader = window.submitCmsFormFromHeader || function() {
+        const form = document.getElementById('cmsForm');
+        if (!form) return;
+        if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+        } else {
+            form.submit();
+        }
+    };
+</script>
 
 <style>
     .desktop-only { display: inline !important; }

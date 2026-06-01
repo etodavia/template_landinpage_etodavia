@@ -135,7 +135,7 @@
                 <div class="tab-link" onclick="switchTab('tab-footer')"><i class="ri-layout-bottom-line"></i> <span>Rodapé</span></div>
             </nav>
 
-            <form id="cmsForm" action="/admin/conteudo" method="POST" class="cms-content" enctype="multipart/form-data">
+            <form id="cmsForm" action="/admin/conteudo" method="POST" class="cms-content" enctype="multipart/form-data" novalidate>
                 <input type="hidden" name="active_tab" id="activeTabInput" value="<%= (locals.activeTab) ? locals.activeTab : ((locals.userRole !== 'superadmin') ? 'tab-identidade' : 'tab-licenciamento') %>">
                 <div style="max-width: 900px; margin: 0 auto;">
                     <%- include('../partials/admin-alerts') %>
@@ -1129,6 +1129,17 @@
         }
 
         // Hub de Redes Sociais: Consolidação JSON
+        window.submitCmsFormFromHeader = function() {
+            const form = document.getElementById('cmsForm');
+            if (!form) return;
+            bindDetachedControlsToCmsForm();
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.submit();
+            }
+        };
+
         document.getElementById('cmsForm').addEventListener('submit', function(e) {
             bindDetachedControlsToCmsForm();
             const currentPanel = document.querySelector('.tab-panel.active');

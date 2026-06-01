@@ -928,12 +928,25 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
 
     // 2. FILTRAGEM E UPDATE DAS CONFIGURAÇÕES GLOBAIS
     const filteredData = {};
+    const numericColumns = new Set([
+        'smtp_port',
+        'show_topbar',
+        'hero_overlay_opacity',
+        'title_size_hero_desktop', 'title_size_hero_tablet', 'title_size_hero_mobile',
+        'title_size_page_desktop', 'title_size_page_tablet', 'title_size_page_mobile',
+        'title_size_section_desktop', 'title_size_section_tablet', 'title_size_section_mobile',
+        'title_size_card_desktop', 'title_size_card_tablet', 'title_size_card_mobile'
+    ]);
     validColumns.forEach(key => {
         // Ignoramos beneficios_json que já foi tratado, e só pegamos o que existe no updateData
         if (key !== 'beneficios_json' && updateData[key] !== undefined) {
             let val = updateData[key];
             if (Array.isArray(val)) {
                 val = val[0];
+            }
+            if (numericColumns.has(key)) {
+                val = val === '' || val === null ? null : Number(val);
+                if (Number.isNaN(val)) val = null;
             }
             filteredData[key] = val;
         }
@@ -954,7 +967,9 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         res.redirect(cmsRedirect(req, 'success'));
     } catch (e) { 
         console.error('❌ CMS UPDATE ERROR:', e);
-        res.redirect(cmsRedirect(req, 'error'));
+        const redirectUrl = cmsRedirect(req, 'error');
+        const separator = redirectUrl.includes('?') ? '&' : '?';
+        res.redirect(`${redirectUrl}${separator}message=${encodeURIComponent(e.sqlMessage || e.message || 'Erro ao salvar configuracoes.')}`);
     }
 });
 

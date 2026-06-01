@@ -261,7 +261,7 @@ async function setupDB() {
             'smtp_host VARCHAR(255)', 'smtp_port INT', 'smtp_user VARCHAR(255)', 'smtp_pass VARCHAR(255)',
             'meta_keywords TEXT', 'pinterest_pixel TEXT', 'linkedin_pixel TEXT', 'custom_head_code TEXT', 'custom_body_code TEXT',
             'email_reply_contact TEXT', 'email_reply_newsletter TEXT', 'email_subject_contact VARCHAR(255)', 'email_subject_newsletter VARCHAR(255)',
-            'site_name VARCHAR(100)', 'footer_text TEXT', 'home_hero_title TEXT', 'home_hero_description TEXT', 'services_hero_title TEXT',
+            'site_name VARCHAR(100)', 'footer_text TEXT', 'privacy_policy_content LONGTEXT', 'terms_conditions_content LONGTEXT', 'home_hero_title TEXT', 'home_hero_description TEXT', 'services_hero_title TEXT',
             'instagram_url VARCHAR(255)', 'linkedin_url VARCHAR(255)', 'facebook_url VARCHAR(255)', 'nav_cta_text VARCHAR(100)', 'endereco TEXT', 'whatsapp VARCHAR(50)',
             'color_marinho VARCHAR(20) DEFAULT "#0A1128"', 'color_areia VARCHAR(20) DEFAULT "#F7F7F4"', 'color_vermelho VARCHAR(20) DEFAULT "#D62828"', 'color_hero_button VARCHAR(50)', 'color_texto VARCHAR(20) DEFAULT "#333333"',
             'color_header VARCHAR(20) DEFAULT "#FFFFFF"', 'color_footer VARCHAR(20) DEFAULT "#0A1128"',
@@ -656,11 +656,10 @@ app.get('/', async (req, res) => {
 
         // Consultar Serviços (com fallback)
         try {
-            [services] = await pool.execute('SELECT * FROM servicos WHERE destaque_home = 1 AND ativo = 1 ORDER BY ordem ASC, created_at DESC LIMIT 3');
-            if (services.length === 0) [services] = await pool.execute('SELECT * FROM servicos WHERE ativo = 1 ORDER BY created_at ASC LIMIT 3');
+            [services] = await pool.execute('SELECT * FROM servicos WHERE ativo = 1 ORDER BY ordem ASC, titulo ASC');
         } catch (err) {
             console.warn('⚠️ Fallback Service Query (Missing Columns?):', err.message);
-            [services] = await pool.execute('SELECT * FROM servicos ORDER BY created_at ASC LIMIT 3');
+            [services] = await pool.execute('SELECT * FROM servicos ORDER BY titulo ASC');
         }
 
         // Consultar Equipe e Depoimentos
@@ -844,7 +843,7 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
     
     // Whitelist de colunas válidas no banco para evitar erros de SQL
     const validColumns = [
-        'site_name', 'footer_text', 'home_hero_title', 'home_hero_description', 'services_hero_title',
+        'site_name', 'footer_text', 'privacy_policy_content', 'terms_conditions_content', 'home_hero_title', 'home_hero_description', 'services_hero_title',
         'instagram_url', 'linkedin_url', 'facebook_url', 'nav_cta_text', 'endereco', 'whatsapp',
         'color_marinho', 'color_areia', 'color_vermelho', 'color_texto', 'color_header', 'color_footer',
         'color_header_text', 'color_footer_text', 'hero_image', 'hero_image_tablet', 'hero_image_mobile', 'about_title', 'about_text', 'about_image',

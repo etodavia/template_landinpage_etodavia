@@ -86,6 +86,21 @@
     <button class="lgpd-btn" onclick="acceptLGPD()">ACEITAR</button>
 </div>
 
+<button type="button" id="lgpd-tab" class="lgpd-tab" onclick="openLGPD()" aria-label="Abrir aviso de cookies">
+    Cookies
+</button>
+
+<div id="lgpd-modal" class="lgpd-modal" aria-hidden="true">
+    <div class="lgpd-modal-card" role="dialog" aria-modal="true" aria-labelledby="lgpd-modal-title">
+        <h3 id="lgpd-modal-title">Privacidade e cookies</h3>
+        <p>Utilizamos cookies e tecnologias semelhantes para melhorar sua experiência em nosso site. Ao continuar navegando, você concorda com nossa <a href="/politica-de-privacidade">Política de Privacidade</a>.</p>
+        <div class="lgpd-modal-actions">
+            <button type="button" class="lgpd-btn" onclick="acceptLGPD()">ACEITAR</button>
+            <button type="button" class="lgpd-secondary-btn" onclick="closeLGPD()">Agora não</button>
+        </div>
+    </div>
+</div>
+
 <!-- NAVEGAÇÃO FLUTUANTE BOTTOM (MOBILE/TABLET) -->
 <div class="m-floating-nav">
     <a href="/#servicos" class="m-nav-item <%= (locals.currentPage === 'servicos') ? 'active' : '' %>">
@@ -105,16 +120,38 @@
 </a>
 
 <script>
+    function openLGPD() {
+        const modal = document.getElementById('lgpd-modal');
+        if (modal) {
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+        }
+    }
+
+    function closeLGPD() {
+        const modal = document.getElementById('lgpd-modal');
+        if (modal) {
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+    }
+
     function acceptLGPD() {
         localStorage.setItem('lgpd_accepted', 'true');
-        document.getElementById('lgpd-bar').classList.remove('show');
+        const bar = document.getElementById('lgpd-bar');
+        const tab = document.getElementById('lgpd-tab');
+        if (bar) bar.classList.remove('show');
+        if (tab) tab.classList.remove('show');
+        closeLGPD();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
         if (!localStorage.getItem('lgpd_accepted')) {
             setTimeout(() => {
                 const bar = document.getElementById('lgpd-bar');
+                const tab = document.getElementById('lgpd-tab');
                 if(bar) bar.classList.add('show');
+                if(tab) tab.classList.add('show');
             }, 1000);
         }
     });

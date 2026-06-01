@@ -440,6 +440,88 @@ footer {
     background: var(--accent-red);
 }
 
+.lgpd-tab {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-height: 112px;
+    padding: 18px 10px;
+    border: none;
+    border-radius: 18px 0 0 18px;
+    background: var(--navy-blue);
+    color: white;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+    z-index: 3990;
+    cursor: pointer;
+}
+
+.lgpd-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(10, 17, 40, 0.58);
+    z-index: 5000;
+}
+
+.lgpd-modal.show {
+    display: flex;
+}
+
+.lgpd-modal-card {
+    width: min(92vw, 420px);
+    background: white;
+    color: var(--text-dark);
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.28);
+}
+
+.lgpd-modal-card h3 {
+    margin: 0 0 12px;
+    font-size: 1.3rem;
+    color: var(--navy-blue);
+}
+
+.lgpd-modal-card p {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.lgpd-modal-card a {
+    color: var(--navy-blue);
+    font-weight: 800;
+}
+
+.lgpd-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 22px;
+    flex-wrap: wrap;
+}
+
+.lgpd-secondary-btn {
+    background: transparent;
+    color: var(--navy-blue);
+    border: 1px solid rgba(10, 17, 40, 0.16);
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
 /* RESPONSIVIDADE */
 @media (max-width: 1024px) {
     header { padding: 0 5%; gap: 30px; }
@@ -475,6 +557,13 @@ footer {
     .hero { height: auto; min-height: 85vh; padding: 100px 5% 40px 5%; margin-top: 0; display: flex; flex-direction: column; justify-content: center; } 
     .hero-content { margin-top: 20px; width: 100%; }
     .hero-content h1 { font-size: 2.2rem; margin-bottom: 1.5rem; letter-spacing: -1px; }
+    .lgpd-bar,
+    .lgpd-bar.show {
+        display: none;
+    }
+    .lgpd-tab.show {
+        display: flex;
+    }
 
     /* NAVEGAÇÃO MOBILE/TABLET HUD */
     .desktop-only { display: none !important; }
@@ -609,7 +698,7 @@ footer {
         color-adjust: exact !important;
     }
     body { background: white !important; }
-    header, footer, .no-print, .btn-cta-header, .lgpd-bar { display: none !important; }
+    header, footer, .no-print, .btn-cta-header, .lgpd-bar, .lgpd-tab, .lgpd-modal { display: none !important; }
     .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 30px !important; }
     h1, h2, h3 { page-break-after: avoid; }
     img { page-break-inside: avoid; }

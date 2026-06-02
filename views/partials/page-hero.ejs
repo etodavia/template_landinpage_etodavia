@@ -1,13 +1,22 @@
 <%
-    const pageHeroDesktop = locals.image || "/img/hero_optimo.png";
-    const pageHeroTablet = locals.imageTablet || pageHeroDesktop;
-    const pageHeroMobile = locals.imageMobile || pageHeroTablet;
+    const normalizePageHeroImage = (src) => {
+        const cleanSrc = String(src || '').trim().replace(/\\/g, '/');
+        if (!cleanSrc) return '';
+        const separator = cleanSrc.includes('?') ? '&' : '?';
+        return `${cleanSrc}${separator}v=${Date.now()}`;
+    };
+    const pageHeroDesktop = normalizePageHeroImage(locals.image || "/img/hero_optimo.png");
+    const pageHeroTablet = normalizePageHeroImage(locals.imageTablet || locals.image || "/img/hero_optimo.png");
+    const pageHeroMobile = normalizePageHeroImage(locals.imageMobile || locals.imageTablet || locals.image || "/img/hero_optimo.png");
+    const pageHeroLabel = locals.pageLabel || 'Jurídico';
     const pageHeroOverlay = 'linear-gradient(rgba(10, 17, 40, 0.4), rgba(10, 17, 40, 0.8))';
 %>
 <section class="page-hero responsive-bg" style="--responsive-bg-desktop: <%= pageHeroOverlay %>, url('<%= pageHeroDesktop %>'); --responsive-bg-tablet: <%= pageHeroOverlay %>, url('<%= pageHeroTablet %>'); --responsive-bg-mobile: <%= pageHeroOverlay %>, url('<%= pageHeroMobile %>');">
     <div class="container">
         <div class="page-hero-content">
-            <span class="section-label" data-reveal style="color: white; opacity: 0.6;">Consultoria Boutique Sistema</span>
+            <% if (pageHeroLabel) { %>
+                <span class="section-label" data-reveal style="color: white; opacity: 0.6;"><%= pageHeroLabel %></span>
+            <% } %>
             <h1 data-reveal style="color: white;">
                 <% if (pageTitle.includes('<em>')) { %>
                     <%- pageTitle %>

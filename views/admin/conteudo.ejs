@@ -128,6 +128,7 @@
 
                 <div class="tab-category-header">Estrutura</div>
                 <div class="tab-link" onclick="switchTab('tab-footer')"><i class="ri-layout-bottom-line"></i> <span>Rodapé</span></div>
+                <div class="tab-link" onclick="switchTab('tab-legal-pages')"><i class="ri-file-shield-2-line"></i> <span>Páginas Legais</span></div>
             </nav>
 
             <form id="cmsForm" action="/admin/conteudo" method="POST" class="cms-content" enctype="multipart/form-data" novalidate>
@@ -853,16 +854,6 @@
                         <label>Resumo Institucional</label>
                         <textarea name="footer_short_text"><%= settings.footer_short_text %></textarea>
                     </div>
-                    <div class="form-group full">
-                        <label>Política de Privacidade</label>
-                        <textarea name="privacy_policy_content" style="min-height: 220px;" placeholder="Digite aqui o conteúdo da Política de Privacidade. Pode usar HTML simples, como <h2>, <p> e <ul>."><%= settings.privacy_policy_content %></textarea>
-                        <p class="field-note"><i class="ri-file-text-line"></i> Este conteúdo aparece na página /politica-de-privacidade.</p>
-                    </div>
-                    <div class="form-group full">
-                        <label>Termos e Condições</label>
-                        <textarea name="terms_conditions_content" style="min-height: 220px;" placeholder="Digite aqui o conteúdo dos Termos e Condições. Pode usar HTML simples, como <h2>, <p> e <ul>."><%= settings.terms_conditions_content %></textarea>
-                        <p class="field-note"><i class="ri-file-list-3-line"></i> Este conteúdo aparece na página /termos-e-condicoes.</p>
-                    </div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>CNPJ</label>
@@ -875,6 +866,80 @@
                         <div class="form-group full">
                             <label>Copyright (Sufixo)</label>
                             <input type="text" name="footer_text" value="<%= settings.footer_text %>">
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-legal-pages" class="tab-panel">
+                    <div class="section-header"><h3>Páginas Legais</h3></div>
+                    <div class="section-header" style="margin-top: 10px;"><h4>Política de Privacidade</h4></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hero: Rótulo Superior</label>
+                            <input type="text" name="privacy_hero_label" value="<%= settings.privacy_hero_label || '' %>" placeholder="Ex: Jurídico">
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Título</label>
+                            <input type="text" name="privacy_hero_title" value="<%= settings.privacy_hero_title || '' %>" placeholder="Política de <em>Privacidade</em>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para destacar uma palavra.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Desktop</label>
+                            <input type="file" name="privacy_hero_image_file" accept="image/*">
+                            <input type="hidden" name="privacy_hero_image" value="<%= settings.privacy_hero_image %>">
+                            <% if (settings.privacy_hero_image) { %> <img src="<%= settings.privacy_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Tablet</label>
+                            <input type="file" name="privacy_hero_image_tablet_file" accept="image/*">
+                            <input type="hidden" name="privacy_hero_image_tablet" value="<%= settings.privacy_hero_image_tablet %>">
+                            <% if (settings.privacy_hero_image_tablet) { %> <img src="<%= settings.privacy_hero_image_tablet %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Mobile</label>
+                            <input type="file" name="privacy_hero_image_mobile_file" accept="image/*">
+                            <input type="hidden" name="privacy_hero_image_mobile" value="<%= settings.privacy_hero_image_mobile %>">
+                            <% if (settings.privacy_hero_image_mobile) { %> <img src="<%= settings.privacy_hero_image_mobile %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group full">
+                            <label>Conteúdo Completo</label>
+                            <textarea name="privacy_policy_content" style="min-height: 320px;" placeholder="Digite aqui o conteúdo da Política de Privacidade. Pode usar HTML simples, como <h2>, <p> e <ul>."><%= settings.privacy_policy_content %></textarea>
+                            <p class="field-note"><i class="ri-file-text-line"></i> Este conteúdo aparece na página /politica-de-privacidade.</p>
+                        </div>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 45px;"><h4>Termos e Condições</h4></div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Hero: Rótulo Superior</label>
+                            <input type="text" name="terms_hero_label" value="<%= settings.terms_hero_label || '' %>" placeholder="Ex: Jurídico">
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Título</label>
+                            <input type="text" name="terms_hero_title" value="<%= settings.terms_hero_title || '' %>" placeholder="Termos e <em>Condições</em>">
+                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para destacar uma palavra.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Desktop</label>
+                            <input type="file" name="terms_hero_image_file" accept="image/*">
+                            <input type="hidden" name="terms_hero_image" value="<%= settings.terms_hero_image %>">
+                            <% if (settings.terms_hero_image) { %> <img src="<%= settings.terms_hero_image %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Tablet</label>
+                            <input type="file" name="terms_hero_image_tablet_file" accept="image/*">
+                            <input type="hidden" name="terms_hero_image_tablet" value="<%= settings.terms_hero_image_tablet %>">
+                            <% if (settings.terms_hero_image_tablet) { %> <img src="<%= settings.terms_hero_image_tablet %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group">
+                            <label>Hero: Imagem Mobile</label>
+                            <input type="file" name="terms_hero_image_mobile_file" accept="image/*">
+                            <input type="hidden" name="terms_hero_image_mobile" value="<%= settings.terms_hero_image_mobile %>">
+                            <% if (settings.terms_hero_image_mobile) { %> <img src="<%= settings.terms_hero_image_mobile %>" class="img-preview"> <% } %>
+                        </div>
+                        <div class="form-group full">
+                            <label>Conteúdo Completo</label>
+                            <textarea name="terms_conditions_content" style="min-height: 320px;" placeholder="Digite aqui o conteúdo dos Termos e Condições. Pode usar HTML simples, como <h2>, <p> e <ul>."><%= settings.terms_conditions_content %></textarea>
+                            <p class="field-note"><i class="ri-file-list-3-line"></i> Este conteúdo aparece na página /termos-e-condicoes.</p>
                         </div>
                     </div>
                 </div>

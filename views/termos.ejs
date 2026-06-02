@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/main.css">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <%- include('partials/head-tags') %>
 </head>
-<body>
+<body style="background: white; padding-top: 0 !important;">
+    <%- settings.custom_body_code || '' %>
     <%- include('partials/header') %>
-    <%- include('partials/page-hero', { pageTitle: 'Termos e <em>Condições</em>' }) %>
+    <%- include('partials/page-hero', {
+        pageTitle: settings.terms_hero_title || 'Termos e <em>Condições</em>',
+        pageLabel: settings.terms_hero_label || 'Jurídico',
+        image: settings.terms_hero_image || settings.hero_image || '/img/hero_optimo.png',
+        imageTablet: settings.terms_hero_image_tablet || settings.terms_hero_image || settings.hero_image_tablet || settings.hero_image || '/img/hero_optimo.png',
+        imageMobile: settings.terms_hero_image_mobile || settings.terms_hero_image_tablet || settings.terms_hero_image || settings.hero_image_mobile || settings.hero_image_tablet || settings.hero_image || '/img/hero_optimo.png'
+    }) %>
 
     <main>
         <section>

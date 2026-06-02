@@ -109,6 +109,7 @@
                 <div class="tab-category-header">Global</div>
                 <div class="tab-link <%= (locals.userRole !== 'superadmin') ? 'active' : '' %>" onclick="switchTab('tab-identidade')"><i class="ri-fingerprint-line"></i> <span>Identidade & Cores</span></div>
                 <div class="tab-link" onclick="switchTab('tab-header')"><i class="ri-layout-top-line"></i> <span>Cabeçalho</span></div>
+                <div class="tab-link" onclick="switchTab('tab-whatsapp')"><i class="ri-whatsapp-line"></i> <span>WhatsApp</span></div>
                 <div class="tab-link" onclick="switchTab('tab-redes')"><i class="ri-share-line"></i> <span>Redes Sociais</span></div>
                 <div class="tab-link" onclick="switchTab('tab-seo')"><i class="ri-search-line"></i> <span>SEO & Marketing</span></div>
                 <% if (locals.userRole === 'superadmin') { %>
@@ -300,18 +301,25 @@
                         <input type="text" name="nav_cta_text" value="<%= settings.nav_cta_text %>">
                     </div>
                     <div class="form-group full">
-                        <label>WhatsApp Principal</label>
-                        <input type="text" name="whatsapp" value="<%= settings.whatsapp %>">
-                    </div>
-                    <div class="form-group full">
-                        <label>Mensagem Padrão do WhatsApp</label>
-                        <textarea name="whatsapp_message" rows="3" placeholder="Olá, estive no site e gostaria de agendar uma consulta."><%= settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma consulta.' %></textarea>
-                        <p class="field-note"><i class="ri-whatsapp-line"></i> Essa frase vai preenchida automaticamente nos botões principais do WhatsApp.</p>
-                    </div>
-                    <div class="form-group full">
                         <label>Estrutura do Menu (Um por linha: RÓTULO|LINK)</label>
                             <textarea name="site_menu" rows="6" placeholder="Home | /#home\nSobre | /#sobre\nServiços | /#servicos\nContato | /#contato"><%= settings.site_name ? settings.site_menu : '' %></textarea>
                         <p style="font-size: 0.65rem; color: #999; margin-top: 5px;">Use o formato: Nome|/link. Ex: Contato|/contato</p>
+                    </div>
+                </div>
+
+                <!-- WHATSAPP -->
+                <div id="tab-whatsapp" class="tab-panel">
+                    <div class="section-header"><h3>Configurações do WhatsApp</h3></div>
+
+                    <div class="form-group full">
+                        <label>WhatsApp Principal</label>
+                        <input type="text" name="whatsapp" value="<%= settings.whatsapp %>" placeholder="Ex: 5521999999999">
+                        <p class="field-note"><i class="ri-information-line"></i> Use apenas números com DDD e código do país.</p>
+                    </div>
+                    <div class="form-group full">
+                        <label>Mensagem Padrão do WhatsApp</label>
+                        <textarea name="whatsapp_message" rows="4" placeholder="Olá, estive no site e gostaria de agendar uma consulta."><%= settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma consulta.' %></textarea>
+                        <p class="field-note"><i class="ri-whatsapp-line"></i> Essa frase vai preenchida automaticamente nos botões principais do WhatsApp.</p>
                     </div>
                 </div>
 

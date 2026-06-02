@@ -57,6 +57,25 @@ aside {
     background: #F8FAFC;
 }
 
+.dashboard-page {
+    padding: 2.5rem 4rem;
+}
+
+.dashboard-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.dashboard-license-grid {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+}
+
 /* CMS & Editor Layout */
 .cms-layout {
     display: flex;
@@ -108,6 +127,13 @@ p.subtitle { color: var(--text-muted); font-size: 1rem; margin-top: -20px; margi
 @media (max-width: 992px) {
     .form-grid { grid-template-columns: 1fr !important; }
     .form-group.full { grid-column: 1 / -1 !important; }
+    .admin-content-scroll { padding: 24px; }
+    .dashboard-page { padding: 1.5rem; }
+    .dashboard-hero-grid,
+    .dashboard-license-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
 }
 .form-group { margin-bottom: 24px; }
 .form-group.full { grid-column: span 2; }

@@ -470,15 +470,7 @@ async function setupDB() {
             console.log('✅ DATABASE: Posts Iniciais Migrados.');
         }
 
-        const seedSv = [
-            ['cultura-organizacional', 'Cultura Organizacional', 'Diagnóstico analítico do DNA invisível da sua empresa para alinhar valores e comportamentos reais.', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800', 'ri-team-line', '<h3>O DNA da sua Empresa</h3><p>A cultura organizacional é o que acontece quando ninguém está olhando. Na Sua Empresa, ajudamos você a mapear os valores reais versus os valores desejados, criando um ambiente que atrai talentos.</p>'],
-            ['mentoria-de-lideranca', 'Mentoria de Liderança', 'Capacitação estratégica para gestores transformarem potencial em resultados exponenciais.', 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800', 'ri-focus-3-line', '<h3>Líderes que Inspiram</h3><p>Liderança não é cargo, é impacto. Nossa mentoria foca em competências comportamentais e inteligência emocional para que seu time atue como verdadeiros parceiros do negócio.</p>'],
-            ['gestao-de-processos-rh', 'Gestão de Processos de RH', 'Recrutamento técnico e estruturação de fluxos operacionais com foco em eficiência máxima.', 'https://images.unsplash.com/photo-1507679793137-c72a09c17e64?auto=format&fit=crop&q=80&w=800', 'ri-node-tree', '<h3>Eficiência em cada Contratação</h3><p>Otimizamos todo o ciclo do colaborador, do onboarding ao offboarding. Processos claros reduzem custos e aumentam a clareza para todos os envolvidos.</p>']
-        ];
-        for(let s of seedSv) {
-            await pool.execute('INSERT IGNORE INTO servicos (slug, titulo, resumo, imagem, icone, conteudo) VALUES (?, ?, ?, ?, ?, ?)', s);
-        }
-        console.log('✅ DATABASE: Portfólio de Especialidades Sincronizado.');
+        console.log('✅ DATABASE: Portfólio de Especialidades gerenciado pelo painel.');
 
         // Garantir Usuário Admin Padrão
         // Tabela de Usuários (Login Admin) com Nível de Acesso
@@ -532,6 +524,10 @@ app.locals.assetVersion = ASSET_VERSION;
 // EJS Config
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.get('/img/hero_optimo.png', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.sendFile(path.join(__dirname, 'public', 'img', 'hero_optimo.png'));
+});
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
     maxAge: 0,
     etag: false,
@@ -557,10 +553,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// ROTA ATUALIZADA PARA INTEGRAR O NOVO HERO (519481.jpg)
-app.get('/img/hero_optimo.png', (req, res) => {
-    res.sendFile(path.join(__dirname, '519481.jpg'));
-});
 app.get('/img/logo-agencia.png', (req, res) => {
     const logoPath = path.join(__dirname, 'public', 'img', 'logo-agencia.png');
     if (fs.existsSync(logoPath)) {
@@ -914,10 +906,18 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
 
     fileFields.forEach(field => {
         const fileKey = field + '_file';
+        const removeKey = field + '_remove';
+        if (updateData[removeKey] === '1') {
+            updateData[field] = '';
+        }
         if(req.files && req.files[fileKey]) {
             updateData[field] = `/uploads/${req.files[fileKey][0].filename}`;
+        } else if (typeof updateData[field] === 'string' && updateData[field].startsWith('/uploads/')) {
+            const storedPath = path.join(__dirname, 'public', updateData[field].replace(/^\//, ''));
+            if (!fs.existsSync(storedPath)) updateData[field] = '';
         }
         delete updateData[fileKey];
+        delete updateData[removeKey];
     });
 
     // 1. SINCRONIZAÇÃO DA TABELA DE BENEFÍCIOS (Independente do UPDATE principal)

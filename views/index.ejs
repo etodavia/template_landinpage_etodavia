@@ -12,7 +12,8 @@
             const b = parseInt(hex.length === 3 ? hex[2]+hex[2] : hex.substring(4, 6), 16);
             return `${r}, ${g}, ${b}`;
         }
-        const overlayStyle = `linear-gradient(rgba(${hexToRgb(oColor)}, ${oOpacity}), rgba(${hexToRgb(oColor)}, ${oOpacity}))`;
+        const overlayRgb = hexToRgb(oColor);
+        const overlayStyle = `linear-gradient(rgba(${overlayRgb}, ${oOpacity}), rgba(${overlayRgb}, ${oOpacity}))`;
         const normalizeHeroImage = (src) => {
             const cleanSrc = String(src || '').trim().replace(/\\/g, '/');
             if (!cleanSrc) return '';
@@ -45,7 +46,13 @@
 
     <main>
         <!-- HERO IMPACTO -->
-        <section id="home" class="hero responsive-bg" style="--responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>'); --hero-title-offset-y: <%= heroTitleOffsetY %>px; --hero-button-offset-y: <%= heroButtonOffsetY %>px;">
+        <section id="home" class="hero" style="--responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>'); --hero-title-offset-y: <%= heroTitleOffsetY %>px; --hero-button-offset-y: <%= heroButtonOffsetY %>px;">
+            <picture class="hero-media">
+                <source media="(max-width: 640px)" srcset="<%= heroMobile %>">
+                <source media="(max-width: 1024px)" srcset="<%= heroTablet %>">
+                <img src="<%= heroDesktop %>" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high">
+            </picture>
+            <div class="hero-overlay" style="background: rgba(<%= overlayRgb %>, <%= oOpacity %>);"></div>
             <div class="hero-content">
                 <% if (homeHeroTitle.trim()) { %>
                     <h1 data-reveal class="hero-title-adjustable">

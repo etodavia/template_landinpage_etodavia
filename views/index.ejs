@@ -68,7 +68,7 @@
                 <% } %>
                 <% if (homeHeroButtonText.trim()) { %>
                 <div data-reveal class="hero-button-adjustable" style="display: flex; justify-content: flex-start;">
-                    <a href="https://wa.me/<%= settings.whatsapp %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                    <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma consulta.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
                         <%= homeHeroButtonText %> 
                         <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
                     </a>

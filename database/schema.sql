@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS google_reviews (
 CREATE TABLE IF NOT EXISTS configuracoes_globais (
     id INT PRIMARY KEY DEFAULT 1,
     whatsapp VARCHAR(20),
+    whatsapp_message TEXT,
     facebook_pixel TEXT,
     google_analytics TEXT,
     email_smtp VARCHAR(100),

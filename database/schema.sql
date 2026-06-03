@@ -55,7 +55,15 @@ CREATE TABLE IF NOT EXISTS configuracoes_globais (
     endereco TEXT,
     meta_title_home VARCHAR(255),
     meta_description_home TEXT,
-    seo_share_image TEXT
+    seo_share_image TEXT,
+    hero_title_offset_y INT DEFAULT 0,
+    hero_button_offset_y INT DEFAULT 0,
+    hero_title_offset_y_desktop INT DEFAULT 0,
+    hero_title_offset_y_tablet INT DEFAULT 0,
+    hero_title_offset_y_mobile INT DEFAULT 0,
+    hero_button_offset_y_desktop INT DEFAULT 0,
+    hero_button_offset_y_tablet INT DEFAULT 0,
+    hero_button_offset_y_mobile INT DEFAULT 0
 );
 
 -- Inserir Usuário Admin Padrão (Senha: Et.123654*)

@@ -23,8 +23,18 @@
         const heroDesktop = normalizeHeroImage(settings.hero_image);
         const heroTablet = normalizeHeroImage(settings.hero_image_tablet || settings.hero_image);
         const heroMobile = normalizeHeroImage(settings.hero_image_mobile || settings.hero_image_tablet || settings.hero_image);
-        const heroTitleOffsetY = Number(settings.hero_title_offset_y || 0);
-        const heroButtonOffsetY = Number(settings.hero_button_offset_y || 0);
+        const settingNumber = (value, fallback = 0) => {
+            if (value === null || typeof value === 'undefined' || value === '') return Number(fallback || 0);
+            return Number(value);
+        };
+        const heroTitleOffsetLegacy = settingNumber(settings.hero_title_offset_y, 0);
+        const heroButtonOffsetLegacy = settingNumber(settings.hero_button_offset_y, 0);
+        const heroTitleOffsetDesktop = settingNumber(settings.hero_title_offset_y_desktop, heroTitleOffsetLegacy);
+        const heroTitleOffsetTablet = settingNumber(settings.hero_title_offset_y_tablet, heroTitleOffsetLegacy);
+        const heroTitleOffsetMobile = settingNumber(settings.hero_title_offset_y_mobile, heroTitleOffsetLegacy);
+        const heroButtonOffsetDesktop = settingNumber(settings.hero_button_offset_y_desktop, heroButtonOffsetLegacy);
+        const heroButtonOffsetTablet = settingNumber(settings.hero_button_offset_y_tablet, heroButtonOffsetLegacy);
+        const heroButtonOffsetMobile = settingNumber(settings.hero_button_offset_y_mobile, heroButtonOffsetLegacy);
         const heroText = (value, fallback) => (value === null || typeof value === 'undefined') ? fallback : String(value);
         const homeHeroTitle = heroText(settings.home_hero_title, 'Lidere Negócios com <em>Confiança</em>.');
         const homeHeroDescription = heroText(settings.home_hero_description, 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.');
@@ -46,7 +56,7 @@
 
     <main>
         <!-- HERO IMPACTO -->
-        <section id="home" class="hero" style="background: var(--navy-blue) !important; background-image: none !important; --responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>'); --hero-title-offset-y: <%= heroTitleOffsetY %>px; --hero-button-offset-y: <%= heroButtonOffsetY %>px;">
+        <section id="home" class="hero" style="background: var(--navy-blue) !important; background-image: none !important; --responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>'); --hero-title-offset-y-desktop: <%= heroTitleOffsetDesktop %>px; --hero-title-offset-y-tablet: <%= heroTitleOffsetTablet %>px; --hero-title-offset-y-mobile: <%= heroTitleOffsetMobile %>px; --hero-button-offset-y-desktop: <%= heroButtonOffsetDesktop %>px; --hero-button-offset-y-tablet: <%= heroButtonOffsetTablet %>px; --hero-button-offset-y-mobile: <%= heroButtonOffsetMobile %>px;">
             <% if (heroDesktop) { %>
                 <picture class="hero-media">
                     <source media="(max-width: 640px)" srcset="<%= heroMobile || heroDesktop %>">

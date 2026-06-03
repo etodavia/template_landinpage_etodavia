@@ -531,15 +531,35 @@
                             <label>Opacidade do Overlay (0.00 a 1.00)</label>
                             <input type="number" name="hero_overlay_opacity" value="<%= settings.hero_overlay_opacity || 0.4 %>" step="0.05" min="0" max="1" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%;">
                         </div>
-                        <div class="form-group">
-                            <label>Posição Vertical do Título (px)</label>
-                            <input type="number" name="hero_title_offset_y" value="<%= settings.hero_title_offset_y || 0 %>" step="5" min="-300" max="300" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%;">
-                            <p class="field-note"><i class="ri-arrow-up-down-line"></i> Valor negativo sobe o título. Valor positivo desce.</p>
-                        </div>
-                        <div class="form-group">
-                            <label>Posição Vertical do Botão (px)</label>
-                            <input type="number" name="hero_button_offset_y" value="<%= settings.hero_button_offset_y || 0 %>" step="5" min="-300" max="300" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%;">
-                            <p class="field-note"><i class="ri-arrow-up-down-line"></i> Ajusta o botão separadamente do título.</p>
+                        <div class="form-group full">
+                            <label>Posição Vertical do Título e Botão por Tela (px)</label>
+                            <p class="field-note" style="margin-bottom: 16px;"><i class="ri-arrow-up-down-line"></i> Valor negativo sobe. Valor positivo desce. Desktop acima de 1024px, tablet até 1024px e mobile até 640px.</p>
+                            <% 
+                                const hasHeroValue = (value) => value !== null && typeof value !== 'undefined' && value !== '';
+                                const heroTitleBase = hasHeroValue(settings.hero_title_offset_y) ? settings.hero_title_offset_y : 0;
+                                const heroButtonBase = hasHeroValue(settings.hero_button_offset_y) ? settings.hero_button_offset_y : 0;
+                                const heroPositionFields = [
+                                    { label: 'Desktop', icon: 'ri-computer-line', suffix: 'desktop' },
+                                    { label: 'Tablet', icon: 'ri-tablet-line', suffix: 'tablet' },
+                                    { label: 'Mobile', icon: 'ri-smartphone-line', suffix: 'mobile' }
+                                ];
+                            %>
+                            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+                                <% heroPositionFields.forEach(device => { 
+                                    const titleKey = 'hero_title_offset_y_' + device.suffix;
+                                    const buttonKey = 'hero_button_offset_y_' + device.suffix;
+                                    const titleValue = hasHeroValue(settings[titleKey]) ? settings[titleKey] : heroTitleBase;
+                                    const buttonValue = hasHeroValue(settings[buttonKey]) ? settings[buttonKey] : heroButtonBase;
+                                %>
+                                    <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px;">
+                                        <strong style="display: flex; align-items: center; gap: 8px; color: #0f172a; font-size: 0.85rem; margin-bottom: 12px;"><i class="<%= device.icon %>"></i> <%= device.label %></strong>
+                                        <label style="font-size: 0.72rem; margin-bottom: 6px;">Título</label>
+                                        <input type="number" name="<%= titleKey %>" value="<%= titleValue %>" step="5" min="-300" max="300" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%; margin-bottom: 12px;">
+                                        <label style="font-size: 0.72rem; margin-bottom: 6px;">Botão</label>
+                                        <input type="number" name="<%= buttonKey %>" value="<%= buttonValue %>" step="5" min="-300" max="300" style="padding: 12px; border-radius: 12px; border: 1px solid #E2E8F0; width: 100%;">
+                                    </div>
+                                <% }) %>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Título de Impacto</label>

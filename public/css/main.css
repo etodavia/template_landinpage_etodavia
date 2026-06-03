@@ -227,11 +227,11 @@ h1 em, h2 em, h3 em {
 }
 
 .hero-title-adjustable {
-    transform: translateY(var(--hero-title-offset-y, 0px));
+    transform: translateY(var(--hero-title-offset-y-desktop, var(--hero-title-offset-y, 0px)));
 }
 
 .hero-button-adjustable {
-    transform: translateY(var(--hero-button-offset-y, 0px));
+    transform: translateY(var(--hero-button-offset-y-desktop, var(--hero-button-offset-y, 0px)));
 }
 
 /* BOTÕES PILL */
@@ -588,6 +588,21 @@ footer {
     .hero-content h1 { font-size: 3.5rem; }
     .container { padding: 0 30px; }
     .hero { padding-left: 5%; }
+    .hero-title-adjustable {
+        transform: translateY(var(--hero-title-offset-y-tablet, var(--hero-title-offset-y-desktop, 0px)));
+    }
+    .hero-button-adjustable {
+        transform: translateY(var(--hero-button-offset-y-tablet, var(--hero-button-offset-y-desktop, 0px)));
+    }
+}
+
+@media (max-width: 640px) {
+    .hero-title-adjustable {
+        transform: translateY(var(--hero-title-offset-y-mobile, var(--hero-title-offset-y-tablet, 0px)));
+    }
+    .hero-button-adjustable {
+        transform: translateY(var(--hero-button-offset-y-mobile, var(--hero-button-offset-y-tablet, 0px)));
+    }
 }
 
 @media (max-width: 1024px) {

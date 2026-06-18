@@ -18,7 +18,7 @@
             const cleanSrc = String(src || '').trim().replace(/\\/g, '/');
             if (!cleanSrc) return '';
             const separator = cleanSrc.includes('?') ? '&' : '?';
-            return `${cleanSrc}${separator}v=${Date.now()}`;
+            return `${cleanSrc}${separator}v=${locals.assetVersion || '1'}`;
         };
         const heroDesktop = normalizeHeroImage(settings.hero_image);
         const heroTablet = normalizeHeroImage(settings.hero_image_tablet || settings.hero_image);
@@ -110,7 +110,9 @@
                         </a>
                     </div>
                     <div data-reveal="right" class="about-image-wrapper">
-                        <img src="<%= settings.about_image || 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=800' %>" 
+                        <img src="<%= settings.about_image || 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=800' %>"
+                             alt="Equipe da <%= settings.site_name || 'empresa' %> em atividade"
+                             loading="lazy" decoding="async"
                              style="width: 100%; height: 550px; object-fit: cover; border-radius: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.1);">
                     </div>
                 </div>
@@ -248,7 +250,8 @@
                                     <div style="background: var(--bg-sand); border-radius: 24px; padding: 35px; min-height: 250px; display: flex; flex-direction: column; justify-content: space-between;">
                                         <div>
                                             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 18px;">
-                                                <img src="<%= t.foto || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=80&w=100' %>" 
+                                                <img src="<%= t.foto || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=80&w=100' %>"
+                                                     alt="Foto de <%= t.nome || 'cliente' %>" loading="lazy" decoding="async"
                                                      style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
                                                 <div>
                                                     <div style="font-weight: 800; color: var(--navy-blue); font-size: 0.95rem;"><%= t.nome %></div>

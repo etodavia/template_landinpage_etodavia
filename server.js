@@ -528,22 +528,26 @@ app.locals.assetVersion = ASSET_VERSION;
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.get('/img/hero_optimo.png', (req, res) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
     res.sendFile(path.join(__dirname, 'public', 'img', 'hero_optimo.png'));
 });
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
-    maxAge: 0,
-    etag: false,
+    maxAge: process.env.NODE_ENV === 'production' ? '30d' : 0,
+    etag: true,
     lastModified: true,
     setHeaders: (res) => {
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        if (process.env.NODE_ENV === 'production') {
+            res.setHeader('Cache-Control', 'public, max-age=2592000, stale-while-revalidate=86400');
+        }
     }
 }));
 app.use(express.static(path.join(__dirname, 'public'), {
-    maxAge: process.env.NODE_ENV === 'production' ? '7d' : 0,
+    maxAge: process.env.NODE_ENV === 'production' ? '30d' : 0,
     etag: true,
     lastModified: true
 }));
+app.get('/img/placeholder-user.png', (req, res) => res.redirect(301, '/img/placeholder-user.svg'));
+app.get('/img/placeholder-post.png', (req, res) => res.redirect(301, '/img/placeholder-post.svg'));
 
 // MIDDLEWARE DE GOVERNANÇA DE NAVEGAÇÃO (ESTADO ATIVO DOS MENUS)
 app.use((req, res, next) => {
@@ -554,15 +558,6 @@ app.use((req, res, next) => {
     else if (path.startsWith('/termos')) res.locals.currentPage = 'termos';
     else res.locals.currentPage = '';
     next();
-});
-
-app.get('/img/logo-agencia.png', (req, res) => {
-    const logoPath = path.join(__dirname, 'public', 'img', 'logo-agencia.png');
-    if (fs.existsSync(logoPath)) {
-        res.sendFile(logoPath);
-    } else {
-        res.status(404).send('Logo not found');
-    }
 });
 
 // Middleware de Governança de Acesso (RBAC Industrial via JWT Cookie)
@@ -604,6 +599,10 @@ app.use((req, res, next) => {
 
 // Middleware Global para Configurações (Acessível em todas as Views)
 app.use(async (req, res, next) => {
+    if (req.path.startsWith('/admin') || req.path.startsWith('/api') || req.path === '/colher-depoimento' || req.path === '/depoimentos/novo') {
+        res.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    }
+
     try {
         const [rows] = await pool.execute('SELECT * FROM configuracoes_globais WHERE id = 1 LIMIT 1');
         const settings = rows[0] || { whatsapp: '5511999999999', cnpj: '00.000.000/0001-00' };
@@ -638,6 +637,9 @@ app.use(async (req, res, next) => {
         const host = req.get('host');
         res.locals.baseUrl = `${protocol}://${host}`;
         res.locals.currentUrl = `${res.locals.baseUrl}${req.originalUrl}`;
+        const canonicalPath = req.path === '/' ? '/' : req.path.replace(/\/$/, '');
+        res.locals.canonicalUrl = `${res.locals.baseUrl}${canonicalPath}`;
+        res.locals.isAdminPage = req.path.startsWith('/admin');
         res.locals.absoluteAssetUrl = (assetPath) => {
             if (!assetPath) return '';
             if (/^https?:\/\//i.test(assetPath)) return assetPath;
@@ -648,12 +650,98 @@ app.use(async (req, res, next) => {
         res.locals.daysOverdue = daysOverdue;
         next();
     } catch (err) {
+        const forwardedProto = (req.headers['x-forwarded-proto'] || '').split(',')[0].trim();
+        const protocol = forwardedProto || req.protocol || 'http';
+        const host = req.get('host');
+        const canonicalPath = req.path === '/' ? '/' : req.path.replace(/\/$/, '');
+        res.locals.baseUrl = `${protocol}://${host}`;
+        res.locals.currentUrl = `${res.locals.baseUrl}${req.originalUrl}`;
+        res.locals.canonicalUrl = `${res.locals.baseUrl}${canonicalPath}`;
+        res.locals.isAdminPage = req.path.startsWith('/admin');
+        res.locals.absoluteAssetUrl = (assetPath) => {
+            if (!assetPath) return '';
+            if (/^https?:\/\//i.test(assetPath)) return assetPath;
+            return `${res.locals.baseUrl}${assetPath.startsWith('/') ? assetPath : '/' + assetPath}`;
+        };
         res.locals.settings = { whatsapp: '5511999999999', cnpj: '00.000.000/0001-00' };
         res.locals.licenseStatus = 'active';
         res.locals.daysOverdue = 0;
         next();
     }
 });
+
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain').send([
+        'User-agent: *',
+        'Allow: /',
+        'Disallow: /admin/',
+        'Disallow: /api/',
+        `Sitemap: ${res.locals.baseUrl}/sitemap.xml`
+    ].join('\n'));
+});
+
+app.get('/llms.txt', (req, res) => {
+    const siteName = res.locals.settings?.site_name || 'Sua Empresa';
+    const description = res.locals.settings?.meta_description_home || `${siteName} oferece serviços de mudanças, transporte e logística.`;
+    res.type('text/plain').send([
+        `# ${siteName}`,
+        '',
+        `> ${description}`,
+        '',
+        '## Páginas principais',
+        `- [Início](${res.locals.baseUrl}/)`,
+        `- [Blog](${res.locals.baseUrl}/blog)`,
+        `- [Política de Privacidade](${res.locals.baseUrl}/politica-de-privacidade)`,
+        `- [Termos e Condições](${res.locals.baseUrl}/termos-e-condicoes)`
+    ].join('\n'));
+});
+
+app.get('/sitemap.xml', async (req, res) => {
+    const urls = [
+        { loc: '/', priority: '1.0', changefreq: 'weekly' },
+        { loc: '/blog', priority: '0.7', changefreq: 'weekly' },
+        { loc: '/politica-de-privacidade', priority: '0.3', changefreq: 'yearly' },
+        { loc: '/termos-e-condicoes', priority: '0.3', changefreq: 'yearly' }
+    ];
+
+    try {
+        const [posts] = await pool.execute('SELECT slug, created_at FROM posts WHERE ativo = 1 ORDER BY created_at DESC');
+        posts.forEach((post) => urls.push({
+            loc: `/blog/${encodeURIComponent(post.slug)}`,
+            lastmod: post.created_at,
+            priority: '0.6',
+            changefreq: 'monthly'
+        }));
+    } catch (err) {
+        console.warn('Sitemap gerado sem artigos:', err.message);
+    }
+
+    const escapeXml = (value) => String(value).replace(/[<>&'\"]/g, (char) => ({
+        '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;'
+    }[char]));
+    const entries = urls.map((item) => {
+        const lastmod = item.lastmod ? `<lastmod>${new Date(item.lastmod).toISOString().slice(0, 10)}</lastmod>` : '';
+        return `<url><loc>${escapeXml(res.locals.baseUrl + item.loc)}</loc>${lastmod}<changefreq>${item.changefreq}</changefreq><priority>${item.priority}</priority></url>`;
+    }).join('');
+
+    res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${entries}</urlset>`);
+});
+
+// URLs antigas do template agora apontam para as seções equivalentes da landing page.
+app.get('/sobre', (req, res) => res.redirect(301, '/#sobre'));
+app.get('/servicos', (req, res) => res.redirect(301, '/#servicos'));
+app.get('/servicos/:slug', (req, res) => res.redirect(301, '/#servicos'));
+app.get('/contato', (req, res) => res.redirect(301, '/#contato'));
+
+function renderNotFound(res) {
+    const siteName = res.locals.settings?.site_name || 'Sua Empresa';
+    res.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    res.locals.isNotFoundPage = true;
+    return res.status(404).render('404', {
+        title: `Página não encontrada | ${siteName}`,
+        description: `A página solicitada não foi encontrada no site da ${siteName}.`
+    });
+}
 
 // FRONT-END ROUTES (DATABASE DRIVEN)
 app.get('/', async (req, res) => {
@@ -717,9 +805,9 @@ app.get('/', async (req, res) => {
         }
         
         res.render('index', { 
-            title: res.locals.settings?.meta_title_home || 'Sua Empresa | Consultoria Estratégica e Capital Humano', 
-            description: res.locals.settings?.meta_description_home || 'Especialistas em impulsionar o capital humano e elevar a performance operacional com visão sistêmica e resultados exponenciais.',
-            keywords: res.locals.settings?.meta_keywords || 'gestão, consultoria, rh, capital humano, performance, arquê gestão',
+            title: res.locals.settings?.meta_title_home || `${res.locals.settings?.site_name || 'Sua Empresa'} | Mudanças e Logística`,
+            description: res.locals.settings?.meta_description_home || `${res.locals.settings?.site_name || 'Sua Empresa'}: soluções de mudanças e logística com atendimento personalizado. Solicite um orçamento.`,
+            keywords: res.locals.settings?.meta_keywords || 'mudanças, transportes, logística, empresa de mudanças, orçamento de mudança',
             posts,
             services,
             team,
@@ -729,7 +817,12 @@ app.get('/', async (req, res) => {
         });
     } catch (e) { 
         console.error('❌ CRITICAL HOME ROUTE ERROR:', e);
-        res.render('index', { title: 'Home | Sua Empresa', posts: [], services: [], team: [], testimonials: [], beneficios: [] }); 
+        const siteName = res.locals.settings?.site_name || 'Sua Empresa';
+        res.render('index', {
+            title: `${siteName} | Mudanças e Logística`,
+            description: `${siteName}: soluções de mudanças e logística com atendimento personalizado. Solicite um orçamento.`,
+            posts: [], services: [], team: [], testimonials: [], testimonialSource: 'manual', beneficios: []
+        });
     }
 });
 
@@ -772,7 +865,7 @@ app.get('/colher-depoimento', (req, res) => {
 
 app.post('/api/public-depoimento', upload.single('foto_file'), async (req, res) => {
     const { nome, cargo, empresa, texto } = req.body;
-    let foto = '/img/placeholder-user.png';
+    let foto = null;
     if (req.file) foto = `/uploads/${req.file.filename}`;
     
     try {
@@ -788,21 +881,26 @@ app.post('/api/public-depoimento', upload.single('foto_file'), async (req, res) 
 });
 
 app.get('/blog', async (req, res) => {
+    const siteName = res.locals.settings?.site_name || 'Sua Empresa';
+    const blogDescription = `Conteúdos e dicas da ${siteName} sobre mudanças, transporte e logística.`;
     try {
         const [posts] = await pool.execute('SELECT * FROM posts WHERE ativo = 1 ORDER BY created_at DESC');
-        res.render('blog', { title: 'Blog | Sua Empresa', posts });
-    } catch (e) { res.render('blog', { title: 'Blog | Sua Empresa', posts: [] }); }
+        res.render('blog', { title: `Blog | ${siteName}`, description: blogDescription, posts });
+    } catch (e) {
+        res.render('blog', { title: `Blog | ${siteName}`, description: blogDescription, posts: [] });
+    }
 });
 
 app.get('/blog/:slug', async (req, res) => {
     try {
         const [rows] = await pool.execute('SELECT * FROM posts WHERE slug = ?', [req.params.slug]);
         const post = rows[0];
-        if (!post) return res.redirect('/blog');
+        if (!post) return renderNotFound(res);
         const [comments] = await pool.execute('SELECT * FROM comentarios WHERE post_id = ? AND aprovado = TRUE ORDER BY created_at DESC', [req.params.slug]);
         res.render('post', { 
-            title: post.meta_title || `${post.titulo} | Sua Empresa`, 
+            title: post.meta_title || `${post.titulo} | ${res.locals.settings?.site_name || 'Sua Empresa'}`,
             description: post.meta_description || post.resumo,
+            article: post,
             post, 
             comments,
             success: req.query.success,
@@ -1176,8 +1274,20 @@ app.post('/admin/servicos/delete/:id', async (req, res) => {
 });
 
 // app.get('/contato', (req, res) => res.render('contato', { title: 'Contato | Sua Empresa' }));
-app.get('/politica-de-privacidade', (req, res) => res.render('politica', { title: 'Política de Privacidade | Sua Empresa' }));
-app.get('/termos-e-condicoes', (req, res) => res.render('termos', { title: 'Termos e Condições | Sua Empresa' }));
+app.get('/politica-de-privacidade', (req, res) => {
+    const siteName = res.locals.settings?.site_name || 'Sua Empresa';
+    res.render('politica', {
+        title: `Política de Privacidade | ${siteName}`,
+        description: `Entenda como a ${siteName} coleta, utiliza e protege os dados pessoais enviados pelo site.`
+    });
+});
+app.get('/termos-e-condicoes', (req, res) => {
+    const siteName = res.locals.settings?.site_name || 'Sua Empresa';
+    res.render('termos', {
+        title: `Termos e Condições | ${siteName}`,
+        description: `Consulte os termos e condições de uso do site e dos conteúdos digitais da ${siteName}.`
+    });
+});
 
 // APIS
 app.use('/api/auth/login', loginRateLimit);
@@ -1409,6 +1519,8 @@ app.use((err, req, res, next) => {
     }
     next(err);
 });
+
+app.use((req, res) => renderNotFound(res));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Sistema SISTEMA ON: Porta ${PORT}`));

@@ -4,9 +4,9 @@
             <div class="footer-column">
                 <a href="/" class="footer-logo">
                     <% if (settings.logo_white) { %>
-                        <img src="<%= settings.logo_white %>" alt="Sistema" style="max-height: 40px;">
+                        <img src="<%= settings.logo_white %>" alt="<%= settings.site_name || 'Empresa' %>" style="max-height: 40px;">
                     <% } else if (settings.logo) { %>
-                        <img src="<%= settings.logo %>" alt="Sistema" style="max-height: 40px;">
+                        <img src="<%= settings.logo %>" alt="<%= settings.site_name || 'Empresa' %>" style="max-height: 40px;">
                     <% } else { %>
                         Sistema
                     <% } %>

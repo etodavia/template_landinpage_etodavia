@@ -1,15 +1,81 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <%
-    const metaTitle = title || settings.meta_title_home || settings.site_name || 'Site';
-    const metaDescription = locals.description || settings.meta_description_home || '';
+    const siteName = settings.site_name || 'Sua Empresa';
+    const metaTitle = title || settings.meta_title_home || siteName;
+    const metaDescription = locals.description || settings.meta_description_home || `Conheça os serviços da ${siteName} e solicite um orçamento.`;
     const rawShareImage = locals.ogImage || settings.seo_share_image || settings.hero_image || settings.logo || settings.favicon || '/capashow1.png';
     const shareImage = locals.absoluteAssetUrl ? locals.absoluteAssetUrl(rawShareImage) : rawShareImage;
-    const pageUrl = locals.currentUrl || '';
+    const pageUrl = locals.canonicalUrl || locals.currentUrl || '';
+    const robotsContent = (locals.isAdminPage || locals.isNotFoundPage) ? 'noindex, nofollow, noarchive' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+    let configuredSocialProfiles = [];
+    try {
+        configuredSocialProfiles = JSON.parse(settings.social_links || '[]').map((item) => item.url).filter(Boolean);
+    } catch (error) {
+        configuredSocialProfiles = [];
+    }
+    const socialProfiles = [...new Set([
+        settings.instagram_url,
+        settings.facebook_url,
+        settings.linkedin_url,
+        ...configuredSocialProfiles
+    ].filter(Boolean))];
+    const businessAddress = settings.address_full || settings.endereco;
+    const validTaxId = settings.cnpj && settings.cnpj !== '00.000.000/0001-00' ? settings.cnpj : undefined;
+    const businessSchema = {
+        '@context': 'https://schema.org',
+        '@type': businessAddress ? 'MovingCompany' : 'Organization',
+        '@id': `${locals.baseUrl || ''}/#organization`,
+        name: siteName,
+        url: locals.baseUrl || pageUrl,
+        description: metaDescription,
+        image: shareImage || undefined,
+        logo: settings.logo && locals.absoluteAssetUrl ? locals.absoluteAssetUrl(settings.logo) : undefined,
+        telephone: settings.contact_phone || settings.whatsapp || undefined,
+        email: settings.contact_email || undefined,
+        taxID: validTaxId,
+        address: businessAddress ? {
+            '@type': 'PostalAddress',
+            streetAddress: businessAddress,
+            addressCountry: 'BR'
+        } : undefined,
+        sameAs: socialProfiles.length ? socialProfiles : undefined
+    };
+    const webSiteSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        '@id': `${locals.baseUrl || ''}/#website`,
+        url: locals.baseUrl || pageUrl,
+        name: siteName,
+        publisher: { '@id': `${locals.baseUrl || ''}/#organization` },
+        inLanguage: 'pt-BR'
+    };
+    const webPageSchema = {
+        '@context': 'https://schema.org',
+        '@type': locals.article ? 'BlogPosting' : 'WebPage',
+        '@id': `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: metaTitle,
+        description: metaDescription,
+        isPartOf: { '@id': `${locals.baseUrl || ''}/#website` },
+        about: { '@id': `${locals.baseUrl || ''}/#organization` },
+        primaryImageOfPage: shareImage ? { '@type': 'ImageObject', url: shareImage } : undefined,
+        headline: locals.article ? (locals.article.titulo || metaTitle) : undefined,
+        datePublished: locals.article ? (locals.article.created_at || undefined) : undefined,
+        image: locals.article && shareImage ? shareImage : undefined,
+        author: locals.article ? { '@id': `${locals.baseUrl || ''}/#organization` } : undefined,
+        publisher: locals.article ? { '@id': `${locals.baseUrl || ''}/#organization` } : undefined,
+        mainEntityOfPage: locals.article ? pageUrl : undefined,
+        inLanguage: 'pt-BR'
+    };
+    const safeJson = (data) => JSON.stringify(data).replace(/</g, '\\u003c');
 %>
-<title><%= title %></title>
+<title><%= metaTitle %></title>
 <meta name="description" content="<%= metaDescription %>">
-<meta name="keywords" content="<%= locals.keywords || '' %>">
+<meta name="robots" content="<%= robotsContent %>">
+<meta name="googlebot" content="<%= robotsContent %>">
+<% if (locals.keywords) { %><meta name="keywords" content="<%= locals.keywords %>"><% } %>
+<% if (pageUrl) { %><link rel="canonical" href="<%= pageUrl %>"><% } %>
 <% if (settings.favicon) { %>
 <link rel="icon" type="image/x-icon" href="<%= settings.favicon %>">
 <% } %>
@@ -17,9 +83,10 @@
 <!-- SEO & Social Meta -->
 <meta property="og:title" content="<%= metaTitle %>">
 <meta property="og:description" content="<%= metaDescription %>">
-<meta property="og:type" content="website">
+<meta property="og:type" content="<%= locals.article ? 'article' : 'website' %>">
 <% if (pageUrl) { %><meta property="og:url" content="<%= pageUrl %>"><% } %>
 <meta property="og:site_name" content="<%= settings.site_name || metaTitle %>">
+<meta property="og:locale" content="pt_BR">
 <% if (shareImage) { %>
 <meta property="og:image" content="<%= shareImage %>">
 <meta property="og:image:secure_url" content="<%= shareImage %>">
@@ -30,6 +97,12 @@
 <meta name="twitter:title" content="<%= metaTitle %>">
 <meta name="twitter:description" content="<%= metaDescription %>">
 <meta name="twitter:image" content="<%= shareImage %>">
+<% } %>
+
+<% if (!locals.isAdminPage && !locals.isNotFoundPage) { %>
+<script type="application/ld+json"><%- safeJson(businessSchema) %></script>
+<script type="application/ld+json"><%- safeJson(webSiteSchema) %></script>
+<script type="application/ld+json"><%- safeJson(webPageSchema) %></script>
 <% } %>
 
 <% 
@@ -47,7 +120,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?<%= fontsQuery %>&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/main.css?v=<%= locals.assetVersion || '1' %>">
+<link rel="stylesheet" href="/css/main.min.css?v=<%= locals.assetVersion || '1' %>">
 <style>
     :root {
         --navy-blue: <%= settings.color_marinho || '#0A1128' %>;

@@ -243,7 +243,7 @@
                     <% team.forEach((member, index) => { %>
                         <div class="team-card-executive" data-reveal="up" data-delay="<%= index * 0.1 %>">
                             <div class="team-img-wrapper">
-                                <img src="<%= member.imagem || '/img/placeholder-user.png' %>" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="<%= member.imagem || '/kelly.png' %>" alt="<%= member.nome %> - <%= member.funcao %>" loading="lazy" decoding="async" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div class="team-info-box">
                                 <h4><%= member.nome %></h4>

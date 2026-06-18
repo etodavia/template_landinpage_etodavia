@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <%- include('partials/head-tags') %>
+</head>
+<body style="background: var(--bg-sand);">
+    <%- include('partials/header') %>
+    <main>
+        <section style="min-height: 62vh; display: grid; place-items: center; padding: 100px 20px; text-align: center;">
+            <div style="max-width: 680px;">
+                <span class="section-label">Erro 404</span>
+                <h1 style="font-size: clamp(2.5rem, 7vw, 5rem); color: var(--navy-blue); margin: 20px 0; line-height: 1;">Página não encontrada</h1>
+                <p style="font-size: 1.1rem; color: var(--text-color); line-height: 1.7; margin-bottom: 35px;">O endereço acessado não existe ou foi alterado. Use o botão abaixo para voltar ao site.</p>
+                <a href="/" class="btn-pill-large" style="background: var(--navy-blue); color: white;">Voltar ao início <i class="ri-arrow-right-line"></i></a>
+            </div>
+        </section>
+    </main>
+    <%- include('partials/footer') %>
+</body>
+</html>

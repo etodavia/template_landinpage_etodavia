@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-labelledby="title">
+  <title id="title">Imagem de artigo</title>
+  <rect width="800" height="500" rx="28" fill="#eef1f5"/>
+  <path d="M80 400l185-185 110 110 90-90 255 165z" fill="#aab4c3"/>
+  <circle cx="610" cy="135" r="55" fill="#d4dae3"/>
+</svg>

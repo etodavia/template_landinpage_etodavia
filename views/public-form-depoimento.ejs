@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compartilhe sua Experiência | <%= settings.site_name || 'Sua Empresa' %></title>
+    <meta name="description" content="Envie seu depoimento para a equipe da <%= settings.site_name || 'empresa' %>.">
+    <meta name="robots" content="noindex, nofollow, noarchive">
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -88,7 +90,7 @@
     <div class="capture-card" id="mainCard">
         <div id="formContent">
             <div class="logo-box">
-                <img src="/img/logo-agencia.png" alt="Sua Empresa">
+                <% if (settings.logo) { %><img src="<%= settings.logo %>" alt="<%= settings.site_name || 'Empresa' %>"><% } %>
             </div>
             <h1>Sua voz molda nossa <em>excelência</em>.</h1>
             <p class="lead">Compartilhe como foi sua experiência com as soluções estratégicas da Sistema.</p>

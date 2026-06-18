@@ -56,9 +56,9 @@
     <header>
         <a href="/" class="logo">
             <% if (settings.logo) { %>
-                <img src="<%= settings.logo %>" alt="Sistema" class="logo-main" style="max-height: 40px;">
+                <img src="<%= settings.logo %>" alt="<%= settings.site_name || 'Empresa' %>" class="logo-main" style="max-height: 40px;">
                 <% if (settings.logo_white) { %>
-                    <img src="<%= settings.logo_white %>" alt="Sistema" class="logo-white" style="display: none; max-height: 40px;">
+                    <img src="<%= settings.logo_white %>" alt="<%= settings.site_name || 'Empresa' %>" class="logo-white" style="display: none; max-height: 40px;">
                 <% } %>
             <% } else { %>
                 Sistema

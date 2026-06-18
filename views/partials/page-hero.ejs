@@ -3,7 +3,7 @@
         const cleanSrc = String(src || '').trim().replace(/\\/g, '/');
         if (!cleanSrc) return '';
         const separator = cleanSrc.includes('?') ? '&' : '?';
-        return `${cleanSrc}${separator}v=${Date.now()}`;
+        return `${cleanSrc}${separator}v=${locals.assetVersion || '1'}`;
     };
     const pageHeroDesktop = normalizePageHeroImage(locals.image);
     const pageHeroTablet = normalizePageHeroImage(locals.imageTablet || locals.image);

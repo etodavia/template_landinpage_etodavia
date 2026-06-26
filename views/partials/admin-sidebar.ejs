@@ -52,40 +52,59 @@
                     <i class="ri-article-line"></i> <span class="nav-text">Blog & Notícias</span>
                 </a>
                 -->
+            <% 
+                const hasPerm = (p) => locals.userRole === 'superadmin' || (locals.userPermissions && locals.userPermissions.includes(p));
+            %>
+            <% if (hasPerm('dashboard')) { %>
+            <li>
                 <a href="/admin/dashboard" class="<%= (locals.title === 'Dashboard') ? 'active' : '' %>">
                     <i class="ri-dashboard-fill"></i> <span class="nav-text">Dashboard</span>
                 </a>
             </li>
+            <% } %>
             <% if (locals.userRole === 'superadmin') { %>
             <li>
                 <a href="/admin/conteudo?tab=tab-licenciamento" style="border: 1px solid rgba(214, 40, 40, 0.4); background: rgba(214, 40, 40, 0.1); color: #ff4d4d !important; margin: 5px 0;">
                     <i class="ri-shield-keyhole-fill"></i> <span class="nav-text">Licenciamento (Elite)</span>
                 </a>
             </li>
+            <li>
+                <a href="/admin/usuarios" class="<%= (locals.title && locals.title.includes('Usuário')) ? 'active' : '' %>" style="border: 1px solid rgba(255, 255, 255, 0.15); margin: 5px 0;">
+                    <i class="ri-user-shared-line"></i> <span class="nav-text">Gestão de Usuários</span>
+                </a>
+            </li>
             <% } %>
 
+            <% if (hasPerm('depoimentos')) { %>
             <li>
                 <a href="/admin/depoimentos" class="<%= (locals.title === 'Moderação de Depoimentos') ? 'active' : '' %>">
                     <i class="ri-star-smile-fill"></i> <span class="nav-text">Depoimentos</span>
                 </a>
             </li>
+            <% } %>
+            <% if (hasPerm('config')) { %>
             <li>
                 <a href="/admin/config" class="<%= (locals.title.includes('Configur')) ? 'active' : '' %>">
                     <i class="ri-settings-4-fill"></i> <span class="nav-text">Configurações (Geral)</span>
                 </a>
             </li>
+            <% } %>
             <li class="nav-label" style="margin-top: 1.5rem; padding: 0 1rem; color: rgba(255,255,255,0.3); font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">CONTEÚDO E CMS</li>
+            <% if (hasPerm('cms')) { %>
             <li>
                 <a href="/admin/conteudo" class="<%= (locals.title.includes('CMS')) ? 'active' : '' %>">
                     <i class="ri-layout-masonry-fill"></i> <span class="nav-text">Editor Global</span>
                 </a>
             </li>
+            <% } %>
 
+            <% if (hasPerm('servicos')) { %>
             <li>
                 <a href="/admin/servicos" class="<%= (locals.title && (locals.title.includes('Especialidade') || locals.title.includes('Serviço'))) ? 'active' : '' %>">
                     <i class="ri-briefcase-line"></i> <span class="nav-text">Serviços</span>
                 </a>
             </li>
+            <% } %>
             <!-- Blog e Equipe removidos do projeto Landing Page -->
             <!-- Editor de Form removed for Logistica project -->
             <li style="margin-bottom: 2rem">

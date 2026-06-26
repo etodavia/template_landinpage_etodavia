@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | <%= settings.site_name || 'Sistema' %></title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            <div class="admin-content-scroll">
+                <div style="padding: 2.5rem 4rem;">
+                    <div class="card-cms">
+                        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
+                            <div>
+                                <h1 style="font-size: 2.2rem; margin: 0;">Gestão de <em>Usuários</em></h1>
+                                <p class="subtitle" style="color: #888; font-size: 0.95rem; margin-top: 5px;">Crie, edite e defina as permissões de acesso dos administradores do painel.</p>
+                            </div>
+                            <a href="/admin/usuarios/novo" class="btn-premium" style="background: var(--admin-primary); color: white; border: none; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;"><i class="ri-user-add-line"></i> NOVO USUÁRIO</a>
+                        </header>
+
+                        <%- include('../partials/admin-alerts') %>
+
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nome / E-mail</th>
+                                        <th>Nível de Acesso</th>
+                                        <th>Permissões Ativas</th>
+                                        <th style="width: 150px; text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if(users && users.length > 0) { %>
+                                        <% users.forEach(user => { %>
+                                            <tr>
+                                                <td>
+                                                    <strong style="color: var(--admin-primary); display: block;"><%= user.nome %></strong>
+                                                    <span style="font-size: 0.75rem; color: #666;"><%= user.email %></span>
+                                                </td>
+                                                <td>
+                                                    <% if (user.nivel === 'superadmin') { %>
+                                                        <span style="background: #fee2e2; color: #ef4444; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Super Admin</span>
+                                                    <% } else if (user.nivel === 'admin') { %>
+                                                        <span style="background: #e0f2fe; color: #0284c7; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Admin</span>
+                                                    <% } else { %>
+                                                        <span style="background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Editor</span>
+                                                    <% } %>
+                                                </td>
+                                                <td>
+                                                    <% if (user.nivel === 'superadmin') { %>
+                                                        <span style="font-size: 0.75rem; color: #15803d; font-weight: 700;">● Acesso Total Irrestrito</span>
+                                                    <% } else { %>
+                                                        <% 
+                                                            let perms = [];
+                                                            try {
+                                                                perms = user.permissoes ? JSON.parse(user.permissoes) : [];
+                                                            } catch(e) { perms = []; }
+                                                        %>
+                                                        <% if(perms.length > 0) { %>
+                                                            <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 400px;">
+                                                                <% perms.forEach(p => { %>
+                                                                    <span style="background: #f1f5f9; color: #334155; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 700;"><%= p %></span>
+                                                                <% }) %>
+                                                            </div>
+                                                        <% } else { %>
+                                                            <span style="font-size: 0.75rem; color: #94a3b8; font-style: italic;">Nenhuma permissão (Acesso bloqueado)</span>
+                                                        <% } %>
+                                                    <% } %>
+                                                </td>
+                                                <td style="text-align: right;">
+                                                    <div style="display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+                                                        <a href="/admin/usuarios/editar/<%= user.id %>" class="btn-action" style="background: #f1f5f9; color: #475569; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none;" title="Editar"><i class="ri-edit-line"></i></a>
+                                                        
+                                                        <form action="/admin/usuarios/deletar/<%= user.id %>" method="POST" onsubmit="return confirm('Excluir este usuário permanentemente?');" style="display: inline;">
+                                                            <button type="submit" class="btn-action" style="background: #fff1f2; color: #e11d48; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer;" title="Remover"><i class="ri-delete-bin-line"></i></button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr><td colspan="4" style="text-align: center; padding: 80px; color: #aaa; background: #f8fafc; border-radius: 20px; border: 2px dashed #eee;">Nenhum usuário cadastrado.</td></tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <%- include('../partials/admin-footer') %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

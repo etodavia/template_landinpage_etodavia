@@ -207,6 +207,21 @@ const cmsUpload = upload.fields([
     { name: 'hero_image_file', maxCount: 1 }, 
     { name: 'hero_image_tablet_file', maxCount: 1 }, 
     { name: 'hero_image_mobile_file', maxCount: 1 }, 
+    { name: 'hero_carousel_desktop_0_file', maxCount: 1 },
+    { name: 'hero_carousel_tablet_0_file', maxCount: 1 },
+    { name: 'hero_carousel_mobile_0_file', maxCount: 1 },
+    { name: 'hero_carousel_desktop_1_file', maxCount: 1 },
+    { name: 'hero_carousel_tablet_1_file', maxCount: 1 },
+    { name: 'hero_carousel_mobile_1_file', maxCount: 1 },
+    { name: 'hero_carousel_desktop_2_file', maxCount: 1 },
+    { name: 'hero_carousel_tablet_2_file', maxCount: 1 },
+    { name: 'hero_carousel_mobile_2_file', maxCount: 1 },
+    { name: 'hero_carousel_desktop_3_file', maxCount: 1 },
+    { name: 'hero_carousel_tablet_3_file', maxCount: 1 },
+    { name: 'hero_carousel_mobile_3_file', maxCount: 1 },
+    { name: 'hero_carousel_desktop_4_file', maxCount: 1 },
+    { name: 'hero_carousel_tablet_4_file', maxCount: 1 },
+    { name: 'hero_carousel_mobile_4_file', maxCount: 1 },
     { name: 'about_image_file', maxCount: 1 },
     { name: 'about_hero_image_file', maxCount: 1 },
     { name: 'about_hero_image_tablet_file', maxCount: 1 },
@@ -236,7 +251,8 @@ const cmsUpload = upload.fields([
     { name: 'admin_logo_file', maxCount: 1 },
     { name: 'admin_header_logo_file', maxCount: 1 },
     { name: 'login_logo_file', maxCount: 1 },
-    { name: 'admin_tutorial_image_file', maxCount: 1 }
+    { name: 'admin_tutorial_image_file', maxCount: 1 },
+    { name: 'destaque_paralaxe_image_file', maxCount: 1 }
 ]);
 
 function handleCmsUpload(req, res, next) {
@@ -314,7 +330,22 @@ async function setupDB() {
             'title_size_card_desktop DECIMAL(4,2)', 'title_size_card_tablet DECIMAL(4,2)', 'title_size_card_mobile DECIMAL(4,2)',
             'color_about_bg VARCHAR(20) DEFAULT "#F7F7F4"', 'color_blog_bg VARCHAR(20) DEFAULT "#0A1128"',
             'color_blog_text VARCHAR(20) DEFAULT "#FFFFFF"', 'color_contact_bg VARCHAR(20) DEFAULT "#F7F7F4"',
-            'admin_tutorial_video VARCHAR(500)', 'admin_tutorial_image VARCHAR(500)'
+            'admin_tutorial_video VARCHAR(500)', 'admin_tutorial_image VARCHAR(500)',
+            'layout_secoes TEXT', 'estilo_secoes TEXT', 'hero_carousel_json TEXT', 'header_transparent INT DEFAULT 0',
+            'topbar_font_size DECIMAL(4,2) DEFAULT 0.75', 'topbar_icon_size DECIMAL(4,2) DEFAULT 0.85',
+            'header_font_size DECIMAL(4,2) DEFAULT 0.90', 'header_icon_size DECIMAL(4,2) DEFAULT 1.10',
+            'contact_extra_title VARCHAR(255) DEFAULT "Gostaria de falar com nosso time?"', 'contact_extra_text TEXT',
+            'color_popup_bg VARCHAR(15) DEFAULT "#FFFFFF"', 'color_popup_text VARCHAR(15) DEFAULT "#333333"',
+            'color_popup_title VARCHAR(15) DEFAULT "#0A1128"', 'popup_border_radius INT DEFAULT 30',
+            'color_popup_btn VARCHAR(15) DEFAULT "#0A1128"', 'color_popup_btn_text VARCHAR(15) DEFAULT "#FFFFFF"',
+            'popup_image_style VARCHAR(15) DEFAULT "rounded"', 'popup_font_style VARCHAR(15) DEFAULT "sans-serif"',
+            'popup_layout_model VARCHAR(20) DEFAULT "split"',
+            'destaque_paralaxe_title TEXT',
+            'destaque_paralaxe_subtitle TEXT',
+            'destaque_paralaxe_button_text VARCHAR(100)',
+            'destaque_paralaxe_button_url TEXT',
+            'destaque_paralaxe_image TEXT',
+            'destaque_paralaxe_align VARCHAR(20) DEFAULT "centered"'
         ];
         for (const col of columns) {
             try {
@@ -477,24 +508,28 @@ async function setupDB() {
         console.log('✅ DATABASE: Portfólio de Especialidades gerenciado pelo painel.');
 
         // Garantir Usuário Admin Padrão
-        // Tabela de Usuários (Login Admin) com Nível de Acesso
+        // Tabela de Usuários (Login Admin) com Nível de Acesso e Permissões
         await pool.execute(`
             CREATE TABLE IF NOT EXISTS usuarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 nome VARCHAR(100) NOT NULL,
                 email VARCHAR(100) UNIQUE NOT NULL,
                 senha VARCHAR(255) NOT NULL,
-                nivel ENUM('superadmin', 'admin') DEFAULT 'admin',
+                nivel ENUM('superadmin', 'admin', 'editor') DEFAULT 'admin',
+                permissoes TEXT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
 
-        // Garantir Coluna Nível e ENUM estendido (superadmin)
+        // Garantir Coluna Nível e ENUM estendido (superadmin) e Coluna Permissões
         try { 
             await pool.execute("ALTER TABLE usuarios MODIFY COLUMN nivel ENUM('superadmin', 'admin', 'editor') DEFAULT 'admin'");
         } catch(e) {
             try { await pool.execute("ALTER TABLE usuarios ADD COLUMN nivel ENUM('superadmin', 'admin', 'editor') DEFAULT 'admin'"); } catch(err) {}
         }
+        try {
+            await pool.execute("ALTER TABLE usuarios ADD COLUMN permissoes TEXT NULL");
+        } catch(e) {}
 
         // Garantir que SuperAdmin e Admin existam sem sobrescrever senhas alteradas
         const [existingUsers] = await pool.execute('SELECT email FROM usuarios');
@@ -569,6 +604,8 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     let role = null;
     let isAuthenticated = false;
+    let perms = [];
+    let userObj = null;
     try {
         const cookies = parseCookies(req.headers.cookie || '');
         const token = cookies.token;
@@ -576,21 +613,49 @@ app.use((req, res, next) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             role = decoded.user.nivel || 'admin';
             req.user = decoded.user;
+            perms = decoded.user.permissoes || [];
+            userObj = decoded.user;
             isAuthenticated = true;
         }
     } catch (err) {
         role = null;
         isAuthenticated = false;
+        perms = [];
+        userObj = null;
     }
     
     res.locals.userRole = role;
     res.locals.isAuthenticated = isAuthenticated;
+    res.locals.userPermissions = perms;
+    res.locals.user = userObj;
     res.locals.assetVersion = ASSET_VERSION;
 
     // Bloqueio rígido para qualquer rota administrativa (/admin) exceto login
     if (req.path.startsWith('/admin') && req.path !== '/admin/login') {
         if (!isAuthenticated) {
             return res.redirect('/admin/login');
+        }
+
+        // Restrição de rotas baseada em permissão se não for superadmin
+        if (role !== 'superadmin') {
+            // Proibir acesso a rotas de gestão de usuários
+            if (req.path.startsWith('/admin/usuarios')) {
+                return res.redirect('/admin/dashboard?error=1&message=Acesso+negado');
+            }
+            
+            // Verificar permissões específicas
+            if (req.path.startsWith('/admin/depoimentos') && !perms.includes('depoimentos')) {
+                return res.redirect('/admin/dashboard?error=1&message=Acesso+negado');
+            }
+            if (req.path.startsWith('/admin/config') && !perms.includes('config')) {
+                return res.redirect('/admin/dashboard?error=1&message=Acesso+negado');
+            }
+            if (req.path.startsWith('/admin/conteudo') && !perms.includes('cms')) {
+                return res.redirect('/admin/dashboard?error=1&message=Acesso+negado');
+            }
+            if (req.path.startsWith('/admin/servicos') && !perms.includes('servicos')) {
+                return res.redirect('/admin/dashboard?error=1&message=Acesso+negado');
+            }
         }
     }
 
@@ -1006,7 +1071,13 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'title_size_card_desktop', 'title_size_card_tablet', 'title_size_card_mobile',
         'color_hero_button', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg',
         'benefits_color', 'benefits_text_color', 'benefits_title_color', 'benefits_icon_bg', 'benefits_icon_color', 'benefits_card_title_color', 'benefits_card_text_color', 'benefits_card_bg',
-        'admin_tutorial_video', 'admin_tutorial_image'
+        'admin_tutorial_video', 'admin_tutorial_image',
+        'layout_secoes', 'estilo_secoes', 'hero_carousel_json', 'header_transparent',
+        'topbar_font_size', 'topbar_icon_size', 'header_font_size', 'header_icon_size',
+        'contact_extra_title', 'contact_extra_text',
+        'color_popup_bg', 'color_popup_text', 'color_popup_title', 'popup_border_radius',
+        'color_popup_btn', 'color_popup_btn_text', 'popup_image_style', 'popup_font_style', 'popup_layout_model',
+        'destaque_paralaxe_title', 'destaque_paralaxe_subtitle', 'destaque_paralaxe_button_text', 'destaque_paralaxe_button_url', 'destaque_paralaxe_align', 'destaque_paralaxe_image'
     ];
 
     // Processar Uploads
@@ -1020,7 +1091,7 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'terms_hero_image', 'terms_hero_image_tablet', 'terms_hero_image_mobile',
         'about_story_image', 'logo', 'logo_white', 'favicon', 'seo_share_image',
         'license_qr_code', 'license_pdf', 'admin_logo', 'admin_header_logo',
-        'login_logo', 'admin_tutorial_image'
+        'login_logo', 'admin_tutorial_image', 'destaque_paralaxe_image'
     ];
 
     fileFields.forEach(field => {
@@ -1038,6 +1109,44 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         delete updateData[fileKey];
         delete updateData[removeKey];
     });
+
+    // Processar Carousel do Hero
+    let carouselItems = [];
+    try {
+        const carouselCount = parseInt(req.body.carousel_count || '0');
+        for (let i = 0; i < carouselCount; i++) {
+            let item = {
+                image_desktop: req.body[`carousel_desktop_${i}`] || '',
+                image_tablet: req.body[`carousel_tablet_${i}`] || '',
+                image_mobile: req.body[`carousel_mobile_${i}`] || '',
+                title: req.body[`carousel_title_${i}`] || '',
+                description: req.body[`carousel_description_${i}`] || '',
+                button_text: req.body[`carousel_button_text_${i}`] || '',
+                layout_style: req.body[`carousel_layout_style_${i}`] || 'classic'
+            };
+
+            // Se remove foi checado
+            if (req.body[`carousel_desktop_${i}_remove`] === '1') item.image_desktop = '';
+            if (req.body[`carousel_tablet_${i}_remove`] === '1') item.image_tablet = '';
+            if (req.body[`carousel_mobile_${i}_remove`] === '1') item.image_mobile = '';
+
+            // Se subiu novos arquivos
+            if (req.files && req.files[`hero_carousel_desktop_${i}_file`]) {
+                item.image_desktop = `/uploads/${req.files[`hero_carousel_desktop_${i}_file`][0].filename}`;
+            }
+            if (req.files && req.files[`hero_carousel_tablet_${i}_file`]) {
+                item.image_tablet = `/uploads/${req.files[`hero_carousel_tablet_${i}_file`][0].filename}`;
+            }
+            if (req.files && req.files[`hero_carousel_mobile_${i}_file`]) {
+                item.image_mobile = `/uploads/${req.files[`hero_carousel_mobile_${i}_file`][0].filename}`;
+            }
+
+            carouselItems.push(item);
+        }
+        updateData.hero_carousel_json = JSON.stringify(carouselItems);
+    } catch (e) {
+        console.error('Erro ao processar carrossel do Hero:', e);
+    }
 
     // 1. SINCRONIZAÇÃO DA TABELA DE BENEFÍCIOS (Independente do UPDATE principal)
     if (req.body.beneficios_json) {
@@ -1087,7 +1196,8 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'title_size_hero_desktop', 'title_size_hero_tablet', 'title_size_hero_mobile',
         'title_size_page_desktop', 'title_size_page_tablet', 'title_size_page_mobile',
         'title_size_section_desktop', 'title_size_section_tablet', 'title_size_section_mobile',
-        'title_size_card_desktop', 'title_size_card_tablet', 'title_size_card_mobile'
+        'title_size_card_desktop', 'title_size_card_tablet', 'title_size_card_mobile',
+        'popup_border_radius'
     ]);
     validColumns.forEach(key => {
         // Ignoramos beneficios_json que já foi tratado, e só pegamos o que existe no updateData
@@ -1300,6 +1410,7 @@ app.use(['/api/leads', '/api/newsletter', '/api/depoimentos', '/api/comentarios'
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/newsletter', require('./routes/newsletter'));
+app.use('/admin/usuarios', require('./routes/usuarios'));
 
 // ADMIN DASHBOARD
 app.get('/admin/login', (req, res) => res.render('admin/login', { title: 'Login Admin' }));
@@ -1528,4 +1639,6 @@ app.use((err, req, res, next) => {
 app.use((req, res) => renderNotFound(res));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Sistema SISTEMA ON: Porta ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Sistema SISTEMA ON: Porta ${PORT}`);
+});

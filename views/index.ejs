@@ -41,6 +41,46 @@
         const homeHeroButtonText = heroText(settings.home_hero_button_text, 'Agendar Consultoria');
         const homeHeroCardTitle = heroText(settings.home_hero_card_title, 'Sua empresa em <em>Crescimento</em>.');
         const homeHeroCardSubtitle = heroText(settings.home_hero_card_subtitle, 'Experiência Estratégica');
+
+        const defaultSections = [
+            { id: 'home', active: true },
+            { id: 'sobre', active: true },
+            { id: 'servicos', active: true },
+            { id: 'beneficios', active: true },
+            { id: 'destaque', active: true },
+            { id: 'depoimentos', active: true },
+            { id: 'contato', active: true }
+        ];
+
+        let renderOrder = defaultSections;
+        try {
+            if (settings.layout_secoes) {
+                renderOrder = JSON.parse(settings.layout_secoes);
+                defaultSections.forEach(defSec => {
+                    if (!renderOrder.find(s => s.id === defSec.id)) {
+                        const defIdx = defaultSections.findIndex(s => s.id === defSec.id);
+                        if (defIdx > 0) {
+                            const predecessorId = defaultSections[defIdx - 1].id;
+                            const targetIdx = renderOrder.findIndex(s => s.id === predecessorId);
+                            if (targetIdx !== -1) {
+                                renderOrder.splice(targetIdx + 1, 0, defSec);
+                                return;
+                            }
+                        }
+                        renderOrder.push(defSec);
+                    }
+                });
+            }
+        } catch(e) {
+            renderOrder = defaultSections;
+        }
+
+        let sectionStyles = {};
+        try {
+            if (settings.estilo_secoes) {
+                sectionStyles = JSON.parse(settings.estilo_secoes);
+            }
+        } catch(e) {}
     %>
     <% if (heroDesktop) { %>
         <link rel="preload"
@@ -56,6 +96,117 @@
             margin-top: 0 !important;
             border-top: none !important;
         }
+        .heroSwiper .swiper-button-next::after, 
+        .heroSwiper .swiper-button-prev::after { 
+            font-size: 1.5rem !important; 
+        }
+        .heroSwiper .swiper-pagination-bullet {
+            background: rgba(255,255,255,0.5) !important;
+        }
+        .heroSwiper .swiper-pagination-bullet-active {
+            background: white !important;
+        }
+        .hero-slide {
+            height: 85vh !important;
+        }
+
+        /* Grid and List Layout Variations - Responsive Carousel on Mobile/Tablet */
+        @media (min-width: 1024px) {
+            /* Grid Layouts (Model 2 / 4) on Desktop */
+            .layout-model2:not(.heroSwiper) .swiper-wrapper,
+            .layout-model4:not(.heroSwiper) .swiper-wrapper {
+                display: grid !important;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+                gap: 30px !important;
+                transform: none !important;
+                width: 100% !important;
+            }
+            .layout-model2:not(.heroSwiper) .swiper-slide,
+            .layout-model4:not(.heroSwiper) .swiper-slide {
+                width: auto !important;
+                margin-right: 0 !important;
+                height: auto !important;
+            }
+            .layout-model2:not(.heroSwiper) .swiper-pagination,
+            .layout-model4:not(.heroSwiper) .swiper-pagination,
+            .layout-model2:not(.heroSwiper) .swiper-button-next,
+            .layout-model4:not(.heroSwiper) .swiper-button-next,
+            .layout-model2:not(.heroSwiper) .swiper-button-prev,
+            .layout-model4:not(.heroSwiper) .swiper-button-prev {
+                display: none !important;
+            }
+
+            /* List Layouts (Model 3 / 5) on Desktop */
+            .layout-model3:not(.heroSwiper) .swiper-wrapper,
+            .layout-model5:not(.heroSwiper) .swiper-wrapper {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 20px !important;
+                transform: none !important;
+                width: 100% !important;
+            }
+            .layout-model3:not(.heroSwiper) .swiper-slide,
+            .layout-model5:not(.heroSwiper) .swiper-slide {
+                width: 100% !important;
+                margin-right: 0 !important;
+                height: auto !important;
+            }
+            .layout-model3:not(.heroSwiper) .swiper-pagination,
+            .layout-model5:not(.heroSwiper) .swiper-pagination,
+            .layout-model3:not(.heroSwiper) .swiper-button-next,
+            .layout-model5:not(.heroSwiper) .swiper-button-next,
+            .layout-model3:not(.heroSwiper) .swiper-button-prev,
+            .layout-model5:not(.heroSwiper) .swiper-button-prev {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 1023px) {
+            /* Force Swiper container overflow on Mobile/Tablet */
+            .layout-model2:not(.heroSwiper) .swiper,
+            .layout-model3:not(.heroSwiper) .swiper,
+            .layout-model4:not(.heroSwiper) .swiper,
+            .layout-model5:not(.heroSwiper) .swiper {
+                overflow: hidden !important;
+            }
+            .layout-model2:not(.heroSwiper) .swiper-wrapper,
+            .layout-model3:not(.heroSwiper) .swiper-wrapper,
+            .layout-model4:not(.heroSwiper) .swiper-wrapper,
+            .layout-model5:not(.heroSwiper) .swiper-wrapper {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 0 !important;
+            }
+
+            /* Hide Swiper arrows on Mobile/Tablet */
+            .servicesSwiper .swiper-button-next,
+            .servicesSwiper .swiper-button-prev,
+            .beneficiosSwiper .swiper-button-next,
+            .beneficiosSwiper .swiper-button-prev,
+            .testimonialsSwiper .swiper-button-next,
+            .testimonialsSwiper .swiper-button-prev {
+                display: none !important;
+            }
+        }
+
+        /* Modern Pagination dots for inner sections */
+        .servicesSwiper .swiper-pagination-bullet,
+        .beneficiosSwiper .swiper-pagination-bullet,
+        .testimonialsSwiper .swiper-pagination-bullet {
+            background: var(--navy-blue) !important;
+            opacity: 0.35;
+            width: 10px;
+            height: 10px;
+            transition: all 0.3s ease;
+        }
+        .servicesSwiper .swiper-pagination-bullet-active,
+        .beneficiosSwiper .swiper-pagination-bullet-active,
+        .testimonialsSwiper .swiper-pagination-bullet-active {
+            background: var(--accent-red) !important;
+            opacity: 1;
+            width: 24px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body style="background: white; padding-top: 0 !important;">
@@ -63,311 +214,641 @@
     <%- include('partials/header') %>
 
     <main>
-        <!-- HERO IMPACTO -->
-        <section id="home" class="hero" style="background: var(--navy-blue) !important; background-image: none !important; --responsive-bg-desktop: <%= overlayStyle %>, url('<%= heroDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= heroTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= heroMobile %>'); --hero-title-offset-y-desktop: <%= heroTitleOffsetDesktop %>px; --hero-title-offset-y-tablet: <%= heroTitleOffsetTablet %>px; --hero-title-offset-y-mobile: <%= heroTitleOffsetMobile %>px; --hero-button-offset-y-desktop: <%= heroButtonOffsetDesktop %>px; --hero-button-offset-y-tablet: <%= heroButtonOffsetTablet %>px; --hero-button-offset-y-mobile: <%= heroButtonOffsetMobile %>px;">
-            <% if (heroDesktop) { %>
-                <picture class="hero-media">
-                    <source media="(max-width: 640px)" srcset="<%= heroMobile || heroDesktop %>">
-                    <source media="(max-width: 1024px)" srcset="<%= heroTablet || heroDesktop %>">
-                    <img src="<%= heroDesktop %>" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high">
-                </picture>
-            <% } %>
-            <div class="hero-overlay" style="background: rgba(<%= overlayRgb %>, <%= oOpacity %>);"></div>
-            <div class="hero-content">
-                <% if (homeHeroTitle.trim()) { %>
-                    <h1 data-reveal class="hero-title-adjustable">
-                        <%- homeHeroTitle %>
-                    </h1>
-                <% } %>
-                <% if (homeHeroDescription.trim()) { %>
-                    <p data-reveal>
-                        <%- homeHeroDescription %>
-                    </p>
-                <% } %>
-                <% if (homeHeroButtonText.trim()) { %>
-                <div data-reveal class="hero-button-adjustable" style="display: flex; justify-content: flex-start;">
-                    <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma consulta.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
-                        <%= homeHeroButtonText %> 
-                        <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
-                    </a>
-                </div>
-                <% } %>
-            </div>
-            <% if (homeHeroCardTitle.trim() || homeHeroCardSubtitle.trim()) { %>
-            <div class="floating-card" data-reveal style="bottom: 30px;">
-                <% if (homeHeroCardTitle.trim()) { %><h4><%- homeHeroCardTitle %></h4><% } %>
-                <% if (homeHeroCardSubtitle.trim()) { %><a href="/#servicos"><%= homeHeroCardSubtitle %> <i class="ri-arrow-right-line"></i></a><% } %>
-            </div>
-            <% } %>
-        </section>
-
-        <!-- SOBRE (DINÂMICO) -->
-        <section id="sobre" style="background: var(--bg-about); padding: 100px 0;">
-            <div class="container">
-                <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
-                    <div data-reveal="left">
-                        <span class="section-label">NOSSA ESSÊNCIA</span>
-                        <h2 style="font-size: 3.5rem; line-height: 1; letter-spacing: -3px; margin-bottom: 25px; color: var(--navy-blue);">
-                            <%- settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.' %>
-                        </h2>
-                        <p style="font-size: 1.2rem; color: var(--text-color); margin-bottom: 40px; line-height: 1.6;">
-                            <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação. Nossa abordagem sistêmica conecta os pontos invisíveis que transformam ambientes de trabalho em centros de excelência.' %>
-                        </p>
-                        <a href="/#servicos" class="btn-pill-large" style="background: var(--navy-blue); color: white;">
-                            <%= settings.home_about_button_text || 'Conhecer nossos serviços' %> <div class="icon-blue-circle" style="background: white; color: var(--navy-blue);"><i class="ri-arrow-right-line"></i></div>
-                        </a>
-                    </div>
-                    <div data-reveal="right" class="about-image-wrapper">
-                        <img src="<%= settings.about_image || 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=800' %>"
-                             alt="Equipe da <%= settings.site_name || 'empresa' %> em atividade"
-                             loading="lazy" decoding="async"
-                             style="width: 100%; height: 550px; object-fit: cover; border-radius: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.1);">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SERVIÇOS -->
-        <style>
-            @media (max-width: 1024px) {
-                .section-header-flex { flex-direction: column; align-items: flex-start !important; gap: 20px; }
-            }
-            .servicesSwiper { padding-bottom: 40px; }
-            .servicesSwiper .swiper-slide { height: auto !important; }
-        </style>
-        <section id="servicos" style="background: var(--bg-sand); padding: 60px 0;">
-            <div class="container">
-                <div class="section-header-flex" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
-                    <div data-reveal="left">
-                        <span class="section-label">Especialidades</span>
-                        <h2 style="font-size: 2.8rem; color: var(--navy-blue); line-height: 1.1; margin-bottom: 10px;">
-                            <%- settings.services_section_title || 'Conheça nossos <em>Serviços</em>' %>
-                        </h2>
-                        <p style="color: var(--text-color); max-width: 500px;"><%= settings.services_section_text %></p>
-                    </div>
-                </div>
-                <div class="swiper servicesSwiper" style="overflow: hidden;">
-                    <div class="swiper-wrapper services-wrapper-mobile">
-                        <% if (locals.services) { %>
-                            <% locals.services.forEach(s => { %>
-                                <div class="swiper-slide services-slide">
-                                    <div style="background: var(--bg-header); border-radius: 20px; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); height: 100%; display: flex; flex-direction: column;" data-reveal="up">
-                                        <div style="width: 55px; height: 55px; background: rgba(0,0,0,0.03); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                                            <i class="<%= s.icone %>" style="font-size: 1.8rem; color: var(--navy-blue);"></i>
-                                        </div>
-                                        <h3 style="font-size: 1.4rem; margin-bottom: 15px; color: var(--navy-blue);"><%= s.titulo %></h3>
-                                        <p style="color: var(--text-color); font-size: 0.9rem; line-height: 1.6; margin-bottom: auto;"><%= s.resumo %></p>
-                                        <a href="https://wa.me/<%= settings.whatsapp ? settings.whatsapp.replace(/\D/g, '') : '' %>?text=Olá,%20tenho%20interesse%20no%20serviço%20<%= encodeURIComponent(s.titulo) %>" target="_blank" class="btn-whatsapp-conversion" style="margin-top: 15px; display: inline-flex; align-items: center; gap: 5px; color: var(--navy-blue); font-weight: 600; text-decoration: none; font-size: 0.9rem;">
-                                            Estou interessado <i class="ri-whatsapp-line"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            <% }) %>
-                        <% } %>
-                    </div>
-                    <div class="swiper-pagination services-pagination" style="position: relative; margin-top: 20px;"></div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- BENEFÍCIOS (CARROSSEL PREMIUM) -->
-        <section id="beneficios" style="padding: 100px 0; background: <%= settings.benefits_color || 'white' %>; overflow: hidden;">
-            <div class="container">
-                <div class="section-header" style="text-align: center; margin-bottom: 60px;" data-reveal="up">
-                    <span class="section-label">Vantagens</span>
-                    <h2 style="font-size: 2.8rem; color: <%= settings.benefits_title_color || 'var(--navy-blue)' %>; line-height: 1.1; margin-top: 10px;">
-                        <%- settings.benefits_title || 'Benefícios que <em>Transformam</em>' %>
-                    </h2>
-                    <% if (settings.benefits_text) { %>
-                        <p style="color: <%= settings.benefits_text_color || '#64748b' %>; margin-top: 15px; max-width: 600px; margin-left: auto; margin-right: auto;"><%= settings.benefits_text %></p>
-                    <% } %>
-                </div>
-
-                <div class="swiper beneficiosSwiper" style="padding: 20px 10px 50px 10px;">
-                    <div class="swiper-wrapper">
-                        <% if (locals.beneficios && beneficios.length > 0) { %>
-                            <% beneficios.forEach(b => { %>
-                                <div class="swiper-slide">
-                                    <div class="beneficio-item" style="background: <%= settings.benefits_card_bg || 'rgba(255, 255, 255, 0.6)' %>; backdrop-filter: blur(10px); padding: 40px; border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; gap: 20px; height: 100%;">
-                                        <div class="beneficio-icon" style="width: 60px; height: 60px; background: <%= settings.benefits_icon_bg || 'white' %>; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: <%= settings.benefits_icon_color || 'var(--accent-red)' %>; box-shadow: 0 10px 20px rgba(0,0,0,0.02);">
-                                            <i class="<%= b.icone %>"></i>
-                                        </div>
-                                        <h3 style="font-size: 1.25rem; font-weight: 800; color: <%= settings.benefits_card_title_color || 'var(--navy-blue)' %>; margin: 0;"><%= b.titulo %></h3>
-                                        <p style="font-size: 0.95rem; line-height: 1.6; color: <%= settings.benefits_card_text_color || '#64748b' %>; margin: 0;"><%= b.texto %></p>
-                                    </div>
-                                </div>
-                            <% }) %>
-                        <% } else { %>
-                            <div class="swiper-slide">
-                                <div class="beneficio-item" style="background: #F8FAFC; padding: 40px; border-radius: 24px; text-align: center;">
-                                    <p style="color: #94a3b8;">Cadastre os benefícios no painel administrativo.</p>
-                                </div>
-                            </div>
-                        <% } %>
-                    </div>
+        <% renderOrder.forEach(section => { %>
+            <% if (section.active) { %>
+                <% 
+                    const style = sectionStyles[section.id] || {};
+                    const customBg = style.bg_color ? `background: ${style.bg_color} !important;` : '';
+                    const customColor = style.text_color ? `color: ${style.text_color} !important;` : '';
+                    const customPadding = style.padding_y ? `padding: ${style.padding_y}px 0 !important;` : '';
+                    const styleAttr = (customBg || customColor || customPadding) ? `${customBg} ${customColor} ${customPadding}` : '';
                     
-                    <!-- Navegação -->
-                    <div class="swiper-button-next" style="color: var(--navy-blue); transform: translateX(20px);"></div>
-                    <div class="swiper-button-prev" style="color: var(--navy-blue); transform: translateX(-20px);"></div>
-                    <div class="swiper-pagination beneficios-pagination"></div>
-                </div>
-            </div>
-        </section>
+                    const btnBg = style.bg_button_color ? `background: ${style.bg_button_color} !important;` : '';
+                    const btnColor = style.text_button_color ? `color: ${style.text_button_color} !important;` : '';
+                    const btnStyleAttr = (btnBg || btnColor) ? `${btnBg} ${btnColor}` : '';
+                %>
 
-        <style>
-            .beneficio-item {
-                cursor: grab;
-                user-select: none;
-            }
-            .beneficio-item:active {
-                cursor: grabbing;
-            }
-            .beneficio-item:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-                border-color: var(--accent-red);
-                background: white !important;
-            }
-            .beneficiosSwiper .swiper-pagination-bullet-active {
-                background: var(--accent-red);
-            }
-            @media (max-width: 768px) {
-                .swiper-button-next, .swiper-button-prev { display: none !important; }
-            }
-        </style>
+                <% if (section.id === 'home') { %>
+                    <!-- HERO IMPACTO (CARROSSEL) -->
+                    <%
+                        let slides = [];
+                        try {
+                            if (settings.hero_carousel_json) {
+                                slides = JSON.parse(settings.hero_carousel_json);
+                            }
+                        } catch(e) {}
+                        if (slides.length === 0) {
+                            slides.push({
+                                image_desktop: settings.hero_image || '',
+                                image_tablet: settings.hero_image_tablet || '',
+                                image_mobile: settings.hero_image_mobile || '',
+                                title: homeHeroTitle,
+                                description: homeHeroDescription,
+                                button_text: homeHeroButtonText
+                            });
+                        }
+                    %>
+                    <section id="home" class="hero swiper heroSwiper layout-<%= style.layout_model || 'model1' %>" style="margin-top: 0 !important; border-top: none !important; <%= styleAttr %>">
+                        <div class="swiper-wrapper">
+                            <% slides.forEach((slide, sIdx) => { 
+                                const slideDesktop = normalizeHeroImage(slide.image_desktop);
+                                const slideTablet = normalizeHeroImage(slide.image_tablet || slide.image_desktop);
+                                const slideMobile = normalizeHeroImage(slide.image_mobile || slide.image_tablet || slide.image_desktop);
+                            %>
+                                <div class="swiper-slide hero-slide layout-<%= slide.layout_style || 'classic' %>" style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; background: var(--navy-blue) !important; background-image: none !important; --responsive-bg-desktop: <%= overlayStyle %>, url('<%= slideDesktop %>'); --responsive-bg-tablet: <%= overlayStyle %>, url('<%= slideTablet %>'); --responsive-bg-mobile: <%= overlayStyle %>, url('<%= slideMobile %>'); --hero-title-offset-y-desktop: <%= heroTitleOffsetDesktop %>px; --hero-title-offset-y-tablet: <%= heroTitleOffsetTablet %>px; --hero-title-offset-y-mobile: <%= heroTitleOffsetMobile %>px; --hero-button-offset-y-desktop: <%= heroButtonOffsetDesktop %>px; --hero-button-offset-y-tablet: <%= heroButtonOffsetTablet %>px; --hero-button-offset-y-mobile: <%= heroButtonOffsetMobile %>px;">
+                                    <% if (slideDesktop && slide.layout_style !== 'split') { %>
+                                        <picture class="hero-media" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;">
+                                            <source media="(max-width: 640px)" srcset="<%= slideMobile %>">
+                                            <source media="(max-width: 1024px)" srcset="<%= slideTablet %>">
+                                            <img src="<%= slideDesktop %>" alt="" aria-hidden="true" loading="<%= sIdx === 0 ? 'eager' : 'lazy' %>" decoding="sync" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </picture>
+                                    <% } %>
+                                    <% if (slide.layout_style !== 'split') { %>
+                                        <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(<%= overlayRgb %>, <%= oOpacity %>); z-index: 2;"></div>
+                                    <% } %>
 
-
-
-
-
-        <!-- AVALIACOES / DEPOIMENTOS -->
-        <section style="background: var(--bg-header); padding: 100px 0; overflow: hidden;">
-            <div class="container">
-                <div style="text-align: center; margin-bottom: 60px;" data-reveal>
-                    <span class="section-label"><%= testimonialSource === 'google' ? 'Avaliações no Google' : 'Cases de Sucesso' %></span>
-                    <h2 style="font-size: 3.2rem; color: var(--navy-blue);">
-                        <%- settings.testimonial_section_title || 'O que dizem os <em>Clientes</em>' %>
-                    </h2>
-                </div>
-                
-                <div class="swiper testimonialsSwiper">
-                    <div class="swiper-wrapper">
-                        <% if (testimonials && testimonials.length > 0) { %>
-                            <% testimonials.forEach(t => { %>
-                                <div class="swiper-slide">
-                                    <div style="background: var(--bg-sand); border-radius: 24px; padding: 35px; min-height: 250px; display: flex; flex-direction: column; justify-content: space-between;">
-                                        <div>
-                                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 18px;">
-                                                <img src="<%= t.foto || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=80&w=100' %>"
-                                                     alt="Foto de <%= t.nome || 'cliente' %>" loading="lazy" decoding="async"
-                                                     onerror="this.onerror=null;this.src='/img/placeholder-user.svg';"
-                                                     style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
-                                                <div>
-                                                    <div style="font-weight: 800; color: var(--navy-blue); font-size: 0.95rem;"><%= t.nome %></div>
-                                                    <% if (t.origem === 'google') { %>
-                                                        <div style="font-size: 0.75rem; color: var(--text-color); display: flex; align-items: center; gap: 5px; opacity: 0.8;"><i class="ri-google-fill"></i> Google</div>
-                                                    <% } else { %>
-                                                        <div style="font-size: 0.75rem; color: var(--text-color); opacity: 0.8;"><%= t.cargo %>, <%= t.empresa %></div>
+                                    <% if (slide.layout_style === 'split') { %>
+                                        <!-- Layout Split (50% Texto / 50% Imagem) -->
+                                        <div class="hero-split-container" style="display: grid; grid-template-columns: 1fr 1fr; width: 100%; height: 100%; z-index: 3;">
+                                            <div class="hero-split-left" style="display: flex; align-items: center; justify-content: center; padding: 40px; background: var(--navy-blue);">
+                                                <div style="max-width: 550px; width: 100%;">
+                                                    <% if (slide.title && slide.title.trim()) { %>
+                                                        <h1 class="hero-title-adjustable" style="<%= customColor %>; margin-bottom: 20px;">
+                                                            <%- slide.title %>
+                                                        </h1>
+                                                    <% } %>
+                                                    <% if (slide.description && slide.description.trim()) { %>
+                                                        <p style="<%= customColor %>; margin-bottom: 30px; opacity: 0.9;">
+                                                            <%- slide.description %>
+                                                        </p>
+                                                    <% } %>
+                                                    <% const slideBtnText = slide.button_text || homeHeroButtonText; %>
+                                                    <% if (slideBtnText && slideBtnText.trim()) { %>
+                                                        <div class="hero-button-adjustable">
+                                                            <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                                <%= slideBtnText %> 
+                                                                <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                                                            </a>
+                                                        </div>
                                                     <% } %>
                                                 </div>
                                             </div>
-                                            <% if (t.origem === 'google' && t.rating) { %>
-                                                <div style="color: #f59e0b; display: flex; gap: 2px; margin-bottom: 18px; font-size: 1rem;">
-                                                    <% for (let i = 1; i <= 5; i++) { %>
-                                                        <i class="<%= i <= t.rating ? 'ri-star-fill' : 'ri-star-line' %>"></i>
-                                                    <% } %>
-                                                </div>
-                                            <% } %>
-                                            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-color);">"<%= t.texto %>"</p>
+                                            <div class="hero-split-right" style="position: relative; height: 100%;">
+                                                <picture style="width: 100%; height: 100%;">
+                                                    <source media="(max-width: 640px)" srcset="<%= slideMobile %>">
+                                                    <source media="(max-width: 1024px)" srcset="<%= slideTablet %>">
+                                                    <img src="<%= slideDesktop %>" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                                                </picture>
+                                                <div class="hero-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(<%= overlayRgb %>, <%= oOpacity %>); z-index: 2;"></div>
+                                            </div>
                                         </div>
-                                        <% if (t.origem === 'google' && t.review_url) { %>
-                                            <a href="<%= t.review_url %>" target="_blank" rel="noopener" style="margin-top: 24px; color: var(--navy-blue); text-decoration: none; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px;">
-                                                Ver no Google <i class="ri-arrow-right-up-line"></i>
-                                            </a>
-                                        <% } %>
+                                    <% } else if (slide.layout_style === 'centered') { %>
+                                        <!-- Layout Centralizado -->
+                                        <div class="hero-content" style="position: relative; z-index: 3; width: 100%; max-width: 800px; margin: 0 auto; padding: 0 40px; text-align: center; display: flex; flex-direction: column; align-items: center;">
+                                            <% if (slide.title && slide.title.trim()) { %>
+                                                <h1 class="hero-title-adjustable" style="<%= customColor %>; margin-left: auto; margin-right: auto;">
+                                                    <%- slide.title %>
+                                                </h1>
+                                            <% } %>
+                                            <% if (slide.description && slide.description.trim()) { %>
+                                                <p style="<%= customColor %>; margin-left: auto; margin-right: auto; max-width: 600px;">
+                                                    <%- slide.description %>
+                                                </p>
+                                            <% } %>
+                                            <% const slideBtnText = slide.button_text || homeHeroButtonText; %>
+                                            <% if (slideBtnText && slideBtnText.trim()) { %>
+                                            <div class="hero-button-adjustable" style="display: flex; justify-content: center; margin-top: 10px;">
+                                                <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                    <%= slideBtnText %> 
+                                                    <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                                                </a>
+                                            </div>
+                                            <% } %>
+                                        </div>
+                                    <% } else { %>
+                                        <!-- Layout Clássico -->
+                                        <div class="hero-content" style="position: relative; z-index: 3; width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 40px;">
+                                            <% if (slide.title && slide.title.trim()) { %>
+                                                <h1 class="hero-title-adjustable" style="<%= customColor %>">
+                                                    <%- slide.title %>
+                                                </h1>
+                                            <% } %>
+                                            <% if (slide.description && slide.description.trim()) { %>
+                                                <p style="<%= customColor %>">
+                                                    <%- slide.description %>
+                                                </p>
+                                            <% } %>
+                                            <% const slideBtnText = slide.button_text || homeHeroButtonText; %>
+                                            <% if (slideBtnText && slideBtnText.trim()) { %>
+                                            <div class="hero-button-adjustable" style="display: flex; justify-content: flex-start;">
+                                                <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                    <%= slideBtnText %> 
+                                                    <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                                                </a>
+                                            </div>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% }) %>
+                        </div>
+                        
+                        <!-- Controles do Slider se tiver mais de 1 -->
+                        <% if (slides.length > 1) { %>
+                            <div class="swiper-pagination hero-pagination" style="bottom: 30px; z-index: 10; position: absolute; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; gap: 8px;"></div>
+                            <div class="swiper-button-next hero-next" style="color: white; z-index: 10; right: 40px; position: absolute;"></div>
+                            <div class="swiper-button-prev hero-prev" style="color: white; z-index: 10; left: 40px; position: absolute;"></div>
+                        <% } %>
+
+                        <% if (homeHeroCardTitle.trim() || homeHeroCardSubtitle.trim()) { %>
+                        <div class="floating-card" style="bottom: 30px; z-index: 10;">
+                            <% if (homeHeroCardTitle.trim()) { %><h4><%- homeHeroCardTitle %></h4><% } %>
+                            <% if (homeHeroCardSubtitle.trim()) { %><a href="/#servicos"><%= homeHeroCardSubtitle %> <i class="ri-arrow-right-line"></i></a><% } %>
+                        </div>
+                        <% } %>
+                    </section>
+
+                <% } else if (section.id === 'sobre') { %>
+                    <!-- SOBRE (DINÂMICO COM VARIANTES DE LAYOUT) -->
+                    <section id="sobre" class="section-sobre layout-<%= style.layout_model || 'model1' %>" style="background: var(--bg-about); padding: 100px 0; <%= styleAttr %>">
+                        <div class="container">
+                            <% if (style.layout_model === 'model3' || style.layout_model === 'model5') { %>
+                                <!-- Modelo 3 / 5: Foco Centralizado / Minimalista -->
+                                <div style="text-align: center; max-width: 800px; margin: 0 auto;" data-reveal="up">
+                                    <span class="section-label" style="<%= customColor %>">NOSSA ESSÊNCIA</span>
+                                    <h2 style="font-size: 3.2rem; line-height: 1.1; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
+                                        <%- settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.' %>
+                                    </h2>
+                                    <p style="font-size: 1.2rem; color: var(--text-color); margin-bottom: 40px; line-height: 1.6; <%= customColor %>">
+                                        <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação.' %>
+                                    </p>
+                                    <a href="/#servicos" class="btn-pill-large" style="background: var(--navy-blue); color: white; display: inline-flex; <%= btnStyleAttr %>">
+                                        <%= settings.home_about_button_text || 'Conhecer nossos serviços' %> <div class="icon-blue-circle" style="background: white; color: var(--navy-blue);"><i class="ri-arrow-right-line"></i></div>
+                                    </a>
+                                </div>
+                            <% } else if (style.layout_model === 'model2') { %>
+                                <!-- Modelo 2: Split invertido -->
+                                <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+                                    <div data-reveal="left" class="about-image-wrapper">
+                                        <img src="<%= settings.about_image || 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=800' %>"
+                                             alt="Equipe" style="width: 100%; height: 500px; object-fit: cover; border-radius: 40px;">
+                                    </div>
+                                    <div data-reveal="right">
+                                        <span class="section-label" style="<%= customColor %>">NOSSA ESSÊNCIA</span>
+                                        <h2 style="font-size: 3.5rem; line-height: 1; letter-spacing: -3px; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
+                                            <%- settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.' %>
+                                        </h2>
+                                        <p style="font-size: 1.2rem; color: var(--text-color); margin-bottom: 40px; line-height: 1.6; <%= customColor %>">
+                                            <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação.' %>
+                                        </p>
+                                        <a href="/#servicos" class="btn-pill-large" style="background: var(--navy-blue); color: white; <%= btnStyleAttr %>">
+                                            <%= settings.home_about_button_text || 'Conhecer nossos serviços' %> <div class="icon-blue-circle" style="background: white; color: var(--navy-blue);"><i class="ri-arrow-right-line"></i></div>
+                                        </a>
                                     </div>
                                 </div>
-                            <% }); %>
-                        <% } else { %>
-                            <!-- Fallback Placeholder -->
-                            <div class="swiper-slide">
-                                <div style="background: var(--bg-sand); border-radius: 24px; padding: 35px; min-height: 250px; display: flex; align-items: center; justify-content: center;">
-                                    <p style="color: var(--text-color); opacity: 0.6;">Nenhum depoimento cadastrado.</p>
+                            <% } else { %>
+                                <!-- Modelo 1 (Padrão) / Modelo 4 (Grid Alternado) -->
+                                <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
+                                    <div data-reveal="left">
+                                        <span class="section-label" style="<%= customColor %>">NOSSA ESSÊNCIA</span>
+                                        <h2 style="font-size: 3.5rem; line-height: 1; letter-spacing: -3px; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
+                                            <%- settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.' %>
+                                        </h2>
+                                        <p style="font-size: 1.2rem; color: var(--text-color); margin-bottom: 40px; line-height: 1.6; <%= customColor %>">
+                                            <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação. Nossa abordagem sistêmica conecta os pontos invisíveis que transformam ambientes de trabalho em centros de excelência.' %>
+                                        </p>
+                                        <a href="/#servicos" class="btn-pill-large" style="background: var(--navy-blue); color: white; <%= btnStyleAttr %>">
+                                            <%= settings.home_about_button_text || 'Conhecer nossos serviços' %> <div class="icon-blue-circle" style="background: white; color: var(--navy-blue);"><i class="ri-arrow-right-line"></i></div>
+                                        </a>
+                                    </div>
+                                    <div data-reveal="right" class="about-image-wrapper">
+                                        <img src="<%= settings.about_image || 'https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=800' %>"
+                                             alt="Equipe" style="width: 100%; height: 550px; object-fit: cover; border-radius: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.1);">
+                                    </div>
                                 </div>
-                            </div>
-                        <% } %>
-                    </div>
-                    <!-- Paginação Customizada -->
-                    <div class="swiper-pagination testimonials-pagination" style="position: relative; margin-top: 40px;"></div>
-                </div>
-            </div>
-        </section>
+                            <% } %>
+                        </div>
+                    </section>
 
-        <!-- CONTATO HOME -->
-        <section id="contato" style="background: var(--bg-contact); padding: 100px 0;">
-            <div class="container">
-                <div style="text-align: center; margin-bottom: 60px;" data-reveal>
-                    <span class="section-label">Fale Conosco</span>
-                    <h2 style="font-size: 3rem; color: var(--navy-blue); max-width: 900px; margin: 0 auto;">
-                        <%- settings.contact_section_title || 'Entre em contato e impulse sua operação' %>
-                    </h2>
-                    <p style="color: var(--text-color); max-width: 700px; margin: 20px auto 0; font-size: 1rem; line-height: 1.8; opacity: 0.8;">
-                        <%= settings.contact_section_subtitle || settings.contact_page_description || 'Fale com nossa equipe para receber atendimento personalizado, tirar dúvidas e agendar uma conversa estratégica.' %>
-                    </p>
-                </div>
-
-                <style>
-                    .contact-home-grid {
-                        display: grid; 
-                        grid-template-columns: 1fr 1fr; 
-                        gap: 40px; 
-                        align-items: stretch;
-                    }
-                    @media (max-width: 900px) {
-                        .contact-home-grid {
-                            grid-template-columns: 1fr;
+                <% } else if (section.id === 'servicos') { %>
+                    <!-- SERVIÇOS -->
+                    <style>
+                        @media (max-width: 1024px) {
+                            .section-header-flex { flex-direction: column; align-items: flex-start !important; gap: 20px; }
                         }
-                    }
-                </style>
-                <div class="contact-home-grid">
-                    <div data-reveal="left" style="display: flex; flex-direction: column; gap: 25px;">
-                        <div style="background: var(--bg-header); border-radius: 30px; box-shadow: 0 40px 100px rgba(0,0,0,0.08); padding: 40px;">
-                            <h3 style="font-size: 1.6rem; margin-bottom: 20px; color: var(--navy-blue);">Dados de contato</h3>
-                            <div style="display: grid; gap: 18px;">
-                                <div>
-                                    <strong style="color: var(--navy-blue);">Telefone</strong>
-                                    <p style="margin: 6px 0 0; color: var(--text-color);"><a href="tel:<%= settings.contact_phone ? settings.contact_phone.replace(/\D/g, '') : '' %>" style="color: inherit; text-decoration: none;"><%= settings.contact_phone || '(11) 99999-9999' %></a></p>
+                        .servicesSwiper { padding-bottom: 40px; }
+                        .servicesSwiper .swiper-slide { height: auto !important; }
+                    </style>
+                    <section id="servicos" class="layout-<%= style.layout_model || 'model1' %>" style="background: var(--bg-sand); padding: 60px 0; <%= styleAttr %>">
+                        <div class="container">
+                            <div class="section-header-flex" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; <%= (style.layout_model === 'model3' || style.layout_model === 'model5') ? 'justify-content: center; text-align: center; margin-left: auto; margin-right: auto;' : '' %>">
+                                <div data-reveal="left" style="<%= (style.layout_model === 'model3' || style.layout_model === 'model5') ? 'text-align: center; max-width: 650px; margin: 0 auto;' : '' %>">
+                                    <span class="section-label" style="<%= customColor %>">Especialidades</span>
+                                    <h2 style="font-size: 2.8rem; color: var(--navy-blue); line-height: 1.1; margin-bottom: 10px; <%= customColor %>">
+                                        <%- settings.services_section_title || 'Conheça nossos <em>Serviços</em>' %>
+                                    </h2>
+                                    <p style="color: var(--text-color); max-width: 500px; <%= (style.layout_model === 'model3' || style.layout_model === 'model5') ? 'margin: 0 auto;' : '' %> <%= customColor %>"><%= settings.services_section_text %></p>
                                 </div>
-                                <div>
-                                    <strong style="color: var(--navy-blue);">E-mail</strong>
-                                    <p style="margin: 6px 0 0; color: var(--text-color);"><a href="mailto:<%= settings.contact_email || 'contato@seudominio.com' %>" style="color: inherit; text-decoration: none;"><%= settings.contact_email || 'contato@seudominio.com' %></a></p>
+                            </div>
+
+                            <div class="swiper servicesSwiper" style="overflow: hidden;">
+                                <div class="swiper-wrapper services-wrapper-mobile">
+                                    <% if (locals.services) { %>
+                                        <% locals.services.forEach((s, sIdx) => { %>
+                                            <% 
+                                                const cardBgStyle = style.card_bg ? `background: ${style.card_bg} !important;` : '';
+                                                const cardTitleStyle = style.card_title_color ? `color: ${style.card_title_color} !important;` : '';
+                                                const cardTextStyle = style.card_text_color ? `color: ${style.card_text_color} !important;` : '';
+                                                const cardIconStyle = style.card_icon_color ? `color: ${style.card_icon_color} !important;` : '';
+                                                const cardLinkStyle = style.card_link_color ? `color: ${style.card_link_color} !important;` : '';
+                                            %>
+                                            <div class="swiper-slide services-slide">
+                                                <% if (style.layout_model === 'model3' || style.layout_model === 'model5') { %>
+                                                    <!-- Lista Compacta (Modelo 3 / 5) -->
+                                                    <div style="background: #FFFFFF; border-radius: 15px; padding: 25px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; width: 100%; cursor: pointer; <%= cardBgStyle %>" 
+                                                         data-title="<%= s.titulo %>"
+                                                         data-resumo="<%= s.resumo || '' %>"
+                                                         data-description="<%= s.conteudo || '' %>"
+                                                         data-image="<%= s.imagem || '' %>"
+                                                         data-icon="<%= s.icone %>"
+                                                         onclick="openServiceModalFromEl(this)"
+                                                         data-reveal="up">
+                                                        <div style="display: flex; align-items: center; gap: 20px; flex: 1; min-width: 250px;">
+                                                            <div style="width: 45px; height: 45px; background: rgba(0,0,0,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                                <i class="<%= s.icone %>" style="font-size: 1.5rem; color: var(--navy-blue); <%= cardIconStyle %>"></i>
+                                                            </div>
+                                                            <div style="text-align: left;">
+                                                                <h3 style="font-size: 1.25rem; margin: 0 0 5px 0; color: var(--navy-blue); <%= cardTitleStyle %>"><%= s.titulo %></h3>
+                                                                <p style="color: var(--text-color); font-size: 0.88rem; line-height: 1.5; margin: 0; opacity: 0.8; <%= cardTextStyle %>"><%= s.resumo %></p>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <span style="color: var(--navy-blue); font-weight: 700; text-decoration: underline; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; <%= cardLinkStyle %>">
+                                                                Saiba mais <i class="ri-add-circle-line" style="<%= cardLinkStyle %>"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                <% } else { %>
+                                                    <!-- Carrossel / Grid Estático (Modelo 1 / 2 / 4) -->
+                                                    <div style="background: #FFFFFF; border-radius: 20px; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); height: 100%; display: flex; flex-direction: column; text-align: left; cursor: pointer; <%= cardBgStyle %>" 
+                                                         data-title="<%= s.titulo %>"
+                                                         data-resumo="<%= s.resumo || '' %>"
+                                                         data-description="<%= s.conteudo || '' %>"
+                                                         data-image="<%= s.imagem || '' %>"
+                                                         data-icon="<%= s.icone %>"
+                                                         onclick="openServiceModalFromEl(this)"
+                                                         data-reveal="up">
+                                                        <div style="width: 55px; height: 55px; background: rgba(0,0,0,0.03); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                                            <i class="<%= s.icone %>" style="font-size: 1.8rem; color: var(--navy-blue); <%= cardIconStyle %>"></i>
+                                                        </div>
+                                                        <h3 style="font-size: 1.4rem; margin-bottom: 15px; color: var(--navy-blue); <%= cardTitleStyle %>"><%= s.titulo %></h3>
+                                                        <p style="color: var(--text-color); font-size: 0.9rem; line-height: 1.6; margin-bottom: auto; <%= cardTextStyle %>"><%= s.resumo %></p>
+                                                        
+                                                        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                                                            <span style="color: var(--navy-blue); font-weight: 700; text-decoration: underline; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; <%= cardLinkStyle %>">
+                                                                Saiba mais <i class="ri-add-circle-line" style="<%= cardLinkStyle %>"></i>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                <% } %>
+                                            </div>
+                                        <% }) %>
+                                    <% } %>
                                 </div>
+                                <div class="swiper-pagination services-pagination" style="position: relative; margin-top: 20px;"></div>
+                                <!-- Setas de navegação -->
+                                <div class="swiper-button-next services-next" style="color: var(--navy-blue); transform: translateX(10px);"></div>
+                                <div class="swiper-button-prev" style="color: var(--navy-blue); transform: translateX(-10px);"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- POPUP MODAL DE DETALHES DO SERVIÇO (SPLIT IMAGEM NA LATERAL) -->
+                    <div id="serviceDetailModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 17, 40, 0.7); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.3s ease;">
+                        <div class="modal-card-container" style="background: <%= settings.color_popup_bg || '#FFFFFF' %>; width: 100%; max-width: 900px; max-height: 90vh; border-radius: <%= settings.popup_border_radius || 30 %>px; overflow: hidden; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(255,255,255,0.1); animation: modalEnter 0.3s ease-out; display: flex; flex-direction: <%= (settings.popup_layout_model === 'top-image') ? 'column' : 'row' %>; font-family: <%= settings.popup_font_style === 'serif' ? 'var(--font-serif)' : 'var(--font-main)' %>;">
+                            
+                            <!-- Botão Fechar -->
+                            <button onclick="closeServiceModal()" style="position: absolute; top: 20px; right: 20px; background: white; border: none; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 10; font-size: 1.2rem; color: var(--navy-blue); transition: 0.2s;"><i class="ri-close-line"></i></button>
+
+                            <!-- Imagem Lateral (Desktop) / Topo (Mobile) -->
+                            <% if (settings.popup_image_style !== 'hidden' && settings.popup_layout_model !== 'no-image') { %>
+                            <div id="modalServiceImageContainer" style="<%= (settings.popup_layout_model === 'top-image') ? 'width: 100%; height: 280px;' : 'width: 40%; min-width: 320px;' %> position: relative; background: <%= settings.color_popup_bg || '#FFFFFF' %>; display: none; overflow: hidden; padding: <%= settings.popup_image_style === 'square' ? '0' : '20px' %>; justify-content: center; align-items: center; display: flex;">
+                                <img id="modalServiceImage" src="" alt="" style="width: 100%; height: 100%; object-fit: cover; border-radius: <%= settings.popup_image_style === 'circle' ? '50%' : (settings.popup_image_style === 'square' ? '0' : '20px') %>; aspect-ratio: <%= settings.popup_image_style === 'circle' ? '1 / 1' : 'auto' %>;">
+                            </div>
+                            <% } %>
+                            
+                            <!-- Conteúdo (Lado Direito ou Único) -->
+                            <div class="modal-content-wrapper" style="flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; <%= (settings.popup_layout_model === 'top-image') ? 'max-height: calc(90vh - 280px);' : 'max-height: 90vh;' %>">
                                 <div>
-                                    <strong style="color: var(--navy-blue);">Endereço</strong>
-                                    <p style="margin: 6px 0 0; color: var(--text-color);"><%= settings.address_full || 'Av. Principal, 1000 - Centro' %></p>
+                                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                                        <div id="modalServiceIconBox" style="width: 60px; height: 60px; background: rgba(10, 17, 40, 0.05); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+                                            <i id="modalServiceIcon" class="" style="font-size: 2rem; color: <%= settings.color_popup_title || 'var(--navy-blue)' %>;"></i>
+                                        </div>
+                                        <h3 id="modalServiceTitle" style="font-size: 1.8rem; font-weight: 800; color: <%= settings.color_popup_title || 'var(--navy-blue)' %>; margin: 0; line-height: 1.2;"></h3>
+                                    </div>
+                                    
+                                    <!-- Resumo -->
+                                    <div id="modalServiceText" style="color: <%= settings.color_popup_text || 'var(--text-color)' %>; font-size: 1.05rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px; border-top: 1px solid #f1f5f9; padding-top: 20px;"></div>
+                                    
+                                    <!-- Descrição Completa -->
+                                    <div id="modalServiceDescription" style="color: <%= settings.color_popup_text || 'var(--text-color)' %>; font-size: 0.95rem; line-height: 1.7; margin-bottom: 30px; opacity: 0.85;"></div>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: flex-end; border-top: 1px solid #f1f5f9; padding-top: 25px; margin-top: auto;">
+                                    <a id="modalServiceWhatsappBtn" href="" target="_blank" class="btn-pill-large btn-whatsapp-conversion" style="background: <%= settings.color_popup_btn || 'var(--navy-blue)' %>; color: <%= settings.color_popup_btn_text || 'white' %>; display: inline-flex; width: auto !important; padding: 15px 30px; text-decoration: none; font-weight: 700; gap: 10px; border-radius: 50px;">
+                                        Estou Interessado <div class="icon-blue-circle" style="background: <%= settings.color_popup_btn_text || 'white' %>; color: <%= settings.color_popup_btn || 'var(--navy-blue)' %>; display: flex !important; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%;"><i class="ri-whatsapp-line"></i></div>
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                        <div style="background: var(--bg-header); border-radius: 30px; box-shadow: 0 40px 100px rgba(0,0,0,0.08); padding: 40px;">
-                            <h3 style="font-size: 1.6rem; margin-bottom: 20px; color: var(--navy-blue);">Gostaria de falar com nosso time?</h3>
-                            <p style="margin: 0; color: var(--text-color); line-height: 1.8;">Use os dados acima ou envie sua mensagem pelo formulário de contato na página de administração para que possamos responder rapidamente.</p>
+                    </div>
+
+                    <style>
+                        @keyframes modalEnter {
+                            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+                            to { opacity: 1; transform: scale(1) translateY(0); }
+                        }
+                        @media (max-width: 1023px) {
+                            .modal-card-container {
+                                flex-direction: column !important;
+                                max-height: 95vh !important;
+                            }
+                            <% if (settings.popup_image_style !== 'hidden' && settings.popup_layout_model !== 'no-image') { %>
+                            #modalServiceImageContainer {
+                                width: 100% !important;
+                                height: 220px !important;
+                                min-width: 100% !important;
+                                padding: <%= settings.popup_image_style === 'square' ? '0' : '15px' %> !important;
+                            }
+                            .modal-content-wrapper {
+                                padding: 25px !important;
+                                max-height: calc(95vh - 220px) !important;
+                            }
+                            <% } else { %>
+                            .modal-content-wrapper {
+                                padding: 25px !important;
+                                max-height: 95vh !important;
+                            }
+                            <% } %>
+                        }
+                    </style>
+
+                <% } else if (section.id === 'beneficios') { %>
+                    <!-- BENEFÍCIOS (DINÂMICO) -->
+                    <section id="beneficios" class="layout-<%= style.layout_model || 'model1' %>" style="padding: 100px 0; background: <%= settings.benefits_color || 'white' %>; overflow: hidden; <%= styleAttr %>">
+                        <div class="container">
+                            <div class="section-header" style="text-align: center; margin-bottom: 60px;" data-reveal="up">
+                                <span class="section-label" style="<%= customColor %>">Vantagens</span>
+                                <h2 style="font-size: 2.8rem; color: <%= settings.benefits_title_color || 'var(--navy-blue)' %>; line-height: 1.1; margin-top: 10px; <%= customColor %>">
+                                    <%- settings.benefits_title || 'Benefícios que <em>Transformam</em>' %>
+                                </h2>
+                                <% if (settings.benefits_text) { %>
+                                    <p style="color: <%= settings.benefits_text_color || '#64748b' %>; margin-top: 15px; max-width: 600px; margin-left: auto; margin-right: auto; <%= customColor %>"><%= settings.benefits_text %></p>
+                                <% } %>
+                            </div>
+
+                            <div class="swiper beneficiosSwiper" style="padding: 20px 10px 50px 10px; overflow: hidden; position: relative;">
+                                <div class="swiper-wrapper">
+                                    <% if (locals.beneficios && beneficios.length > 0) { %>
+                                        <% beneficios.forEach(b => { %>
+                                            <div class="swiper-slide">
+                                                <% if (style.layout_model === 'model3' || style.layout_model === 'model5') { %>
+                                                    <!-- Lista Compacta (Modelo 3 / 5) -->
+                                                    <div style="background: <%= settings.benefits_card_bg || '#FFFFFF' %>; border-radius: 15px; padding: 25px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; width: 100%;" data-reveal="up">
+                                                        <div style="width: 45px; height: 45px; background: <%= settings.benefits_icon_bg || 'rgba(0,0,0,0.05)' %>; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.4rem; color: <%= settings.benefits_icon_color || 'var(--navy-blue)' %>;">
+                                                            <i class="<%= b.icone %>"></i>
+                                                        </div>
+                                                        <div style="flex: 1; min-width: 250px; text-align: left;">
+                                                            <h3 style="font-size: 1.2rem; margin: 0 0 5px 0; color: <%= settings.benefits_card_title_color || 'var(--navy-blue)' %>;"><%= b.titulo %></h3>
+                                                            <p style="color: <%= settings.benefits_card_text_color || '#64748b' %>; font-size: 0.9rem; line-height: 1.5; margin: 0;"><%= b.texto %></p>
+                                                        </div>
+                                                    </div>
+                                                <% } else { %>
+                                                    <!-- Carrossel / Grid Estático (Modelo 1 / 2 / 4) -->
+                                                    <div class="beneficio-item" style="background: <%= settings.benefits_card_bg || 'rgba(255, 255, 255, 0.6)' %>; backdrop-filter: blur(10px); padding: 40px; border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; gap: 20px; height: 100%; text-align: left;" data-reveal="up">
+                                                        <div class="beneficio-icon" style="width: 60px; height: 60px; background: <%= settings.benefits_icon_bg || 'white' %>; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: <%= settings.benefits_icon_color || 'var(--accent-red)' %>; box-shadow: 0 10px 20px rgba(0,0,0,0.02);">
+                                                            <i class="<%= b.icone %>"></i>
+                                                        </div>
+                                                        <h3 style="font-size: 1.25rem; font-weight: 800; color: <%= settings.benefits_card_title_color || 'var(--navy-blue)' %>; margin: 0;"><%= b.titulo %></h3>
+                                                        <p style="font-size: 0.95rem; line-height: 1.6; color: <%= settings.benefits_card_text_color || '#64748b' %>; margin: 0;"><%= b.texto %></p>
+                                                    </div>
+                                                <% } %>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <div class="swiper-slide">
+                                            <div class="beneficio-item" style="background: #F8FAFC; padding: 40px; border-radius: 24px; text-align: center; width: 100%;">
+                                                <p style="color: #94a3b8; margin: 0;">Cadastre os benefícios no painel administrativo.</p>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                
+                                <!-- Paginação -->
+                                <div class="swiper-pagination beneficios-pagination" style="position: relative; margin-top: 30px;"></div>
+                                <!-- Navegação -->
+                                <div class="swiper-button-next beneficios-next" style="color: var(--navy-blue); transform: translateX(10px);"></div>
+                                <div class="swiper-button-prev" style="color: var(--navy-blue); transform: translateX(-10px);"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div data-reveal="right" style="height: 100%; min-height: 420px; border-radius: 30px; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.08);">
-                        <iframe src="<%= settings.contact_map_url || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.1973656114175!2d-46.65860718502222!3d-23.561349184683057!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da563797%3A0x7337220556133f99!2sAv.%20Paulista%2C%20S%C3%A3o%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1625500000000!5m2!1spt-BR!2sbr' %>" width="100%" height="100%" style="border:0; min-height: 420px; filter: grayscale(0.9) contrast(1.05);" allowfullscreen="" loading="lazy"></iframe>
-                    </div>
-                </div>
-            </div>
-        </section>
+                    </section>
+                <% } else if (section.id === 'destaque') { %>
+                    <!-- SEÇÃO DESTAQUE PARALAXE COM EFEITO DE ZOOM FIXO -->
+                    <% 
+                        const bgImage = settings.destaque_paralaxe_image || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1600';
+                        const alignment = settings.destaque_paralaxe_align || 'centered';
+                        
+                        let alignClass = 'align-center';
+                        let textAlign = 'center';
+                        let marginLeft = 'auto';
+                        let marginRight = 'auto';
+                        
+                        if (alignment === 'left') {
+                            alignClass = 'align-left';
+                            textAlign = 'left';
+                            marginLeft = '0';
+                            marginRight = 'auto';
+                        } else if (alignment === 'right') {
+                            alignClass = 'align-right';
+                            textAlign = 'right';
+                            marginLeft = 'auto';
+                            marginRight = '0';
+                        }
+                    %>
+                    <section id="destaque" style="position: relative; padding: 140px 0; overflow: hidden; background: #0A1128;">
+                        <!-- Parallax Background Image with fixed attachment -->
+                        <div class="parallax-bg-media" style="position: absolute; top: 0; left: 0; width: 100%; height: 120%; background-image: linear-gradient(rgba(10, 17, 40, 0.65), rgba(10, 17, 40, 0.65)), url('<%= bgImage %>'); background-attachment: fixed; background-position: center; background-repeat: no-repeat; background-size: cover; z-index: 1; transform: translateY(0); transition: transform 0.1s ease-out;"></div>
+                        
+                        <div class="container" style="position: relative; z-index: 2;">
+                            <div style="max-width: 750px; text-align: <%= textAlign %>; margin-left: <%= marginLeft %>; margin-right: <%= marginRight %>;" data-reveal="up">
+                                <% if (settings.destaque_paralaxe_title) { %>
+                                    <h2 style="font-size: var(--title-hero-size, 3.5rem); line-height: 1.2; font-weight: 900; color: #FFFFFF; margin-bottom: 20px;">
+                                        <%- settings.destaque_paralaxe_title %>
+                                    </h2>
+                                <% } %>
+                                <% if (settings.destaque_paralaxe_subtitle) { %>
+                                    <p style="font-size: 1.25rem; line-height: 1.8; color: rgba(255, 255, 255, 0.9); margin-bottom: 40px; font-weight: 500;">
+                                        <%= settings.destaque_paralaxe_subtitle %>
+                                    </p>
+                                <% } %>
+                                <% if (settings.destaque_paralaxe_button_text && settings.destaque_paralaxe_button_url) { %>
+                                    <div>
+                                        <a href="<%= settings.destaque_paralaxe_button_url %>" class="roll-btn" style="background: var(--accent-red); color: #FFFFFF; font-weight: 900; padding: 16px 38px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; box-shadow: 0 10px 20px rgba(214, 40, 40, 0.35); border: 2px solid transparent;" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 15px 30px rgba(214, 40, 40, 0.5)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 10px 20px rgba(214, 40, 40, 0.35)';">
+                                            <%= settings.destaque_paralaxe_button_text %> <i class="ri-arrow-right-line"></i>
+                                        </a>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </section>
+                <% } else if (section.id === 'depoimentos') { %>
+                    <% 
+                        // Depoimentos devem ser sempre em grid/carrossel horizontal (model1 ou model2) e nunca empilhado verticalmente (model3/5)
+                        const testLayout = (style.layout_model === 'model3' || style.layout_model === 'model5') ? 'model2' : (style.layout_model || 'model1');
+                    %>
+                    <section id="depoimentos" class="layout-<%= testLayout %>" style="background: #FFFFFF; padding: 100px 0; overflow: hidden; <%= styleAttr %>">
+                        <div class="container">
+                            <div style="text-align: center; margin-bottom: 60px;" data-reveal>
+                                <span class="section-label" style="<%= customColor %>"><%= testimonialSource === 'google' ? 'Avaliações no Google' : 'Cases de Sucesso' %></span>
+                                <h2 style="font-size: 3.2rem; color: var(--navy-blue); <%= customColor %>">
+                                    <%- settings.testimonial_section_title || 'O que dizem os <em>Clientes</em>' %>
+                                </h2>
+                            </div>
+                            
+                            <div class="swiper testimonialsSwiper" style="overflow: hidden; padding-bottom: 50px; position: relative;">
+                                <div class="swiper-wrapper">
+                                    <% if (testimonials && testimonials.length > 0) { %>
+                                        <% testimonials.forEach(t => { %>
+                                            <% 
+                                                const cardBgStyle = style.card_bg ? `background: ${style.card_bg} !important;` : '';
+                                                const cardTitleStyle = style.card_title_color ? `color: ${style.card_title_color} !important;` : '';
+                                                const cardTextStyle = style.card_text_color ? `color: ${style.card_text_color} !important;` : '';
+                                                const cardIconStyle = style.card_icon_color ? `color: ${style.card_icon_color} !important;` : '';
+                                            %>
+                                            <div class="swiper-slide">
+                                                <div style="background: var(--bg-sand); border-radius: 24px; padding: 35px; min-height: 250px; display: flex; flex-direction: column; justify-content: space-between; height: 100%; text-align: left; <%= cardBgStyle %>" data-reveal="up">
+                                                    <div>
+                                                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 18px;">
+                                                            <img src="<%= t.foto || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?auto=format&fit=crop&q=80&w=100' %>"
+                                                                 alt="Foto de <%= t.nome || 'cliente' %>" loading="lazy" decoding="async"
+                                                                 onerror="this.onerror=null;this.src='/img/placeholder-user.svg';"
+                                                                 style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                                                            <div>
+                                                                <div style="font-weight: 800; color: var(--navy-blue); font-size: 0.95rem; <%= cardTitleStyle %>"><%= t.nome %></div>
+                                                                <% if (t.origem === 'google') { %>
+                                                                    <div style="font-size: 0.75rem; color: var(--text-color); display: flex; align-items: center; gap: 5px; opacity: 0.8; <%= cardTextStyle %>"><i class="ri-google-fill" style="<%= cardIconStyle %>"></i> Google</div>
+                                                                <% } else { %>
+                                                                    <div style="font-size: 0.75rem; color: var(--text-color); opacity: 0.8; <%= cardTextStyle %>"><%= t.cargo %>, <%= t.empresa %></div>
+                                                                <% } %>
+                                                            </div>
+                                                        </div>
+                                                        <% if (t.origem === 'google' && t.rating) { %>
+                                                            <div style="color: #f59e0b; display: flex; gap: 2px; margin-bottom: 18px; font-size: 1rem; <%= cardIconStyle %>">
+                                                                <% for (let i = 1; i <= 5; i++) { %>
+                                                                    <i class="<%= i <= t.rating ? 'ri-star-fill' : 'ri-star-line' %>" style="<%= cardIconStyle %>"></i>
+                                                                <% } %>
+                                                            </div>
+                                                        <% } %>
+                                                        <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-color); <%= cardTextStyle %>">"<%= t.texto %>"</p>
+                                                    </div>
+                                                    <% if (t.origem === 'google' && t.review_url) { %>
+                                                        <a href="<%= t.review_url %>" target="_blank" rel="noopener" style="margin-top: 24px; color: var(--navy-blue); text-decoration: none; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; <%= cardTitleStyle %>">
+                                                            Ver no Google <i class="ri-arrow-right-up-line" style="<%= cardTitleStyle %>"></i>
+                                                        </a>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <!-- Fallback Placeholder -->
+                                        <div class="swiper-slide">
+                                            <div style="background: var(--bg-sand); border-radius: 24px; padding: 35px; min-height: 250px; display: flex; align-items: center; justify-content: center; width: 100%;">
+                                                <p style="color: var(--text-color); opacity: 0.6;">Nenhum depoimento cadastrado.</p>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                <!-- Paginação Customizada -->
+                                <div class="swiper-pagination testimonials-pagination" style="position: relative; margin-top: 40px;"></div>
+                                <!-- Setas de navegação -->
+                                <div class="swiper-button-next testimonials-next" style="color: var(--navy-blue); transform: translateX(10px);"></div>
+                                <div class="swiper-button-prev" style="color: var(--navy-blue); transform: translateX(-10px);"></div>
+                            </div>
+                        </div>
+                    </section>
 
+                <% } else if (section.id === 'contato') { %>
+                    <!-- CONTATO HOME -->
+                    <section id="contato" style="background: var(--bg-contact); padding: 100px 0; <%= styleAttr %>">
+                        <div class="container">
+                            <div style="text-align: center; margin-bottom: 60px;" data-reveal>
+                                <span class="section-label" style="<%= customColor %>">Fale Conosco</span>
+                                <h2 style="font-size: 3rem; color: var(--navy-blue); max-width: 900px; margin: 0 auto; <%= customColor %>">
+                                    <%- settings.contact_section_title || 'Entre em contato e impulse sua operação' %>
+                                </h2>
+                                <p style="color: var(--text-color); max-width: 700px; margin: 20px auto 0; font-size: 1rem; line-height: 1.8; opacity: 0.8; <%= customColor %>">
+                                    <%= settings.contact_section_subtitle || settings.contact_page_description || 'Fale com nossa equipe para receber atendimento personalizado, tirar dúvidas e agendar uma conversa estratégica.' %>
+                                </p>
+                            </div>
 
+                            <style>
+                                .contact-home-grid {
+                                    display: grid; 
+                                    grid-template-columns: 1fr 1fr; 
+                                    gap: 40px; 
+                                    align-items: stretch;
+                                }
+                                @media (max-width: 900px) {
+                                    .contact-home-grid {
+                                        grid-template-columns: 1fr;
+                                    }
+                                }
+                            </style>
+                            <% 
+                                const contactCardBg = style.card_bg ? `background: ${style.card_bg} !important;` : '';
+                                const contactCardTitle = style.card_title_color ? `color: ${style.card_title_color} !important;` : '';
+                                const contactCardText = style.card_text_color ? `color: ${style.card_text_color} !important;` : '';
+                            %>
+                            <div class="contact-home-grid">
+                                <div data-reveal="left" style="display: flex; flex-direction: column; gap: 25px;">
+                                    <div style="background: #FFFFFF; border-radius: 30px; box-shadow: 0 40px 100px rgba(0,0,0,0.08); padding: 40px; <%= contactCardBg %>">
+                                        <h3 style="font-size: 1.6rem; margin-bottom: 20px; color: var(--navy-blue); <%= contactCardTitle %>">Dados de contato</h3>
+                                        <div style="display: grid; gap: 18px;">
+                                            <div>
+                                                <strong style="color: var(--navy-blue); <%= contactCardTitle %>">Telefone</strong>
+                                                <p style="margin: 6px 0 0; color: var(--text-color); <%= contactCardText %>"><a href="tel:<%= settings.contact_phone ? settings.contact_phone.replace(/\D/g, '') : '' %>" style="color: inherit; text-decoration: none;"><%= settings.contact_phone || '(11) 99999-9999' %></a></p>
+                                            </div>
+                                            <div>
+                                                <strong style="color: var(--navy-blue); <%= contactCardTitle %>">E-mail</strong>
+                                                <p style="margin: 6px 0 0; color: var(--text-color); <%= contactCardText %>"><a href="mailto:<%= settings.contact_email || 'contato@seudominio.com' %>" style="color: inherit; text-decoration: none;"><%= settings.contact_email || 'contato@seudominio.com' %></a></p>
+                                            </div>
+                                            <div>
+                                                <strong style="color: var(--navy-blue); <%= contactCardTitle %>">Endereço</strong>
+                                                <p style="margin: 6px 0 0; color: var(--text-color); <%= contactCardText %>"><%= settings.address_full || 'Av. Principal, 1000 - Centro' %></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="background: #FFFFFF; border-radius: 30px; box-shadow: 0 40px 100px rgba(0,0,0,0.08); padding: 40px; <%= contactCardBg %>">
+                                        <h3 style="font-size: 1.6rem; margin-bottom: 20px; color: var(--navy-blue); <%= contactCardTitle %>"><%= settings.contact_extra_title || 'Gostaria de falar com nosso time?' %></h3>
+                                        <p style="margin: 0; color: var(--text-color); line-height: 1.8; <%= contactCardText %>"><%= settings.contact_extra_text || 'Use os dados acima ou envie sua mensagem pelo formulário de contato na página de administração para que possamos responder rapidamente.' %></p>
+                                    </div>
+                                </div>
+                                <div data-reveal="right" style="height: 100%; min-height: 420px; border-radius: 30px; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.08);">
+                                    <iframe src="<%= settings.contact_map_url || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.1973656114175!2d-46.65860718502222!3d-23.561349184683057!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da563797%3A0x7337220556133f99!2sAv.%20Paulista%2C%20São%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1625500000000!5m2!1spt-BR!2sbr' %>" width="100%" height="100%" style="border:0; min-height: 420px; filter: grayscale(0.9) contrast(1.05);" allowfullscreen="" loading="lazy"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                <% } %>
+            <% } %>
+        <% }) %>
     </main>
 
     <%- include('partials/footer') %>
 
     <!-- Scripts: GSAP + Swiper -->
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('load', () => {
         if (window.gsap && window.ScrollTrigger) {
             gsap.registerPlugin(ScrollTrigger);
             gsap.utils.toArray("[data-reveal]").forEach(el => {
@@ -381,9 +862,37 @@
             else config.y = 40;
             gsap.from(el, config);
             });
+
+            // Parallax fixed zoom animation for the spotlight parallax section
+            gsap.fromTo("#destaque .parallax-bg-media", 
+                { scale: 1.25, yPercent: -10 },
+                { 
+                    scale: 1.0, 
+                    yPercent: 10,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: "#destaque",
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: true
+                    }
+                }
+            );
         }
 
         if (!window.Swiper) return;
+
+        // Hero Swiper
+        new Swiper('.heroSwiper', {
+            slidesPerView: 1,
+            spaceBetween: 0,
+            loop: true,
+            effect: 'fade',
+            fadeEffect: { crossFade: true },
+            autoplay: { delay: 6000, disableOnInteraction: false },
+            pagination: { el: ".hero-pagination", clickable: true },
+            navigation: { nextEl: ".hero-next", prevEl: ".hero-prev" }
+        });
 
         // Testimonials Swiper
         const testimonialSlides = document.querySelectorAll('.testimonialsSwiper .swiper-slide').length;
@@ -393,6 +902,7 @@
             grabCursor: true,
             loop: testimonialSlides > 4,
             pagination: { el: ".testimonials-pagination", clickable: true },
+            navigation: { nextEl: ".testimonials-next", prevEl: ".swiper-button-prev" },
             breakpoints: {
                 768: { slidesPerView: 2 },
                 1024: { slidesPerView: 3 },
@@ -406,14 +916,13 @@
             spaceBetween: 20,
             centeredSlides: false,
             pagination: { el: ".services-pagination", clickable: true },
+            navigation: { nextEl: ".services-next", prevEl: ".services-prev" },
             breakpoints: {
                 768: { slidesPerView: 2 },
                 1024: { slidesPerView: 3 },
                 1200: { slidesPerView: 4 }
             }
         });
-
-
 
         // Lógica Newsletter
         // Carrossel de Benefícios
@@ -424,16 +933,122 @@
             loop: beneficiosSlides > 4,
             autoplay: { delay: 4000, disableOnInteraction: false },
             pagination: { el: ".beneficios-pagination", clickable: true },
-            navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+            navigation: { nextEl: ".beneficios-next", prevEl: ".beneficios-prev" },
             breakpoints: {
-                640: { slidesPerView: 1.5 },
                 768: { slidesPerView: 2 },
                 1024: { slidesPerView: 3 },
                 1200: { slidesPerView: 4 }
             }
         });
+    });
 
+    function openServiceModalFromEl(el) {
+        try {
+            const title = el.getAttribute('data-title') || '';
+            const text = el.getAttribute('data-resumo') || '';
+            const description = el.getAttribute('data-description') || '';
+            const image = el.getAttribute('data-image') || '';
+            const icon = el.getAttribute('data-icon') || '';
+            const phone = <%- JSON.stringify(settings.whatsapp ? settings.whatsapp.replace(/\D/g, '') : '') %>;
+            const defaultMsg = <%- JSON.stringify(settings.whatsapp_message || '') %>;
+            
+            // Passar os estilos de botões da seção de serviços para o modal
+            let btnBg = '';
+            let btnColor = '';
+            try {
+                const styles = <%- settings.estilo_secoes || '{}' %>;
+                const servicosStyle = styles['servicos'] || {};
+                if (servicosStyle.bg_button_color) btnBg = servicosStyle.bg_button_color;
+                if (servicosStyle.text_button_color) btnColor = servicosStyle.text_button_color;
+            } catch(e) {}
 
+            openServiceModal(title, text, description, image, icon, phone, defaultMsg, btnBg, btnColor);
+        } catch (err) {
+            console.error("Error in openServiceModalFromEl:", err);
+        }
+    }
+
+    function openServiceModal(title, text, description, image, icon, phone, defaultMsg, btnBg, btnColor) {
+        try {
+            const modal = document.getElementById('serviceDetailModal');
+            if (!modal) return;
+
+            // Customizar cores do botão no popup
+            const whatsappBtn = document.getElementById('modalServiceWhatsappBtn');
+            if (whatsappBtn) {
+                const finalBtnBg = '<%= settings.color_popup_btn || "" %>' || btnBg;
+                const finalBtnColor = '<%= settings.color_popup_btn_text || "" %>' || btnColor;
+                if (finalBtnBg) whatsappBtn.style.setProperty('background', finalBtnBg, 'important');
+                if (finalBtnColor) whatsappBtn.style.setProperty('color', finalBtnColor, 'important');
+                
+                const iconCircle = whatsappBtn.querySelector('.icon-blue-circle');
+                if (iconCircle) {
+                    if (finalBtnBg) iconCircle.style.setProperty('color', finalBtnBg, 'important');
+                    if (finalBtnColor) iconCircle.style.setProperty('background', finalBtnColor, 'important');
+                }
+                
+                const customMsg = defaultMsg ? defaultMsg : 'Olá, estive no site e gostaria de agendar uma consulta.';
+                const cleanMsg = `${customMsg}\n\n*Serviço de interesse:* ${title}`;
+                whatsappBtn.href = `https://wa.me/${phone}?text=${encodeURIComponent(cleanMsg)}`;
+            }
+
+            const titleEl = document.getElementById('modalServiceTitle');
+            if (titleEl) titleEl.innerText = title;
+
+            const textEl = document.getElementById('modalServiceText');
+            if (textEl) textEl.innerHTML = text;
+
+            const descEl = document.getElementById('modalServiceDescription');
+            if (descEl) descEl.innerHTML = description ? description.replace(/\r?\n/g, '<br>') : '';
+
+            const imgContainer = document.getElementById('modalServiceImageContainer');
+            const img = document.getElementById('modalServiceImage');
+            const popupImageStyle = '<%= settings.popup_image_style || "rounded" %>';
+            const popupLayoutModel = '<%= settings.popup_layout_model || "split" %>';
+            if (img && imgContainer) {
+                if (image && image.trim() !== '' && popupImageStyle !== 'hidden' && popupLayoutModel !== 'no-image') {
+                    img.src = image;
+                    imgContainer.style.setProperty('display', 'flex', 'important');
+                } else {
+                    imgContainer.style.setProperty('display', 'none', 'important');
+                }
+            }
+
+            const iconEl = document.getElementById('modalServiceIcon');
+            if (iconEl) iconEl.className = icon || 'ri-briefcase-line';
+
+            // Abrir com animação suave
+            modal.style.display = 'flex';
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.opacity = '1';
+            }, 50);
+            document.body.style.overflow = 'hidden'; // Evita scroll do background
+        } catch (err) {
+            console.error("Error in openServiceModal:", err);
+        }
+    }
+
+    function closeServiceModal() {
+        try {
+            const modal = document.getElementById('serviceDetailModal');
+            if (!modal) return;
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+            document.body.style.overflow = '';
+        } catch (err) {
+            console.error("Error in closeServiceModal:", err);
+        }
+    }
+
+    // Fechar ao clicar fora do modal
+    window.addEventListener('click', function(e) {
+        const modal = document.getElementById('serviceDetailModal');
+        if (e.target === modal) {
+            closeServiceModal();
+        }
     });
     </script>
 </body>

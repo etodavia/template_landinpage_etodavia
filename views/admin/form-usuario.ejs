@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | <%= settings.site_name || 'Sistema' %></title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        .form-section-title { font-size: 1.1rem; font-weight: 700; color: var(--admin-primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin: 30px 0 20px 0; }
+        .permissions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .perm-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; }
+        .perm-card h4 { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: #475569; margin: 0 0 12px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
+        .perm-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 8px; cursor: pointer; }
+        .perm-item input { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="admin-app">
+        <%- include('../partials/admin-sidebar') %>
+        
+        <div class="admin-main">
+            <%- include('../partials/admin-header') %>
+            <div class="admin-content-scroll">
+                <div style="padding: 2.5rem 4rem;">
+                    <div class="card-cms">
+                        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;">
+                            <div>
+                                <h1 style="font-size: 2.2rem; margin: 0;"><%= user ? 'Editar' : 'Criar' %> <em>Usuário</em></h1>
+                                <p class="subtitle" style="color: #888; font-size: 0.95rem; margin-top: 5px;">Configure as credenciais e defina permissões granulares de visualização e edição.</p>
+                            </div>
+                            <a href="/admin/usuarios" class="btn-premium" style="background: #f1f5f9; color: #475569; border: none; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;"><i class="ri-arrow-left-line"></i> VOLTAR</a>
+                        </header>
+
+                        <%- include('../partials/admin-alerts') %>
+
+                        <form action="<%= user ? '/admin/usuarios/editar/' + user.id : '/admin/usuarios/novo' %>" method="POST">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Nome Completo</label>
+                                    <input type="text" name="nome" value="<%= user ? user.nome : '' %>" required placeholder="Nome do Usuário">
+                                </div>
+                                <div class="form-group">
+                                    <label>E-mail de Acesso (Login)</label>
+                                    <input type="email" name="email" value="<%= user ? user.email : '' %>" required placeholder="email@exemplo.com">
+                                </div>
+                                <div class="form-group">
+                                    <label>Senha <%= user ? '(Preencha apenas para alterar)' : '' %></label>
+                                    <input type="password" name="senha" <%= user ? '' : 'required' %> placeholder="Senha de segurança">
+                                </div>
+                                <div class="form-group">
+                                    <label>Nível de Governança</label>
+                                    <select name="nivel" id="userNivelSelect" onchange="togglePermissionsView()" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; outline: none; font-size: 0.9rem; font-weight: 600; width: 100%;">
+                                        <option value="editor" <%= (user && user.nivel === 'editor') ? 'selected' : '' %>>Editor (Apenas abas CMS liberadas)</option>
+                                        <option value="admin" <%= (user && user.nivel === 'admin') || !user ? 'selected' : '' %>>Admin (Páginas e menus específicos)</option>
+                                        <option value="superadmin" <%= (user && user.nivel === 'superadmin') ? 'selected' : '' %>>Super Admin (Acesso Total Sem Bloqueio)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div id="permissionsSection">
+                                <div class="form-section-title">Governança & Controle de Acesso</div>
+                                <p style="font-size: 0.8rem; color: #64748B; margin-bottom: 20px;">Marque os módulos e subseções que este usuário terá permissão para visualizar e gerenciar.</p>
+                                
+                                <% 
+                                    const userPerms = (user && user.permissoesArr) ? user.permissoesArr : [];
+                                    const hasPerm = (p) => userPerms.includes(p);
+                                %>
+                                <div class="permissions-grid">
+                                    <!-- Menus do Painel -->
+                                    <div class="perm-card">
+                                        <h4>Módulos Principais (Menu Lateral)</h4>
+                                        <label class="perm-item">
+                                            <input type="checkbox" name="perms" value="dashboard" <%= hasPerm('dashboard') ? 'checked' : '' %>> Dashboard Operacional
+                                        </label>
+                                        <label class="perm-item">
+                                            <input type="checkbox" name="perms" value="depoimentos" <%= hasPerm('depoimentos') ? 'checked' : '' %>> Moderação de Depoimentos
+                                        </label>
+                                        <label class="perm-item">
+                                            <input type="checkbox" name="perms" value="servicos" <%= hasPerm('servicos') ? 'checked' : '' %>> Especialidades & Serviços
+                                        </label>
+                                        <label class="perm-item">
+                                            <input type="checkbox" name="perms" value="config" <%= hasPerm('config') ? 'checked' : '' %>> Configurações Gerais
+                                        </label>
+                                        <label class="perm-item">
+                                            <input type="checkbox" name="perms" value="cms" id="cmsMenuCheck" onchange="toggleCmsTabsView()" <%= hasPerm('cms') ? 'checked' : '' %>> Editor Global (CMS)
+                                        </label>
+                                    </div>
+
+                                    <!-- Abas do Editor Global -->
+                                    <div class="perm-card" id="cmsTabsCard" style="grid-column: span 2;">
+                                        <h4>Abas Permitidas no Editor Global (CMS)</h4>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                            <div>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-identidade" <%= hasPerm('tab-identidade') ? 'checked' : '' %>> Identidade & Cores
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-header" <%= hasPerm('tab-header') ? 'checked' : '' %>> Cabeçalho
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-whatsapp" <%= hasPerm('tab-whatsapp') ? 'checked' : '' %>> WhatsApp
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-redes" <%= hasPerm('tab-redes') ? 'checked' : '' %>> Redes Sociais
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-seo" <%= hasPerm('tab-seo') ? 'checked' : '' %>> SEO & Marketing
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-layout-builder" <%= hasPerm('tab-layout-builder') ? 'checked' : '' %>> Construtor de Layout
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-home-hero" <%= hasPerm('tab-home-hero') ? 'checked' : '' %>> Hero Banner
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-admin-branding" <%= hasPerm('tab-admin-branding') ? 'checked' : '' %>> Branding do Painel
+                                                </label>
+                                            </div>
+                                            <div>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-home-sobre" <%= hasPerm('tab-home-sobre') ? 'checked' : '' %>> Sobre Nós
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-home-servicos" <%= hasPerm('tab-home-servicos') ? 'checked' : '' %>> Serviços CMS
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-home-popup" <%= hasPerm('tab-home-popup') ? 'checked' : '' %>> Pop-up de Detalhes
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-home-beneficios" <%= hasPerm('tab-home-beneficios') ? 'checked' : '' %>> Benefícios
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-home-destaque" <%= hasPerm('tab-home-destaque') ? 'checked' : '' %>> Destaque Parolaxe
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-home-depoimentos" <%= hasPerm('tab-home-depoimentos') ? 'checked' : '' %>> Depoimentos CMS
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-home-contato" <%= hasPerm('tab-home-contato') ? 'checked' : '' %>> Contato Home
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-footer" <%= hasPerm('tab-footer') ? 'checked' : '' %>> Rodapé
+                                                </label>
+                                                <label class="perm-item">
+                                                    <input type="checkbox" name="perms" value="tab-legal-pages" <%= hasPerm('tab-legal-pages') ? 'checked' : '' %>> Páginas Legais
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-premium" style="background: var(--admin-primary); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: 800; font-size: 0.95rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 30px; cursor: pointer;"><i class="ri-save-fill"></i> SALVAR USUÁRIO</button>
+                        </form>
+                    </div>
+                </div>
+                <%- include('../partials/admin-footer') %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePermissionsView() {
+            const nivel = document.getElementById('userNivelSelect').value;
+            const pSec = document.getElementById('permissionsSection');
+            if (nivel === 'superadmin') {
+                pSec.style.display = 'none';
+            } else {
+                pSec.style.display = 'block';
+            }
+        }
+
+        function toggleCmsTabsView() {
+            const cmsChecked = document.getElementById('cmsMenuCheck').checked;
+            const tabsCard = document.getElementById('cmsTabsCard');
+            if (cmsChecked) {
+                tabsCard.style.opacity = '1';
+                tabsCard.querySelectorAll('input').forEach(i => i.disabled = false);
+            } else {
+                tabsCard.style.opacity = '0.4';
+                tabsCard.querySelectorAll('input').forEach(i => {
+                    i.checked = false;
+                    i.disabled = true;
+                });
+            }
+        }
+
+        // Rodar ao carregar
+        togglePermissionsView();
+        toggleCmsTabsView();
+    </script>
+</body>
+</html>

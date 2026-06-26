@@ -28,18 +28,26 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ msg: 'Credenciais inválidas' });
         }
 
+        let permissoesArr = [];
+        try {
+            permissoesArr = user.permissoes ? JSON.parse(user.permissoes) : [];
+        } catch (e) {
+            permissoesArr = [];
+        }
+
         const payload = { 
             user: { 
                 id: user.id, 
                 nome: user.nome,
                 email: user.email,
-                nivel: user.nivel 
+                nivel: user.nivel,
+                permissoes: permissoesArr
             } 
         };
         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '12h' }, (err, token) => {
             if (err) throw err;
             res.cookie('token', token, cookieOptions);
-            res.json({ ok: true, role: user.nivel });
+            res.json({ ok: true, role: user.nivel, permissions: permissoesArr });
         });
 
     } catch (err) {

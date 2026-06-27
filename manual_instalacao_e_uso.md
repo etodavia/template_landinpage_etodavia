@@ -44,20 +44,41 @@ A Hostinger oferece suporte nativo a aplicações Node.js em seus planos Cloud a
    ```
 
 #### Passo 4: Configurar e Iniciar a Aplicação Node.js no hPanel
-1. Procure pela seção **Node.js** no painel da Hostinger (se disponível no seu plano Cloud).
-2. Configure a aplicação preenchendo os campos:
-   * **Versão do Node.js:** Escolha a versão recomendada (ex: v18 ou v20).
-   * **Diretório da aplicação:** `/` (ou a pasta onde descompactou).
-   * **Arquivo de Inicialização (Startup File):** `server.js`
-3. Clique em **Salvar** ou **Instalar Dependências** para que a Hostinger execute o comando `npm install` internamente.
-4. Execute o script de banco de dados. Como no hPanel o acesso ao terminal SSH pode ser feito de forma simplificada:
-   * Acesse via **SSH** (se ativado no hPanel).
-   * Vá até a pasta do projeto e execute:
-     ```bash
-     node setup-db.js
-     node setup-superadmin.js
-     ```
-5. Clique em **Iniciar aplicação** no painel Node.js.
+
+1. **Acessar a Seção Node.js:** 
+   * No menu lateral do **hPanel**, navegue até **Avançado** > **Node.js**.
+   
+2. **Criar a Configuração da Aplicação:**
+   * Clique em **Criar aplicação** (ou edite a existente) e preencha os campos obrigatórios:
+     * **Versão do Node.js:** Selecione a versão recomendada (ex: `v18` ou `v20`).
+     * **Diretório da aplicação:** Selecione a pasta onde os arquivos foram descompactados (geralmente `/` ou `/public_html`).
+     * **Domínio da aplicação:** Selecione o domínio ou subdomínio onde o site ficará visível.
+     * **Arquivo de inicialização (Startup File):** Defina como `server.js`.
+   * Clique no botão **Salvar** para registrar as configurações.
+
+3. **Instalar Dependências (npm install):**
+   * Ainda na tela de gerenciamento do Node.js, clique no botão **Instalar dependências** (ou **npm install**). A Hostinger lerá o arquivo `package.json` e instalará todas as dependências automaticamente.
+
+4. **Executar a Inicialização do Banco de Dados (Criar tabelas e Super Admin):**
+   Como esta etapa exige rodar scripts em linha de comando, você tem duas opções no **hPanel**:
+   
+   * **Opção 1 (Via Terminal SSH - Recomendada):**
+     1. No menu lateral do hPanel, vá em **Avançado** > **Acesso SSH**.
+     2. Ative o acesso SSH caso esteja desativado e copie as credenciais de login.
+     3. Conecte-se usando o terminal do seu computador (ou o terminal web integrado da Hostinger).
+     4. Navegue até a pasta do site (ex: `cd domains/seu_dominio.com/public_html`) e execute:
+        ```bash
+        node setup-db.js
+        node setup-superadmin.js
+        ```
+   * **Opção 2 (Temporária pelo Painel):**
+     1. Na página do **Node.js**, altere temporariamente o campo **Arquivo de inicialização** para `setup-db.js` e clique em **Salvar**.
+     2. Clique em **Iniciar aplicação** para rodar o script de criação das tabelas. Em seguida, clique em **Parar**.
+     3. Repita o processo alterando o **Arquivo de inicialização** para `setup-superadmin.js` e clique em **Iniciar aplicação** (isso criará o usuário admin). Clique em **Parar**.
+     4. Restaure o **Arquivo de inicialização** de volta para `server.js` e clique em **Salvar**.
+
+5. **Iniciar a Aplicação:**
+   * Com tudo configurado e o banco inicializado, basta ir até a aba **Node.js** e clicar no botão **Iniciar aplicação** (ou **Start**). O status mudará para *Executando*.
 
 ---
 

@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS configuracoes_globais (
 -- Inserir Usuário Admin Padrão (Senha: Et.123654*)
 -- Hash bcrypt para 'Et.123654*'
 INSERT IGNORE INTO usuarios (id, nome, email, senha, nivel) 
-VALUES (1, 'Admin do Sistema', 'admin@site.com', '$2a$10$7Z2vO6R6uI.XqW0v1jGq6.X4lB8y9Tf9u8A0j6y1.z.f.p.d.e.g.', 'admin');
+VALUES (1, 'Super Admin', 'superadmin@etodavia.com', '$2a$10$kU4tuxSbSDDxg06vymtzr.xC4Gc3qGlSXzyvp4mDhLvXF3IeXWhxK', 'superadmin');
 
 -- Configuração Inicial
 INSERT IGNORE INTO configuracoes_globais (id, whatsapp, cnpj) 

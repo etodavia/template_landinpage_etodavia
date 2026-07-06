@@ -122,10 +122,11 @@
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?<%= fontsQuery %>&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/main.min.css?v=<%= locals.assetVersion || '1' %>">
+<link rel="stylesheet" href="/css/main.css?v=<%= locals.assetVersion || '1' %>-font-fix5">
 <style>
     :root {
-        --navy-blue: <%= settings.color_marinho || '#0A1128' %>;
+        --navy-blue: <%= settings.color_marinho || '#002D80' %>;
+        --topbar-bg: <%= settings.color_topbar || settings.color_marinho || '#002D80' %>;
         --bg-sand: <%= settings.color_areia || '#F7F7F4' %>;
         --accent-red: <%= settings.color_vermelho || '#D62828' %>;
         --text-color: <%= settings.color_texto || '#333333' %>;

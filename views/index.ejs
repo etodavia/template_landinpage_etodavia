@@ -39,8 +39,6 @@
         const homeHeroTitle = heroText(settings.home_hero_title, 'Lidere Negócios com <em>Confiança</em>.');
         const homeHeroDescription = heroText(settings.home_hero_description, 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.');
         const homeHeroButtonText = heroText(settings.home_hero_button_text, 'Agendar Consultoria');
-        const homeHeroCardTitle = heroText(settings.home_hero_card_title, 'Sua empresa em <em>Crescimento</em>.');
-        const homeHeroCardSubtitle = heroText(settings.home_hero_card_subtitle, 'Experiência Estratégica');
 
         const defaultSections = [
             { id: 'home', active: true },
@@ -48,7 +46,7 @@
             { id: 'servicos', active: true },
             { id: 'beneficios', active: true },
             { id: 'destaque', active: true },
-            { id: 'depoimentos', active: true },
+            { id: 'depoimentos', active: false },
             { id: 'contato', active: true }
         ];
 
@@ -214,6 +212,21 @@
     <%- include('partials/header') %>
 
     <main>
+        <% if (locals.banners && banners.length) { %>
+        <section class="promo-banners swiper promoBannerSwiper" aria-label="Ofertas em destaque">
+            <div class="swiper-wrapper">
+                <% banners.forEach(banner => { %>
+                <div class="swiper-slide">
+                    <a href="<%= banner.link || '#ofertas' %>" aria-label="<%= banner.texto_botao || banner.titulo || 'Ver oferta' %>">
+                        <img src="<%= banner.imagem %>" alt="<%= banner.titulo || 'Oferta Drogarias Destaque' %>">
+                    </a>
+                </div>
+                <% }) %>
+            </div>
+            <% if (banners.length > 1) { %><div class="swiper-pagination promo-banner-pagination"></div><% } %>
+        </section>
+        <% } %>
+
         <% renderOrder.forEach(section => { %>
             <% if (section.active) { %>
                 <% 
@@ -285,10 +298,16 @@
                                                     <% const slideBtnText = slide.button_text || homeHeroButtonText; %>
                                                     <% if (slideBtnText && slideBtnText.trim()) { %>
                                                         <div class="hero-button-adjustable">
-                                                            <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
-                                                                <%= slideBtnText %> 
-                                                                <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
-                                                            </a>
+                                                            <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
+                                                                <a href="javascript:void(0)" onclick="if(typeof openLocationModal === 'function') openLocationModal()" class="btn-pill-large" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                                    <%= slideBtnText %>
+                                                                </a>
+                                                            <% } else { %>
+                                                                <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                                    <%= slideBtnText %>
+                                                                </a>
+                                                            <% } %>
+                                                            <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
                                                         </div>
                                                     <% } %>
                                                 </div>
@@ -318,10 +337,17 @@
                                             <% const slideBtnText = slide.button_text || homeHeroButtonText; %>
                                             <% if (slideBtnText && slideBtnText.trim()) { %>
                                             <div class="hero-button-adjustable" style="display: flex; justify-content: center; margin-top: 10px;">
-                                                <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
-                                                    <%= slideBtnText %> 
-                                                    <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
-                                                </a>
+                                                <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
+                                                    <a href="javascript:void(0)" onclick="if(typeof openLocationModal === 'function') openLocationModal()" class="btn-pill-large" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                        <%= slideBtnText %> 
+                                                        <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                                                    </a>
+                                                <% } else { %>
+                                                    <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                        <%= slideBtnText %> 
+                                                        <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                                                    </a>
+                                                <% } %>
                                             </div>
                                             <% } %>
                                         </div>
@@ -341,10 +367,17 @@
                                             <% const slideBtnText = slide.button_text || homeHeroButtonText; %>
                                             <% if (slideBtnText && slideBtnText.trim()) { %>
                                             <div class="hero-button-adjustable" style="display: flex; justify-content: flex-start;">
-                                                <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
-                                                    <%= slideBtnText %> 
-                                                    <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
-                                                </a>
+                                                <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
+                                                    <a href="javascript:void(0)" onclick="if(typeof openLocationModal === 'function') openLocationModal()" class="btn-pill-large" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                        <%= slideBtnText %> 
+                                                        <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                                                    </a>
+                                                <% } else { %>
+                                                    <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma conversa.') %>" class="btn-pill-large btn-whatsapp-conversion" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
+                                                        <%= slideBtnText %> 
+                                                        <div class="icon-blue-circle" style="<%= settings.color_hero_button ? 'background: rgba(255,255,255,0.2);' : 'background: var(--accent-red);' %> color: white;"><i class="ri-arrow-right-up-line"></i></div>
+                                                    </a>
+                                                <% } %>
                                             </div>
                                             <% } %>
                                         </div>
@@ -360,13 +393,7 @@
                             <div class="swiper-button-prev hero-prev" style="color: white; z-index: 10; left: 40px; position: absolute;"></div>
                         <% } %>
 
-                        <% if (homeHeroCardTitle.trim() || homeHeroCardSubtitle.trim()) { %>
-                        <div class="floating-card" style="bottom: 30px; z-index: 10;">
-                            <% if (homeHeroCardTitle.trim()) { %><h4><%- homeHeroCardTitle %></h4><% } %>
-                            <% if (homeHeroCardSubtitle.trim()) { %><a href="/#servicos"><%= homeHeroCardSubtitle %> <i class="ri-arrow-right-line"></i></a><% } %>
-                        </div>
-                        <% } %>
-                    </section>
+                                    </section>
 
                 <% } else if (section.id === 'sobre') { %>
                     <!-- SOBRE (DINÂMICO COM VARIANTES DE LAYOUT) -->
@@ -376,8 +403,8 @@
                                 <!-- Modelo 3 / 5: Foco Centralizado / Minimalista -->
                                 <div style="text-align: center; max-width: 800px; margin: 0 auto;" data-reveal="up">
                                     <span class="section-label" style="<%= customColor %>">NOSSA ESSÊNCIA</span>
-                                    <h2 style="font-size: 3.2rem; line-height: 1.1; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
-                                        <%- settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.' %>
+                                    <h2 style="font-size: 3.2rem; line-height: 1.1; letter-spacing: -0.5px; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
+                                        <%- (settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.').replace(/<em>/g, '<span style="font-family: \'Montserrat\', sans-serif; font-weight: 700;">').replace(/<\/em>/g, '</span>') %>
                                     </h2>
                                     <p style="font-size: 1.2rem; color: var(--text-color); margin-bottom: 40px; line-height: 1.6; <%= customColor %>">
                                         <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação.' %>
@@ -395,8 +422,8 @@
                                     </div>
                                     <div data-reveal="right">
                                         <span class="section-label" style="<%= customColor %>">NOSSA ESSÊNCIA</span>
-                                        <h2 style="font-size: 3.5rem; line-height: 1; letter-spacing: -3px; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
-                                            <%- settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.' %>
+                                        <h2 style="font-size: 3.2rem; line-height: 1.1; letter-spacing: -0.5px; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
+                                            <%- (settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.').replace(/<em>/g, '<span style="font-family: \'Montserrat\', sans-serif; font-weight: 700;">').replace(/<\/em>/g, '</span>') %>
                                         </h2>
                                         <p style="font-size: 1.2rem; color: var(--text-color); margin-bottom: 40px; line-height: 1.6; <%= customColor %>">
                                             <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação.' %>
@@ -411,8 +438,8 @@
                                 <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
                                     <div data-reveal="left">
                                         <span class="section-label" style="<%= customColor %>">NOSSA ESSÊNCIA</span>
-                                        <h2 style="font-size: 3.5rem; line-height: 1; letter-spacing: -3px; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
-                                            <%- settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.' %>
+                                        <h2 style="font-size: 3.2rem; line-height: 1.1; letter-spacing: -0.5px; margin-bottom: 25px; color: var(--navy-blue); <%= customColor %>">
+                                            <%- (settings.about_title || 'Sinergia Pura entre <em>Pessoas e Resultados</em>.').replace(/<em>/g, '<span style="font-family: \'Montserrat\', sans-serif; font-weight: 700;">').replace(/<\/em>/g, '</span>') %>
                                         </h2>
                                         <p style="font-size: 1.2rem; color: var(--text-color); margin-bottom: 40px; line-height: 1.6; <%= customColor %>">
                                             <%= settings.about_text || 'Na Arque Gestão, acreditamos que a cultura organizacional é o verdadeiro motor da inovação. Nossa abordagem sistêmica conecta os pontos invisíveis que transformam ambientes de trabalho em centros de excelência.' %>
@@ -443,7 +470,7 @@
                         <div class="container">
                             <div class="section-header-flex" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; <%= (style.layout_model === 'model3' || style.layout_model === 'model5') ? 'justify-content: center; text-align: center; margin-left: auto; margin-right: auto;' : '' %>">
                                 <div data-reveal="left" style="<%= (style.layout_model === 'model3' || style.layout_model === 'model5') ? 'text-align: center; max-width: 650px; margin: 0 auto;' : '' %>">
-                                    <span class="section-label" style="<%= customColor %>">Especialidades</span>
+                                    <span class="section-label" style="<%= customColor %>">Ofertas em destaque</span>
                                     <h2 style="font-size: 2.8rem; color: var(--navy-blue); line-height: 1.1; margin-bottom: 10px; <%= customColor %>">
                                         <%- settings.services_section_title || 'Conheça nossos <em>Serviços</em>' %>
                                     </h2>
@@ -463,7 +490,21 @@
                                                 const cardLinkStyle = style.card_link_color ? `color: ${style.card_link_color} !important;` : '';
                                             %>
                                             <div class="swiper-slide services-slide">
-                                                <% if (style.layout_model === 'model3' || style.layout_model === 'model5') { %>
+                                                <article class="product-offer-card" data-reveal="up">
+                                                    <% if (s.selo) { %><span class="product-badge"><%= s.selo %></span><% } %>
+                                                    <div class="product-image-area">
+                                                        <% if (s.imagem) { %>
+                                                            <img src="<%= s.imagem %>" alt="<%= s.titulo %>" loading="lazy">
+                                                        <% } else { %>
+                                                            <i class="<%= s.icone || 'ri-shopping-bag-3-line' %>"></i>
+                                                        <% } %>
+                                                    </div>
+                                                    <h3><%= s.titulo %></h3>
+                                                    <a href="https://wa.me/<%= (settings.whatsapp || '').replace(/\D/g, '') %>?text=<%= encodeURIComponent('Olá, tenho interesse no item ' + s.titulo + ', poderia me dar mais informações?') %>" target="_blank" style="text-decoration: none;">
+                                                        <button type="button" style="width: 100%; cursor: pointer;">Tenho Interesse</button>
+                                                    </a>
+                                                </article>
+                                                <% if (false && (style.layout_model === 'model3' || style.layout_model === 'model5')) { %>
                                                     <!-- Lista Compacta (Modelo 3 / 5) -->
                                                     <div style="background: #FFFFFF; border-radius: 15px; padding: 25px 35px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; width: 100%; cursor: pointer; <%= cardBgStyle %>" 
                                                          data-title="<%= s.titulo %>"
@@ -488,7 +529,7 @@
                                                             </span>
                                                         </div>
                                                     </div>
-                                                <% } else { %>
+                                                <% } else if (false) { %>
                                                     <!-- Carrossel / Grid Estático (Modelo 1 / 2 / 4) -->
                                                     <div style="background: #FFFFFF; border-radius: 20px; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); height: 100%; display: flex; flex-direction: column; text-align: left; cursor: pointer; <%= cardBgStyle %>" 
                                                          data-title="<%= s.titulo %>"
@@ -594,6 +635,23 @@
                     </style>
 
                 <% } else if (section.id === 'beneficios') { %>
+                    <section id="campanhas" class="promotional-grid-section" style="padding:80px 0;background:<%= settings.benefits_color || '#f4f5f7' %>;<%= styleAttr %>">
+                        <div class="container">
+                            <div class="promotional-grid">
+                                <% if (locals.promotionalBanners && promotionalBanners.length) { %>
+                                    <% promotionalBanners.slice(0, 2).forEach(banner => { %>
+                                        <a class="promotional-tile" href="<%= banner.link || '#servicos' %>" data-reveal="up">
+                                            <% if (banner.titulo) { %><strong><%= banner.titulo %></strong><% } %>
+                                            <img src="<%= banner.imagem %>" alt="<%= banner.titulo || 'Campanha promocional' %>" loading="lazy">
+                                        </a>
+                                    <% }) %>
+                                <% } else { %>
+                                    <div class="promotional-empty">Adicione banners na opção “Seção promocional” do painel.</div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </section>
+                    <% if (false) { %>
                     <!-- BENEFÍCIOS (DINÂMICO) -->
                     <section id="beneficios" class="layout-<%= style.layout_model || 'model1' %>" style="padding: 100px 0; background: <%= settings.benefits_color || 'white' %>; overflow: hidden; <%= styleAttr %>">
                         <div class="container">
@@ -652,6 +710,7 @@
                             </div>
                         </div>
                     </section>
+                    <% } %>
                 <% } else if (section.id === 'destaque') { %>
                     <!-- SEÇÃO DESTAQUE PARALAXE COM EFEITO DE ZOOM FIXO -->
                     <% 
@@ -783,7 +842,7 @@
                         <div class="container">
                             <div style="text-align: center; margin-bottom: 60px;" data-reveal>
                                 <span class="section-label" style="<%= customColor %>">Fale Conosco</span>
-                                <h2 style="font-size: 3rem; color: var(--navy-blue); max-width: 900px; margin: 0 auto; <%= customColor %>">
+                                <h2 style="font-size: clamp(1.7rem, 3vw, 2.35rem); line-height: 1.15; color: var(--navy-blue); max-width: 760px; margin: 0 auto; <%= customColor %>">
                                     <%- settings.contact_section_title || 'Entre em contato e impulse sua operação' %>
                                 </h2>
                                 <p style="color: var(--text-color); max-width: 700px; margin: 20px auto 0; font-size: 1rem; line-height: 1.8; opacity: 0.8; <%= customColor %>">
@@ -845,6 +904,51 @@
     </main>
 
     <%- include('partials/footer') %>
+
+    <div id="locationModal" class="location-modal" aria-hidden="true">
+        <div class="location-card" role="dialog" aria-modal="true" aria-labelledby="locationTitle">
+            <button type="button" class="location-close" onclick="closeLocationModal()" aria-label="Fechar">×</button>
+            <h2 id="locationTitle"><i class="ri-store-2-line"></i> Escolha a Loja</h2>
+            <p>Selecione a loja mais próxima para ver as ofertas e pedir pelo WhatsApp.</p>
+            
+            <div class="filiais-list" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
+                    <select id="lojaSelect" style="width: 100%; padding: 15px; border: 1px solid #e3eaf4; border-radius: 12px; font-size: 1rem; color: var(--navy-blue); font-weight: 600; appearance: none; background: #f5f8fc url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'24\' height=\'24\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23073783\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'6 9 12 15 18 9\'></polyline></svg>') no-repeat right 15px center; background-size: 16px; cursor: pointer;">
+                        <option value="">Selecione uma loja...</option>
+                        <% filiais.forEach(f => { %>
+                            <% 
+                                let optionText = f.nome;
+                                if (f.cidade && f.estado) optionText += ` (${f.cidade} - ${f.estado})`;
+                                if (f.bairros) optionText += ` | Bairros: ${f.bairros}`;
+                            %>
+                            <option value="<%= f.link %>"><%= optionText %></option>
+                        <% }) %>
+                    </select>
+                    <button type="button" onclick="goToSelectedLoja()" style="background: var(--accent-red, #ed1c24); color: white; border: none; border-radius: 12px; padding: 15px 30px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.2s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        Avançar <i class="ri-whatsapp-line"></i>
+                    </button>
+                <% } else { %>
+                    <p style="text-align: center; color: #697386; padding: 20px;">Nenhuma loja cadastrada no momento.</p>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <script>
+    function openLocationModal(){const m=document.getElementById('locationModal');m.classList.add('open');m.setAttribute('aria-hidden','false')}
+    function closeLocationModal(){const m=document.getElementById('locationModal');m.classList.remove('open');m.setAttribute('aria-hidden','true')}
+    function goToSelectedLoja() {
+        const sel = document.getElementById('lojaSelect');
+        if (!sel || !sel.value) {
+            alert('Por favor, selecione uma loja primeiro.');
+            return;
+        }
+        window.open(sel.value, '_blank');
+        closeLocationModal();
+    }
+    function useMyLocation(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(p=>{localStorage.setItem('drogariasDestaqueLocation',JSON.stringify({latitude:p.coords.latitude,longitude:p.coords.longitude}));closeLocationModal()})}
+    if(!localStorage.getItem('drogariasDestaqueCep')&&!localStorage.getItem('drogariasDestaqueLocation'))setTimeout(openLocationModal,700);
+    if(document.querySelector('.promoBannerSwiper'))new Swiper('.promoBannerSwiper',{loop:<%= locals.banners && banners.length > 1 ? 'true' : 'false' %>,autoplay:{delay:4500,disableOnInteraction:false},pagination:{el:'.promo-banner-pagination',clickable:true}});
+    </script>
 
     <!-- Scripts: GSAP + Swiper -->
     <script>

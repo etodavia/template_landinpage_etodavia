@@ -100,8 +100,15 @@
 
             <% if (hasPerm('servicos')) { %>
             <li>
-                <a href="/admin/servicos" class="<%= (locals.title && (locals.title.includes('Especialidade') || locals.title.includes('Serviço'))) ? 'active' : '' %>">
-                    <i class="ri-briefcase-line"></i> <span class="nav-text">Serviços</span>
+                <a href="/admin/servicos" class="<%= (locals.title && (locals.title.includes('Produto') || locals.title.includes('Oferta'))) ? 'active' : '' %>">
+                    <i class="ri-shopping-bag-3-line"></i> <span class="nav-text">Produtos e Ofertas</span>
+                </a>
+            </li>
+            <% } %>
+            <% if (hasPerm('cms')) { %>
+            <li>
+                <a href="/admin/banners" class="<%= (locals.title && locals.title.includes('Banners')) ? 'active' : '' %>">
+                    <i class="ri-image-2-line"></i> <span class="nav-text">Banners Rotativos</span>
                 </a>
             </li>
             <% } %>

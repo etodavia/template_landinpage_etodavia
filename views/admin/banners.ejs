@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= title %> | <%= settings.site_name || 'Sistema' %></title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+<div class="admin-app">
+    <%- include('../partials/admin-sidebar') %>
+    <div class="admin-main">
+        <%- include('../partials/admin-header') %>
+        <div class="admin-content-scroll"><div style="padding:2.5rem 4rem"><div class="card-cms">
+            <header style="margin-bottom:32px">
+                <h1>Banners e <em>Campanhas</em></h1>
+                <p class="subtitle">O Carrossel Principal (abaixo do menu) aceita vários banners. Para uma faixa fina, recomendamos <strong>1920x60 pixels</strong> (Aceita imagens e GIFs). A seção promocional aceita exatamente dois, cada um com imagem e título (Tamanho recomendado: <strong>600x400 pixels</strong>).</p>
+                <div style="background: #FFFBEB; border-left: 4px solid #F59E0B; padding: 12px 16px; margin-top: 15px; border-radius: 4px; font-size: 0.85rem; color: #92400E;">
+                    <strong>Nota:</strong> Se você está tentando editar a seção de textos com ícones da página inicial, acesse <strong>Editor Global (CMS) > Aba Campanhas</strong>. O formulário abaixo é apenas para upload de imagens (banners visuais).
+                </div>
+            </header>
+            <%- include('../partials/admin-alerts') %>
+            <form action="/admin/banners" method="POST" enctype="multipart/form-data" style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;align-items:end;background:#f8fafc;padding:24px;border-radius:18px;margin-bottom:32px">
+                <div class="form-group"><label>Imagem do banner *</label><input type="file" name="imagem_file" accept="image/png,image/jpeg,image/webp" required></div>
+                <div class="form-group"><label>Título interno</label><input type="text" name="titulo" placeholder="Ofertas da semana"></div>
+                <div class="form-group"><label>Posição</label><select name="posicao"><option value="topo">Topo rotativo</option><option value="promocional">Seção promocional</option></select></div>
+                <div class="form-group"><label>Ordem</label><input type="number" name="ordem" value="0"></div>
+                <div class="form-group" style="grid-column:span 2"><label>Link ao clicar</label><input type="text" name="link" placeholder="#ofertas ou https://..."></div>
+                <div class="form-group"><label>Texto acessível</label><input type="text" name="texto_botao" placeholder="Ver oferta"></div>
+                <button class="btn-premium" type="submit" style="grid-column:1/-1;border:0;cursor:pointer"><i class="ri-add-line"></i> ADICIONAR BANNER</button>
+            </form>
+            <div style="display:grid;gap:18px">
+                <% banners.forEach(banner => { %>
+                    <article style="display:grid;grid-template-columns:220px 1fr auto;gap:20px;align-items:center;border:1px solid #e8edf5;padding:15px;border-radius:18px;opacity:<%= banner.ativo ? 1 : .55 %>">
+                        <img src="<%= banner.imagem %>" alt="" style="width:220px;height:75px;object-fit:cover;border-radius:10px;background:#eef2f7">
+                        <div><strong><%= banner.titulo || 'Banner sem título' %></strong><div style="font-size:.8rem;color:#718096;margin-top:5px"><%= banner.posicao === 'promocional' ? 'Seção promocional' : 'Topo rotativo' %> · Ordem: <%= banner.ordem %> · <%= banner.ativo ? 'Ativo' : 'Oculto' %></div></div>
+                        <div class="actions">
+                            <form action="/admin/banners/toggle/<%= banner.id %>" method="POST"><button class="btn-action btn-edit" title="Ativar ou ocultar"><i class="ri-eye-line"></i></button></form>
+                            <form action="/admin/banners/delete/<%= banner.id %>" method="POST" onsubmit="return confirm('Excluir este banner?')"><button class="btn-action btn-delete"><i class="ri-delete-bin-line"></i></button></form>
+                        </div>
+                    </article>
+                <% }) %>
+                <% if (!banners.length) { %><p style="text-align:center;color:#94a3b8;padding:35px">Nenhum banner cadastrado.</p><% } %>
+            </div>
+        </div></div></div>
+    </div>
+</div>
+</body>
+</html>

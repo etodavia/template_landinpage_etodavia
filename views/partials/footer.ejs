@@ -27,19 +27,47 @@
 
             <div class="footer-column footer-links">
                 <h4>Navegação</h4>
+                <% 
+                   let fmenu1 = [
+                       { label: 'Home', link: '/#home' },
+                       { label: 'Sobre', link: '/#sobre' },
+                       { label: 'Serviços', link: '/#servicos' },
+                       { label: 'Campanhas', link: '/#campanhas' },
+                       { label: 'Contato', link: '/#contato' }
+                   ];
+                   if (settings.footer_menu_1 && settings.footer_menu_1.trim() !== '') {
+                       fmenu1 = settings.footer_menu_1.split('\n').filter(line => line.includes('|')).map(line => {
+                           const [label, link] = line.split('|');
+                           return { label: label.trim(), link: link.trim() };
+                       });
+                   }
+                %>
                 <ul>
-                    <li><a href="/#home">Home</a></li>
-                    <li><a href="/#sobre">Sobre</a></li>
-                    <li><a href="/#servicos">Serviços</a></li>
-                    <li><a href="/#contato">Contato</a></li>
+                    <% fmenu1.forEach(item => { %>
+                    <li><a href="<%= item.link %>"><%= item.label %></a></li>
+                    <% }); %>
+                    <li><a href="/admin/login" style="opacity: 0.8; margin-top: 10px; display: inline-block;">Área Administrativa (Login)</a></li>
                 </ul>
             </div>
 
             <div class="footer-column footer-links">
                 <h4>Jurídico</h4>
+                <% 
+                   let fmenu2 = [
+                       { label: 'Política de Privacidade', link: '/politica-de-privacidade' },
+                       { label: 'Termos e Condições', link: '/termos-e-condicoes' }
+                   ];
+                   if (settings.footer_menu_2 && settings.footer_menu_2.trim() !== '') {
+                       fmenu2 = settings.footer_menu_2.split('\n').filter(line => line.includes('|')).map(line => {
+                           const [label, link] = line.split('|');
+                           return { label: label.trim(), link: link.trim() };
+                       });
+                   }
+                %>
                 <ul>
-                    <li><a href="/politica-de-privacidade">Política de Privacidade</a></li>
-                    <li><a href="/termos-e-condicoes">Termos e Condições</a></li>
+                    <% fmenu2.forEach(item => { %>
+                    <li><a href="<%= item.link %>"><%= item.label %></a></li>
+                    <% }); %>
                 </ul>
             </div>
 
@@ -101,17 +129,6 @@
     </div>
 </div>
 
-<!-- NAVEGAÇÃO FLUTUANTE BOTTOM (MOBILE/TABLET) -->
-<div class="m-floating-nav">
-    <a href="/#servicos" class="m-nav-item <%= (locals.currentPage === 'servicos') ? 'active' : '' %>">
-        <i class="ri-briefcase-4-line"></i>
-        <span>Serviços</span>
-    </a>
-    <a href="/#contato" class="m-nav-item <%= (locals.currentPage === 'contato') ? 'active' : '' %>">
-        <i class="ri-chat-3-fill"></i>
-        <span>Contato</span>
-    </a>
-</div>
 
 <!-- BOTÃO WHATSAPP FLUTUANTE -->
 <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma consulta.') %>" 

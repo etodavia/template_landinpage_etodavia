@@ -171,7 +171,7 @@
                 <div class="tab-link" onclick="switchTab('tab-home-popup')" style="color: #6d28d9;"><i class="ri-notification-badge-line"></i> <span>Pop-up de Detalhes</span></div>
                 <% } %>
                 <% if (hasTab('tab-home-beneficios')) { %>
-                <div class="tab-link" onclick="switchTab('tab-home-beneficios')"><i class="ri-heart-pulse-line"></i> <span>Benefícios</span></div>
+                <div class="tab-link" onclick="switchTab('tab-home-beneficios')"><i class="ri-image-line"></i> <span>Campanhas</span></div>
                 <% } %>
                 <% if (hasTab('tab-home-destaque')) { %>
                 <div class="tab-link" onclick="switchTab('tab-home-destaque')" style="color: #ea580c;"><i class="ri-focus-3-line"></i> <span>Destaque Parolaxe</span></div>
@@ -182,6 +182,7 @@
                 <% if (hasTab('tab-home-contato')) { %>
                 <div class="tab-link" onclick="switchTab('tab-home-contato')"><i class="ri-contacts-book-2-line"></i> <span>Contato Home</span></div>
                 <% } %>
+                <div class="tab-link" onclick="switchTab('tab-lojas')"><i class="ri-store-2-line"></i> <span>Lojas / Filiais</span></div>
                 <% } %>
 
                 <% if (hasTab('tab-footer') || hasTab('tab-legal-pages')) { %>
@@ -237,7 +238,8 @@
                     <div class="form-grid">
                         <% 
                             const colors = [
-                                { label: 'Navy Blue (Global)', name: 'color_marinho', value: settings.color_marinho || '#0A1128' },
+                                { label: 'Navy Blue (Global)', name: 'color_marinho', value: settings.color_marinho || '#002D80' },
+                                { label: 'Cor do Topo (Topbar)', name: 'color_topbar', value: settings.color_topbar || '#002D80' },
                                 { label: 'Areia (Global)', name: 'color_areia', value: settings.color_areia || '#F7F7F4' },
                                 { label: 'Destaque / Botões Globais', name: 'color_vermelho', value: settings.color_vermelho || '#D62828' },
                                 { label: 'Cor do Botão Hero', name: 'color_hero_button', value: settings.color_hero_button || '' },
@@ -246,6 +248,8 @@
                                 { label: 'Texto do Cabeçalho', name: 'color_header_text', value: settings.color_header_text || '#333333' },
                                 { label: 'Fundo do Rodapé', name: 'color_footer', value: settings.color_footer || '#0A1128' },
                                 { label: 'Texto do Rodapé', name: 'color_footer_text', value: settings.color_footer_text || '#FFFFFF' },
+                                { label: 'Fundo Menu Lateral (Mobile)', name: 'color_offcanvas_bg', value: settings.color_offcanvas_bg || '#FFFFFF' },
+                                { label: 'Texto Menu Lateral (Mobile)', name: 'color_offcanvas_text', value: settings.color_offcanvas_text || '#333333' },
                                 { label: 'Fundo Seção Sobre', name: 'color_about_bg', value: settings.color_about_bg || '#F7F7F4' },
 
                                 { label: 'Fundo Contato/News', name: 'color_contact_bg', value: settings.color_contact_bg || '#F7F7F4' }
@@ -291,7 +295,17 @@
                     <div class="form-group full">
                         <label>Mensagem da Faixa Superior (Topbar Alert)</label>
                         <input type="text" name="header_strip_text" value="<%= settings.header_strip_text || '' %>" placeholder="Ex: Participe da nossa próxima Mentoria de Liderança!">
-                        <p class="field-note"><i class="ri-information-line"></i> Esta mensagem aparecerá na barra preta no topo do site.</p>
+                        <p class="field-note"><i class="ri-information-line"></i> Esta mensagem aparecerá na barra preta no topo do site se não houver um banner GIF.</p>
+                    </div>
+                    <div class="form-group full">
+                        <label>Imagem/GIF da Faixa Superior (Opcional)</label>
+                        <% if (settings.topbar_gif) { %>
+                            <div style="margin-bottom: 10px;">
+                                <img src="<%= settings.topbar_gif %>" alt="Topbar GIF" style="max-height: 40px; border-radius: 4px; border: 1px solid #ccc;">
+                            </div>
+                        <% } %>
+                        <input type="file" name="topbar_gif" accept="image/png,image/jpeg,image/gif,image/webp">
+                        <p class="field-note"><i class="ri-image-line"></i> Se você subir uma imagem ou GIF aqui (ideal bem fininho, ex: 1920x40), ela vai substituir o texto acima no topo do site.</p>
                     </div>
                     <div class="form-group full">
                         <label>Endereço à Esquerda</label>
@@ -302,9 +316,19 @@
                         <input type="text" name="nav_cta_text" value="<%= settings.nav_cta_text %>">
                     </div>
                     <div class="form-group full">
-                        <label>Estrutura do Menu (Um por linha: RÓTULO|LINK)</label>
-                            <textarea name="site_menu" rows="6" placeholder="Home | /#home\nSobre | /#sobre\nServiços | /#servicos\nContato | /#contato"><%= settings.site_name ? settings.site_menu : '' %></textarea>
+                        <label>Estrutura do Menu do Cabeçalho (Um por linha: RÓTULO|LINK)</label>
+                            <textarea name="site_menu" rows="6" placeholder="Home | /#home\nSobre | /#sobre\nServiços | /#servicos\nCampanhas | /#campanhas\nContato | /#contato"><%= settings.site_name ? settings.site_menu : '' %></textarea>
                         <p style="font-size: 0.65rem; color: #999; margin-top: 5px;">Use o formato: Nome|/link. Ex: Contato|/contato</p>
+                    </div>
+                    <div class="form-group full">
+                        <label>Estrutura do Menu Navegação - Rodapé (Um por linha: RÓTULO|LINK)</label>
+                            <textarea name="footer_menu_1" rows="5" placeholder="Home | /#home\nSobre | /#sobre\nServiços | /#servicos\nCampanhas | /#campanhas\nContato | /#contato"><%= settings.site_name ? settings.footer_menu_1 : '' %></textarea>
+                        <p style="font-size: 0.65rem; color: #999; margin-top: 5px;">Coluna esquerda do rodapé</p>
+                    </div>
+                    <div class="form-group full">
+                        <label>Estrutura do Menu Jurídico - Rodapé (Um por linha: RÓTULO|LINK)</label>
+                            <textarea name="footer_menu_2" rows="3" placeholder="Política de Privacidade | /politica-de-privacidade\nTermos e Condições | /termos-e-condicoes"><%= settings.site_name ? settings.footer_menu_2 : '' %></textarea>
+                        <p style="font-size: 0.65rem; color: #999; margin-top: 5px;">Coluna direita do rodapé</p>
                     </div>
 
                     <div class="section-header" style="margin-top: 30px;"><h3>Dimensionamento de Textos e Ícones (Topo)</h3></div>
@@ -659,15 +683,7 @@
                                 <% }) %>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>Card Flutuante: Título</label>
-                            <input type="text" name="home_hero_card_title" value="<%= settings.home_hero_card_title || '' %>" placeholder="Sua empresa em <em>Crescimento</em>.">
-                            <p class="field-note"><i class="ri-information-line"></i> Use &lt;em&gt;texto&lt;/em&gt; para aplicar a fonte alternada.</p>
-                        </div>
-                        <div class="form-group">
-                            <label>Card Flutuante: Subtítulo (Link)</label>
-                            <input type="text" name="home_hero_card_subtitle" value="<%= settings.home_hero_card_subtitle || '' %>" placeholder="Experiência Estratégica">
-                        </div>
+
                     </div>
                 </div>
 
@@ -796,6 +812,30 @@
 
                 <!-- HOME: BENEFÍCIOS -->
                 <div id="tab-home-beneficios" class="tab-panel">
+                    <div class="section-header"><h3>Home Page » Duas Campanhas Promocionais</h3></div>
+                    <p class="field-note" style="margin-bottom:24px">Cadastre somente duas entradas. Cada entrada possui uma imagem retangular e um título.</p>
+                    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px">
+                        <% for (let campaignIndex = 0; campaignIndex < 2; campaignIndex++) { const campaign = (locals.promotionalBanners || [])[campaignIndex] || {}; %>
+                            <div style="padding:22px;border:1px solid #e2e8f0;border-radius:20px;background:#fff">
+                                <h4 style="margin:0 0 18px;color:var(--primary)">Entrada <%= campaignIndex + 1 %></h4>
+                                <input type="hidden" name="promotional_banner_<%= campaignIndex %>_id" value="<%= campaign.id || '' %>">
+                                <input type="hidden" name="promotional_banner_<%= campaignIndex %>_image" value="<%= campaign.imagem || '' %>">
+                                <div class="form-group">
+                                    <label>Título</label>
+                                    <input type="text" name="promotional_banner_<%= campaignIndex %>_title" value="<%= campaign.titulo || '' %>" placeholder="Ex: Nutrição Infantil em PROMOÇÃO" required>
+                                </div>
+                                <div class="form-group" style="margin-top:16px">
+                                    <label>Imagem retangular</label>
+                                    <input type="file" name="promotional_banner_<%= campaignIndex %>_file" accept="image/png,image/jpeg,image/webp" <%= campaign.imagem ? '' : 'required' %>>
+                                </div>
+                                <% if (campaign.imagem) { %>
+                                    <img src="<%= campaign.imagem %>" alt="" style="display:block;width:100%;aspect-ratio:1.72/1;object-fit:cover;margin-top:16px;border-radius:14px;background:#f1f5f9">
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                    <button type="submit" form="cmsForm" class="btn-premium" style="width:100%;margin-top:24px;background:#10b981;color:#fff;border:0;padding:15px;border-radius:14px;font-weight:900;cursor:pointer"><i class="ri-save-line"></i> SALVAR AS DUAS CAMPANHAS</button>
+                    <% if (false) { %>
                     <div class="section-header"><h3>Home Page » Gestão de Benefícios (Iconbox)</h3></div>
                     
                     <div class="form-grid">
@@ -839,6 +879,7 @@
                             <i class="ri-add-circle-line"></i> ADICIONAR NOVO BENEFÍCIO
                         </button>
                     </div>
+                    <% } %>
                 </div>
 
 
@@ -1006,6 +1047,80 @@
                 </div>
 
 
+
+                <div id="tab-lojas" class="tab-panel">
+                    <div class="section-header">
+                        <h3>Lojas / Filiais</h3>
+                        <p style="font-size: 0.85rem; color: #64748B;">Gerencie as lojas para a busca por CEP (Bairro).</p>
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h4>Adicionar Nova Filial</h4>
+                        <div style="display: grid; gap: 15px;">
+                            <div class="form-group"><label>Nome da Loja</label><input type="text" id="filial_nome" required></div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="form-group"><label>Cidade</label><input type="text" id="filial_cidade" required></div>
+                                <div class="form-group"><label>Estado (UF)</label><input type="text" id="filial_estado" maxlength="2" required></div>
+                            </div>
+                            <div class="form-group"><label>Bairros Atendidos (separados por vírgula)</label><input type="text" id="filial_bairros" placeholder="Ex: Centro, Jardim, Bela Vista"></div>
+                            <div class="form-group"><label>Link de Redirecionamento</label><input type="url" id="filial_link" placeholder="Ex: https://wa.me/..." required></div>
+                            <button type="button" class="btn-primary" style="justify-self: start;" onclick="addFilial()">Adicionar Loja</button>
+                        </div>
+                    </div>
+
+                    <div class="admin-card" style="margin-top: 30px;">
+                        <h4>Lojas Cadastradas</h4>
+                        <table class="admin-table" style="width: 100%; text-align: left; border-collapse: collapse; margin-top: 15px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #E2E8F0;">
+                                    <th style="padding: 10px;">Nome</th>
+                                    <th style="padding: 10px;">Localização</th>
+                                    <th style="padding: 10px;">Bairros</th>
+                                    <th style="padding: 10px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
+                                    <% filiais.forEach(f => { %>
+                                        <tr style="border-bottom: 1px solid #E2E8F0;">
+                                            <td style="padding: 10px;"><strong><%= f.nome %></strong></td>
+                                            <td style="padding: 10px;"><%= f.cidade %> - <%= f.estado %></td>
+                                            <td style="padding: 10px;"><%= f.bairros || 'Todos' %></td>
+                                            <td style="padding: 10px;">
+                                                <button type="button" onclick="deleteFilial(<%= f.id %>)" style="background: none; border: none; color: #EF4444; cursor: pointer; font-size: 1.2rem;"><i class="ri-delete-bin-line"></i></button>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } else { %>
+                                    <tr><td colspan="4" style="padding: 10px; text-align: center; color: #64748B;">Nenhuma loja cadastrada.</td></tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <script>
+                    function addFilial() {
+                        const payload = {
+                            nome: document.getElementById('filial_nome').value,
+                            cidade: document.getElementById('filial_cidade').value,
+                            estado: document.getElementById('filial_estado').value,
+                            bairros: document.getElementById('filial_bairros').value,
+                            link: document.getElementById('filial_link').value
+                        };
+                        if(!payload.nome || !payload.cidade || !payload.estado || !payload.link) return alert('Preencha os campos obrigatórios!');
+                        
+                        fetch('/admin/filiais', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify(payload)
+                        }).then(() => window.location.href = '/admin/conteudo?tab=tab-lojas');
+                    }
+                    function deleteFilial(id) {
+                        if(!confirm('Tem certeza?')) return;
+                        fetch('/admin/filiais/delete/' + id, { method: 'POST' })
+                        .then(() => window.location.href = '/admin/conteudo?tab=tab-lojas');
+                    }
+                    </script>
+                </div>
 
                 <div id="tab-home-contato" class="tab-panel">
                     <div class="section-header"><h3>Home: Seção Contato</h3></div>
@@ -1683,7 +1798,7 @@
             { id: 'home', name: 'Hero / Destaque Principal', active: true, icon: 'ri-flashlight-line' },
             { id: 'sobre', name: 'Sobre Nós', active: true, icon: 'ri-user-3-line' },
             { id: 'servicos', name: 'Serviços / Especialidades', active: true, icon: 'ri-briefcase-line' },
-            { id: 'beneficios', name: 'Benefícios / Vantagens', active: true, icon: 'ri-heart-pulse-line' },
+            { id: 'beneficios', name: 'Campanhas Promocionais', active: true, icon: 'ri-image-line' },
             { id: 'destaque', name: 'Destaque Paralaxe (Fixo/Zoom)', active: true, icon: 'ri-focus-3-line' },
             { id: 'depoimentos', name: 'Depoimentos / Avaliações', active: true, icon: 'ri-chat-quote-line' },
             { id: 'contato', name: 'Contato Home / Dados e Mapa', active: true, icon: 'ri-contacts-book-2-line' }

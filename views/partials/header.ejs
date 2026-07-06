@@ -23,12 +23,16 @@
 
 <div class="header-wrapper">
     <% if (settings.show_topbar == 1) { %>
-    <div class="topbar" style="background: var(--navy-blue); color: white; padding: 10px 0; font-size: 0.75rem;">
+    <div class="topbar" style="background: var(--topbar-bg); color: white; padding: 10px 0; font-size: 0.75rem;">
         <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
             <div class="topbar-left">
-                <span><i class="ri-map-pin-line"></i> <%= settings.endereco %></span>
+                <span onclick="if(typeof openLocationModal === 'function') openLocationModal()" style="cursor: pointer;" title="Alterar Localização"><i class="ri-map-pin-line"></i> <%= settings.endereco %></span>
             </div>
-            <% if (settings.header_strip_text) { %>
+            <% if (settings.topbar_gif) { %>
+            <div class="topbar-center" style="display: flex; align-items: center; justify-content: center;">
+                <img src="<%= settings.topbar_gif %>" alt="Destaque" style="max-height: 25px; max-width: 100%; object-fit: contain;">
+            </div>
+            <% } else if (settings.header_strip_text) { %>
             <div class="topbar-center" style="font-weight: 700; letter-spacing: 0.5px;">
                 <%= settings.header_strip_text %>
             </div>
@@ -56,9 +60,9 @@
     <header>
         <a href="/" class="logo">
             <% if (settings.logo) { %>
-                <img src="<%= settings.logo %>" alt="<%= settings.site_name || 'Empresa' %>" class="logo-main" style="max-height: 40px;">
+                <img src="<%= settings.logo %>" alt="<%= settings.site_name || 'Empresa' %>" class="logo-main">
                 <% if (settings.logo_white) { %>
-                    <img src="<%= settings.logo_white %>" alt="<%= settings.site_name || 'Empresa' %>" class="logo-white" style="display: none; max-height: 40px;">
+                    <img src="<%= settings.logo_white %>" alt="<%= settings.site_name || 'Empresa' %>" class="logo-white" style="display: none;">
                 <% } %>
             <% } else { %>
                 Sistema
@@ -71,6 +75,7 @@
                        { label: 'Home', link: '/#home' },
                        { label: 'Sobre', link: '/#sobre' },
                        { label: 'Serviços', link: '/#servicos' },
+                       { label: 'Campanhas', link: '/#campanhas' },
                        { label: 'Contato', link: '/#contato' }
                    ];
                    if (settings.site_menu && settings.site_menu.trim() !== '') {
@@ -98,30 +103,160 @@
         </nav>
         
         <!-- MOBILE/TABLET QUICK ICONS (ENTRE LOGO E BOTÃO) -->
-        <div class="header-mobile-icons">
-            <a href="/" class="m-icon-link" title="Home"><i class="ri-home-4-fill"></i></a>
-            <a href="/admin/login" class="m-icon-link" title="Login"><i class="ri-user-settings-fill"></i></a>
+        <div class="header-mobile-icons" style="display: flex; align-items: center; gap: 15px;">
+            <button id="mobile-menu-btn" style="background: none; border: none; color: white; font-size: 2.8rem; cursor: pointer; padding: 0;">
+                <i class="ri-menu-line"></i>
+            </button>
         </div>
 
         <div class="header-right">
-            <a href="/admin/login" class="login-link menu-item-link desktop-only">
-                <div class="roll-btn">
-                    <span class="roll-text">Login <i class="ri-login-box-line"></i></span>
-                    <span class="roll-text">Login <i class="ri-login-box-line"></i></span>
-                </div>
+
+            <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
+            <a href="javascript:void(0)" onclick="if(typeof openLocationModal === 'function') openLocationModal()" class="btn-cta-header desktop-only" title="Escolher loja">
+                <i class="ri-whatsapp-line" style="font-size: 1.4rem;"></i> Peça pelo WhatsApp
             </a>
-            <% if (settings.whatsapp) { %>
-            <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma consulta.') %>" class="btn-cta-header btn-whatsapp-conversion" target="_blank">
-                <%= settings.nav_cta_text || 'Agendar Consulta' %>
+            <% } else if (settings.whatsapp) { %>
+            <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma consulta.') %>" class="btn-cta-header btn-whatsapp-conversion desktop-only" target="_blank">
+                <i class="ri-whatsapp-line" style="font-size: 1.4rem;"></i> Peça pelo WhatsApp
             </a>
             <% } %>
         </div>
     </header>
 </div>
 
-<!-- SCRIPT GSAP PARA EFEITO ROLLING -->
+<!-- OFF-CANVAS MOBILE MENU -->
+<div id="mobile-offcanvas" class="offcanvas-menu" style="background-color: <%= settings.color_offcanvas_bg || '#FFFFFF' %>; color: <%= settings.color_offcanvas_text || '#333333' %>;">
+    <div class="offcanvas-header">
+        <% if (settings.logo) { %>
+            <img src="<%= settings.logo %>" alt="Logo" style="max-height: 40px; object-fit: contain;">
+        <% } %>
+        <button id="close-offcanvas-btn" style="background: none; border: none; font-size: 2rem; cursor: pointer; color: <%= settings.color_offcanvas_text || '#333333' %>;">
+            <i class="ri-close-line"></i>
+        </button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="offcanvas-nav">
+            <% menu.forEach(item => { %>
+                <li>
+                    <a href="<%= item.link %>" class="offcanvas-link" style="color: <%= settings.color_offcanvas_text || '#333333' %>;"><%= item.label %></a>
+                </li>
+            <% }); %>
+        </ul>
+        
+        <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="javascript:void(0)" onclick="if(typeof openLocationModal === 'function') { openLocationModal(); closeMenu(); }" class="btn-whatsapp-conversion" title="Escolher loja" style="display: inline-block; background: var(--accent-red); color: white; padding: 15px 30px; border-radius: 50px; font-weight: 700; text-decoration: none; width: 100%;">
+                <i class="ri-whatsapp-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 5px;"></i> Peça pelo WhatsApp
+            </a>
+        </div>
+        <% } else if (settings.whatsapp) { %>
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="https://wa.me/<%= settings.whatsapp %>?text=<%= encodeURIComponent(settings.whatsapp_message || 'Olá, estive no site e gostaria de agendar uma consulta.') %>" class="btn-whatsapp-conversion" target="_blank" style="display: inline-block; background: var(--accent-red); color: white; padding: 15px 30px; border-radius: 50px; font-weight: 700; text-decoration: none; width: 100%;">
+                <i class="ri-whatsapp-line" style="font-size: 1.2rem; vertical-align: middle; margin-right: 5px;"></i> Peça pelo WhatsApp
+            </a>
+        </div>
+        <% } %>
+    </div>
+</div>
+<div id="offcanvas-backdrop" class="offcanvas-backdrop"></div>
+
+<style>
+    /* CSS DO OFF-CANVAS */
+    .offcanvas-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 300px;
+        max-width: 80%;
+        height: 100vh;
+        z-index: 9999;
+        transition: right 0.3s ease;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+    }
+    .offcanvas-menu.open {
+        right: 0;
+    }
+    .offcanvas-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .offcanvas-body {
+        padding: 20px;
+        overflow-y: auto;
+    }
+    .offcanvas-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .offcanvas-nav li {
+        margin-bottom: 15px;
+    }
+    .offcanvas-link {
+        text-decoration: none;
+        font-size: 1.2rem;
+        font-weight: 600;
+        display: block;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .offcanvas-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 9998;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .offcanvas-backdrop.open {
+        display: block;
+        opacity: 1;
+    }
+    @media (max-width: 1024px) {
+        .desktop-only { display: none !important; }
+    }
+</style>
+
+<!-- SCRIPT GSAP E MENU MOBILE -->
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        // Offcanvas logic
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const closeBtn = document.getElementById('close-offcanvas-btn');
+        const offcanvas = document.getElementById('mobile-offcanvas');
+        const backdrop = document.getElementById('offcanvas-backdrop');
+        const offcanvasLinks = document.querySelectorAll('.offcanvas-link');
+
+        function openMenu() {
+            offcanvas.classList.add('open');
+            backdrop.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            offcanvas.classList.remove('open');
+            backdrop.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        if (mobileBtn) mobileBtn.addEventListener('click', openMenu);
+        if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+        if (backdrop) backdrop.addEventListener('click', closeMenu);
+
+        offcanvasLinks.forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // GSAP
         if (!window.gsap) return;
         gsap.utils.toArray(".menu-item-link").forEach(link => {
             const roll = link.querySelector(".roll-btn");

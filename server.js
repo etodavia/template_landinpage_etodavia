@@ -241,6 +241,7 @@ const cmsUpload = upload.fields([
     { name: 'terms_hero_image_file', maxCount: 1 },
     { name: 'terms_hero_image_tablet_file', maxCount: 1 },
     { name: 'terms_hero_image_mobile_file', maxCount: 1 },
+    { name: 'topbar_gif', maxCount: 1 },
     { name: 'about_story_image_file', maxCount: 1 },
     { name: 'logo_file', maxCount: 1 },
     { name: 'logo_white_file', maxCount: 1 },
@@ -252,7 +253,9 @@ const cmsUpload = upload.fields([
     { name: 'admin_header_logo_file', maxCount: 1 },
     { name: 'login_logo_file', maxCount: 1 },
     { name: 'admin_tutorial_image_file', maxCount: 1 },
-    { name: 'destaque_paralaxe_image_file', maxCount: 1 }
+    { name: 'destaque_paralaxe_image_file', maxCount: 1 },
+    { name: 'promotional_banner_0_file', maxCount: 1 },
+    { name: 'promotional_banner_1_file', maxCount: 1 }
 ]);
 
 function handleCmsUpload(req, res, next) {
@@ -290,7 +293,7 @@ async function setupDB() {
             'terms_hero_title TEXT', 'terms_hero_label TEXT', 'terms_hero_image TEXT', 'terms_hero_image_tablet TEXT', 'terms_hero_image_mobile TEXT',
             'home_hero_title TEXT', 'home_hero_description TEXT', 'services_hero_title TEXT',
             'instagram_url VARCHAR(255)', 'linkedin_url VARCHAR(255)', 'facebook_url VARCHAR(255)', 'nav_cta_text VARCHAR(100)', 'endereco TEXT', 'whatsapp VARCHAR(50)', 'whatsapp_message TEXT',
-            'color_marinho VARCHAR(20) DEFAULT "#0A1128"', 'color_areia VARCHAR(20) DEFAULT "#F7F7F4"', 'color_vermelho VARCHAR(20) DEFAULT "#D62828"', 'color_hero_button VARCHAR(50)', 'color_texto VARCHAR(20) DEFAULT "#333333"',
+            'color_marinho VARCHAR(20) DEFAULT "#002D80"', 'color_topbar VARCHAR(20) DEFAULT "#002D80"', 'color_areia VARCHAR(20) DEFAULT "#F7F7F4"', 'color_vermelho VARCHAR(20) DEFAULT "#D62828"', 'color_hero_button VARCHAR(50)', 'color_texto VARCHAR(20) DEFAULT "#333333"',
             'color_header VARCHAR(20) DEFAULT "#FFFFFF"', 'color_footer VARCHAR(20) DEFAULT "#0A1128"',
             'color_header_text VARCHAR(20) DEFAULT "#FFFFFF"', 'color_footer_text VARCHAR(20) DEFAULT "#FFFFFF"',
             'hero_image VARCHAR(255)', 'hero_image_tablet TEXT', 'hero_image_mobile TEXT', 'about_title VARCHAR(255)', 'about_text TEXT', 'about_image VARCHAR(255)', 'benefits_title VARCHAR(255)', 'benefits_text TEXT',
@@ -299,7 +302,7 @@ async function setupDB() {
             'logo VARCHAR(255)', 'logo_white VARCHAR(255)', 'favicon VARCHAR(255)', 'show_topbar INT DEFAULT 1', 'footer_secure_link VARCHAR(255)', 'footer_short_text TEXT',
             'services_section_title VARCHAR(255)', 'services_section_text TEXT', 'blog_section_title VARCHAR(255)', 'blog_section_text TEXT', 'testimonial_section_title VARCHAR(255)', 'newsletter_section_title VARCHAR(255)', 'newsletter_section_text TEXT',
             'services_page_description TEXT', 'blog_page_newsletter_title VARCHAR(255)', 'blog_page_newsletter_text TEXT', 'contact_page_description TEXT',
-            'site_menu TEXT',
+            'site_menu TEXT', 'footer_menu_1 TEXT', 'footer_menu_2 TEXT',
             'home_hero_card_title VARCHAR(255)', 'home_hero_card_subtitle VARCHAR(255)', 'home_hero_button_text VARCHAR(100)', 'home_about_button_text VARCHAR(100)', 'home_services_button_text VARCHAR(100)',
             'about_story_image VARCHAR(255)', 'social_links TEXT', 'about_story_lead TEXT', 'about_guidelines_title VARCHAR(255)', 'about_guidelines_text TEXT',
             'benefits_items TEXT', 'benefits_template VARCHAR(50)', 'benefits_color VARCHAR(50)', 'benefits_card_title_color VARCHAR(50)', 'benefits_card_text_color VARCHAR(50)', 'benefits_card_bg VARCHAR(50)',
@@ -329,9 +332,11 @@ async function setupDB() {
             'title_size_section_desktop DECIMAL(4,2)', 'title_size_section_tablet DECIMAL(4,2)', 'title_size_section_mobile DECIMAL(4,2)',
             'title_size_card_desktop DECIMAL(4,2)', 'title_size_card_tablet DECIMAL(4,2)', 'title_size_card_mobile DECIMAL(4,2)',
             'color_about_bg VARCHAR(20) DEFAULT "#F7F7F4"', 'color_blog_bg VARCHAR(20) DEFAULT "#0A1128"',
+            'color_offcanvas_bg VARCHAR(20) DEFAULT "#FFFFFF"', 'color_offcanvas_text VARCHAR(20) DEFAULT "#333333"',
             'color_blog_text VARCHAR(20) DEFAULT "#FFFFFF"', 'color_contact_bg VARCHAR(20) DEFAULT "#F7F7F4"',
             'admin_tutorial_video VARCHAR(500)', 'admin_tutorial_image VARCHAR(500)',
             'layout_secoes TEXT', 'estilo_secoes TEXT', 'hero_carousel_json TEXT', 'header_transparent INT DEFAULT 0',
+            'topbar_gif VARCHAR(255)',
             'topbar_font_size DECIMAL(4,2) DEFAULT 0.75', 'topbar_icon_size DECIMAL(4,2) DEFAULT 0.85',
             'header_font_size DECIMAL(4,2) DEFAULT 0.90', 'header_icon_size DECIMAL(4,2) DEFAULT 1.10',
             'contact_extra_title VARCHAR(255) DEFAULT "Gostaria de falar com nosso time?"', 'contact_extra_text TEXT',
@@ -347,12 +352,28 @@ async function setupDB() {
             'destaque_paralaxe_image TEXT',
             'destaque_paralaxe_align VARCHAR(20) DEFAULT "centered"'
         ];
+        // Campos editoriais grandes em VARCHAR contam integralmente para o limite
+        // de 65 KB da linha do MariaDB. TEXT mantém esse conteúdo fora da linha.
+        const compactColumnDefinition = (definition) => definition.replace(
+            /VARCHAR\((\d+)\)/i,
+            (match, size) => Number(size) >= 100 ? 'TEXT' : match
+        );
+
         for (const col of columns) {
+            const safeCol = compactColumnDefinition(col);
             try {
-                await pool.execute(`ALTER TABLE configuracoes_globais ADD COLUMN ${col}`);
+                await pool.execute(`ALTER TABLE configuracoes_globais ADD COLUMN ${safeCol}`);
                 console.log(`✅ DATABASE: Coluna [${col.split(' ')[0]}] provisionada.`);
             } catch (e) { 
-                if (e.code !== 'ER_DUP_COLUMN_NAMES' && e.errno !== 1060) {
+                if (e.code === 'ER_DUP_COLUMN_NAMES' || e.errno === 1060) {
+                    if (safeCol !== col) {
+                        try {
+                            await pool.execute(`ALTER TABLE configuracoes_globais MODIFY COLUMN ${safeCol}`);
+                        } catch (compactError) {
+                            console.error(`DATABASE: Erro ao compactar coluna [${col.split(' ')[0]}]:`, compactError.message);
+                        }
+                    }
+                } else {
                     console.error(`❌ DATABASE: Erro ao provisionar coluna [${col.split(' ')[0]}]:`, e.message);
                 }
             }
@@ -443,6 +464,35 @@ async function setupDB() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
+        for (const productColumn of [
+            'preco_de DECIMAL(10,2) NULL',
+            'preco_por DECIMAL(10,2) NULL',
+            'unidade VARCHAR(50) NULL',
+            'selo VARCHAR(100) NULL'
+        ]) {
+            try {
+                await pool.execute(`ALTER TABLE servicos ADD COLUMN ${productColumn}`);
+            } catch (e) {
+                if (e.code !== 'ER_DUP_COLUMN_NAMES' && e.errno !== 1060) throw e;
+            }
+        }
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS banners (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                titulo VARCHAR(255),
+                imagem VARCHAR(255) NOT NULL,
+                link VARCHAR(500),
+                texto_botao VARCHAR(100),
+                ordem INT DEFAULT 0,
+                ativo BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        try {
+            await pool.execute('ALTER TABLE banners ADD COLUMN posicao VARCHAR(30) DEFAULT "topo"');
+        } catch (e) {
+            if (e.code !== 'ER_DUP_COLUMN_NAMES' && e.errno !== 1060) throw e;
+        }
         await pool.execute(`
             CREATE TABLE IF NOT EXISTS beneficios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -506,6 +556,19 @@ async function setupDB() {
         }
 
         console.log('✅ DATABASE: Portfólio de Especialidades gerenciado pelo painel.');
+
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS filiais (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nome VARCHAR(100) NOT NULL,
+                cidade VARCHAR(100) NOT NULL,
+                estado VARCHAR(2) NOT NULL,
+                bairros TEXT,
+                link VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('✅ DATABASE: Tabela de Filiais Pronta.');
 
         // Garantir Usuário Admin Padrão
         // Tabela de Usuários (Login Admin) com Nível de Acesso e Permissões
@@ -820,11 +883,15 @@ app.get('/', async (req, res) => {
     let team = [];
     let testimonials = [];
     let beneficios = [];
+    let banners = [];
+    let promotionalBanners = [];
     let testimonialSource = 'manual';
 
     try {
         // Consultar Benefícios
         [beneficios] = await pool.execute('SELECT * FROM beneficios ORDER BY ordem ASC, created_at ASC');
+        [banners] = await pool.execute('SELECT * FROM banners WHERE ativo = 1 AND (posicao = "topo" OR posicao IS NULL) ORDER BY ordem ASC, created_at DESC');
+        [promotionalBanners] = await pool.execute('SELECT * FROM banners WHERE ativo = 1 AND posicao = "promocional" ORDER BY ordem ASC, created_at DESC');
 
         // Consultar Posts (com fallback)
         try {
@@ -845,6 +912,11 @@ app.get('/', async (req, res) => {
 
         // Consultar Equipe e Depoimentos
         [team] = await pool.execute('SELECT * FROM equipe ORDER BY ordem ASC, created_at DESC');
+
+        let filiais = [];
+        try {
+            [filiais] = await pool.execute('SELECT * FROM filiais ORDER BY nome ASC');
+        } catch (err) {}
         
         try {
             const [googleReviews] = await pool.execute(`
@@ -883,7 +955,10 @@ app.get('/', async (req, res) => {
             team,
             testimonials,
             testimonialSource,
-            beneficios
+            beneficios,
+            banners,
+            promotionalBanners,
+            filiais
         });
     } catch (e) { 
         console.error('❌ CRITICAL HOME ROUTE ERROR:', e);
@@ -891,7 +966,7 @@ app.get('/', async (req, res) => {
         res.render('index', {
             title: `${siteName} | Mudanças e Logística`,
             description: `${siteName}: soluções de mudanças e logística com atendimento personalizado. Solicite um orçamento.`,
-            posts: [], services: [], team: [], testimonials: [], testimonialSource: 'manual', beneficios: []
+            posts: [], services: [], team: [], testimonials: [], testimonialSource: 'manual', beneficios: [], banners: [], promotionalBanners: []
         });
     }
 });
@@ -1013,6 +1088,8 @@ app.get('/admin/conteudo', async (req, res) => {
         const [rows] = await pool.execute('SELECT * FROM configuracoes_globais WHERE id = 1');
         const settings = rows[0] || {};
         const [beneficios] = await pool.execute('SELECT * FROM beneficios ORDER BY ordem ASC, created_at ASC');
+        const [promotionalBanners] = await pool.execute('SELECT * FROM banners WHERE posicao = "promocional" ORDER BY ordem ASC, created_at ASC LIMIT 2');
+        const [filiais] = await pool.execute('SELECT * FROM filiais ORDER BY nome ASC');
         
         res.render('admin/conteudo', { 
             title: 'Editor Global (CMS)', 
@@ -1021,16 +1098,24 @@ app.get('/admin/conteudo', async (req, res) => {
             errorMessage: req.query.message,
             activeTab: req.query.tab || '',
             settings,
-            beneficios
+            beneficios,
+            promotionalBanners,
+            filiais
         });
     } catch (e) {
         console.error('❌ CMS GET ERROR:', e);
-        res.render('admin/conteudo', { title: 'Editor Global (CMS)', settings: {}, beneficios: [] });
+        res.render('admin/conteudo', { title: 'Editor Global (CMS)', settings: {}, beneficios: [], promotionalBanners: [], filiais: [] });
     }
 });
 app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
     let updateData = { ...req.body };
-    console.log('📥 REQ.BODY COMPLETO:', Object.keys(req.body));
+    const files = req.files || {};
+    if (files['logo_file']) updateData.logo = `/uploads/${files['logo_file'][0].filename}`;
+    if (files['logo_white_file']) updateData.logo_white = `/uploads/${files['logo_white_file'][0].filename}`;
+    if (files['favicon_file']) updateData.favicon = `/uploads/${files['favicon_file'][0].filename}`;
+    if (files['about_story_image_file']) updateData.about_story_image = `/uploads/${files['about_story_image_file'][0].filename}`;
+    if (files['topbar_gif']) updateData.topbar_gif = `/uploads/${files['topbar_gif'][0].filename}`;
+    if (files['hero_image_file']) updateData.hero_image = `/uploads/${files['hero_image_file'][0].filename}`;
     
     // Whitelist de colunas válidas no banco para evitar erros de SQL
     const validColumns = [
@@ -1039,7 +1124,7 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'terms_hero_title', 'terms_hero_label', 'terms_hero_image', 'terms_hero_image_tablet', 'terms_hero_image_mobile',
         'home_hero_title', 'home_hero_description', 'services_hero_title',
         'instagram_url', 'linkedin_url', 'facebook_url', 'nav_cta_text', 'endereco', 'whatsapp', 'whatsapp_message',
-        'color_marinho', 'color_areia', 'color_vermelho', 'color_texto', 'color_header', 'color_footer',
+        'color_marinho', 'color_topbar', 'color_areia', 'color_vermelho', 'color_texto', 'color_header', 'color_footer',
         'color_header_text', 'color_footer_text', 'hero_image', 'hero_image_tablet', 'hero_image_mobile', 'about_title', 'about_text', 'about_image',
         'about_story_text_left', 'about_story_text_right',
         'about_mission', 'about_vision', 'about_values', 'about_team_title', 'about_team_text',
@@ -1050,7 +1135,7 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'footer_secure_link', 'footer_short_text', 'services_section_title', 'services_section_text',
         'blog_section_title', 'blog_section_text', 'testimonial_section_title', 'newsletter_section_title',
         'newsletter_section_text', 'services_page_description', 'blog_page_newsletter_title',
-        'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'home_hero_card_title',
+        'blog_page_newsletter_text', 'contact_page_description', 'site_menu', 'footer_menu_1', 'footer_menu_2', 'home_hero_card_title',
         'home_hero_card_subtitle', 'home_hero_button_text', 'home_about_button_text', 'home_services_button_text', 'about_story_image',
         'about_story_lead', 'about_guidelines_title', 'about_guidelines_text',
         'social_links', 'benefits_title', 'benefits_text', 'beneficios_json', 
@@ -1070,9 +1155,11 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
         'title_size_section_desktop', 'title_size_section_tablet', 'title_size_section_mobile',
         'title_size_card_desktop', 'title_size_card_tablet', 'title_size_card_mobile',
         'color_hero_button', 'color_about_bg', 'color_blog_bg', 'color_blog_text', 'color_contact_bg',
+        'color_offcanvas_bg', 'color_offcanvas_text',
         'benefits_color', 'benefits_text_color', 'benefits_title_color', 'benefits_icon_bg', 'benefits_icon_color', 'benefits_card_title_color', 'benefits_card_text_color', 'benefits_card_bg',
         'admin_tutorial_video', 'admin_tutorial_image',
         'layout_secoes', 'estilo_secoes', 'hero_carousel_json', 'header_transparent',
+        'topbar_gif',
         'topbar_font_size', 'topbar_icon_size', 'header_font_size', 'header_icon_size',
         'contact_extra_title', 'contact_extra_text',
         'color_popup_bg', 'color_popup_text', 'color_popup_title', 'popup_border_radius',
@@ -1173,6 +1260,27 @@ app.post('/admin/conteudo', handleCmsUpload, async (req, res) => {
             }
         } catch (err) { 
             console.error('❌ ERRO NA TABELA BENEFICIOS:', err); 
+        }
+    }
+
+    // Duas campanhas fixas da antiga seção de Benefícios.
+    for (let i = 0; i < 2; i++) {
+        const bannerId = req.body[`promotional_banner_${i}_id`];
+        const title = (req.body[`promotional_banner_${i}_title`] || '').trim();
+        const currentImage = req.body[`promotional_banner_${i}_image`] || '';
+        const uploaded = req.files && req.files[`promotional_banner_${i}_file`];
+        const image = uploaded ? `/uploads/${uploaded[0].filename}` : currentImage;
+
+        if (bannerId) {
+            await pool.execute(
+                'UPDATE banners SET titulo = ?, imagem = ?, ordem = ?, ativo = 1, posicao = "promocional" WHERE id = ?',
+                [title, image, i, bannerId]
+            );
+        } else if (image) {
+            await pool.execute(
+                'INSERT INTO banners (titulo, imagem, link, texto_botao, ordem, ativo, posicao) VALUES (?, ?, "", "", ?, 1, "promocional")',
+                [title, image, i]
+            );
         }
     }
 
@@ -1335,13 +1443,44 @@ app.post('/admin/equipe/delete/:id', async (req, res) => {
 });
 
 // Admin: Especialidades (servicos) reativado para o projeto
+app.get('/admin/banners', async (req, res) => {
+    const [banners] = await pool.execute('SELECT * FROM banners ORDER BY ordem ASC, created_at DESC');
+    res.render('admin/banners', { title: 'CMS » Banners Rotativos', banners, query: req.query });
+});
+app.post('/admin/banners', upload.single('imagem_file'), async (req, res) => {
+    try {
+        if (!req.file) return res.redirect('/admin/banners?error=imagem');
+        const { titulo, link, texto_botao, ordem, posicao } = req.body;
+        if (posicao === 'promocional') {
+            const [[{ total }]] = await pool.execute('SELECT COUNT(*) AS total FROM banners WHERE posicao = "promocional"');
+            if (total >= 2) return res.redirect('/admin/banners?error=limite_promocional');
+        }
+        await pool.execute(
+            'INSERT INTO banners (titulo, imagem, link, texto_botao, ordem, ativo, posicao) VALUES (?, ?, ?, ?, ?, 1, ?)',
+            [titulo || '', `/uploads/${req.file.filename}`, link || '', texto_botao || '', parseInt(ordem) || 0, posicao === 'promocional' ? 'promocional' : 'topo']
+        );
+        res.redirect('/admin/banners?success=1');
+    } catch (error) {
+        console.error('Error adding banner:', error);
+        res.redirect('/admin/banners?error=1&message=' + encodeURIComponent('Erro ao salvar o banner no banco de dados.'));
+    }
+});
+app.post('/admin/banners/toggle/:id', async (req, res) => {
+    await pool.execute('UPDATE banners SET ativo = NOT ativo WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/banners?success=1');
+});
+app.post('/admin/banners/delete/:id', async (req, res) => {
+    await pool.execute('DELETE FROM banners WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/banners?success=1');
+});
+
 app.get('/admin/servicos', async (req, res) => {
     const [services] = await pool.execute('SELECT * FROM servicos ORDER BY created_at DESC');
-    res.render('admin/manage-services', { title: 'CMS » Especialidades', services });
+    res.render('admin/manage-services', { title: 'CMS » Produtos e Ofertas', services });
 });
-app.get('/admin/servicos/novo', (req, res) => res.render('admin/form-service', { title: 'Nova Especialidade', service: null }));
+app.get('/admin/servicos/novo', (req, res) => res.render('admin/form-service', { title: 'Novo Produto', service: null }));
 app.post('/admin/servicos', upload.single('imagem_file'), async (req, res) => {
-    const { slug, titulo, resumo, conteudo, icone, meta_title, meta_description, destaque_home, ordem, ativo } = req.body;
+    const { slug, titulo, resumo, conteudo, icone, meta_title, meta_description, destaque_home, ordem, ativo, preco_de, preco_por, unidade, selo } = req.body;
     let imagem = req.body.imagem;
     if (req.file) imagem = `/uploads/${req.file.filename}`;
 
@@ -1349,8 +1488,8 @@ app.post('/admin/servicos', upload.single('imagem_file'), async (req, res) => {
     const ativo_val = (Array.isArray(ativo) ? ativo.includes('1') : (ativo === '1' || ativo === undefined)) ? 1 : 0;
 
     try {
-        await pool.execute('INSERT INTO servicos (slug, titulo, resumo, imagem, conteudo, icone, meta_title, meta_description, destaque_home, ordem, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
-            [slug, titulo, resumo, imagem, conteudo, icone, meta_title, meta_description, destaque_home_val, parseInt(ordem) || 0, ativo_val]);
+        await pool.execute('INSERT INTO servicos (slug, titulo, resumo, imagem, conteudo, icone, meta_title, meta_description, destaque_home, ordem, ativo, preco_de, preco_por, unidade, selo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+            [slug, titulo, resumo || '', imagem, conteudo || '', icone || 'ri-shopping-bag-line', meta_title, meta_description, destaque_home_val, parseInt(ordem) || 0, ativo_val, preco_de || null, preco_por || null, unidade || '', selo || '']);
         res.redirect('/admin/servicos?success=1');
     } catch (e) { 
         console.error('❌ SERVICE SAVE ERROR:', e);
@@ -1361,11 +1500,11 @@ app.get('/admin/servicos/editar/:id', async (req, res) => {
     try {
         const [rows] = await pool.execute('SELECT * FROM servicos WHERE id = ?', [req.params.id]);
         if (rows.length === 0) return res.redirect('/admin/servicos');
-        res.render('admin/form-service', { title: 'Editar Especialidade', service: rows[0] });
+        res.render('admin/form-service', { title: 'Editar Produto', service: rows[0] });
     } catch (e) { res.redirect('/admin/servicos'); }
 });
 app.post('/admin/servicos/editar/:id', upload.single('imagem_file'), async (req, res) => {
-    const { slug, titulo, resumo, conteudo, icone, meta_title, meta_description, destaque_home, ordem, ativo } = req.body;
+    const { slug, titulo, resumo, conteudo, icone, meta_title, meta_description, destaque_home, ordem, ativo, preco_de, preco_por, unidade, selo } = req.body;
     let imagem = req.body.imagem;
     if (req.file) imagem = `/uploads/${req.file.filename}`;
 
@@ -1373,8 +1512,8 @@ app.post('/admin/servicos/editar/:id', upload.single('imagem_file'), async (req,
     const ativo_val = (Array.isArray(ativo) ? ativo.includes('1') : (ativo === '1' || ativo === undefined)) ? 1 : 0;
 
     try {
-        await pool.execute('UPDATE servicos SET slug=?, titulo=?, resumo=?, imagem=?, conteudo=?, icone=?, meta_title=?, meta_description=?, destaque_home=?, ordem=?, ativo=? WHERE id=?', 
-            [slug, titulo, resumo, imagem, conteudo, icone, meta_title, meta_description, destaque_home_val, parseInt(ordem) || 0, ativo_val, req.params.id]);
+        await pool.execute('UPDATE servicos SET slug=?, titulo=?, resumo=?, imagem=?, conteudo=?, icone=?, meta_title=?, meta_description=?, destaque_home=?, ordem=?, ativo=?, preco_de=?, preco_por=?, unidade=?, selo=? WHERE id=?', 
+            [slug, titulo, resumo || '', imagem, conteudo || '', icone || 'ri-shopping-bag-line', meta_title, meta_description, destaque_home_val, parseInt(ordem) || 0, ativo_val, preco_de || null, preco_por || null, unidade || '', selo || '', req.params.id]);
         res.redirect('/admin/servicos?success=1');
     } catch (e) { 
         console.error('❌ SERVICE EDIT ERROR:', e);
@@ -1620,6 +1759,54 @@ app.post('/api/comentarios', async (req, res) => {
         await pool.execute('INSERT INTO comentarios (post_id, nome, email, comentario) VALUES (?, ?, ?, ?)', [post_id, nome, email, comentario]);
         res.redirect(`/blog/${post_id}?success=comment`);
     } catch (e) { res.redirect(`/blog/${post_id}?error=comment`); }
+});
+
+// API Pública de Busca de Filiais
+app.get('/api/filiais/search', async (req, res) => {
+    const { bairro, cidade, estado } = req.query;
+    try {
+        const [rows] = await pool.execute('SELECT * FROM filiais');
+        // Buscar por bairro (match parcial) ou cidade inteira se não tiver bairro específico
+        let match = rows.find(f => {
+            if (f.bairros && f.bairros.trim()) {
+                const bairrosList = f.bairros.split(',').map(b => b.trim().toLowerCase());
+                return bairrosList.includes((bairro||'').toLowerCase()) && f.cidade.toLowerCase() === (cidade||'').toLowerCase();
+            }
+            // Se a filial não definiu bairro, atende a cidade toda
+            return f.cidade.toLowerCase() === (cidade||'').toLowerCase() && f.estado.toLowerCase() === (estado||'').toLowerCase();
+        });
+        
+        if (match) return res.json({ success: true, link: match.link });
+        res.json({ success: false, message: 'Nenhuma loja encontrada para esta região.' });
+    } catch (e) {
+        res.json({ success: false, message: 'Erro ao buscar filiais.' });
+    }
+});
+
+// Admin: Criar/Editar Filial
+app.post('/admin/filiais', async (req, res) => {
+    const { id, nome, cidade, estado, bairros, link } = req.body;
+    try {
+        if (id) {
+            await pool.execute('UPDATE filiais SET nome=?, cidade=?, estado=?, bairros=?, link=? WHERE id=?', [nome, cidade, estado, bairros, link, id]);
+        } else {
+            await pool.execute('INSERT INTO filiais (nome, cidade, estado, bairros, link) VALUES (?, ?, ?, ?, ?)', [nome, cidade, estado, bairros, link]);
+        }
+        res.redirect('/admin/conteudo?tab=tab-lojas&success=1');
+    } catch (e) {
+        console.error(e);
+        res.redirect('/admin/conteudo?tab=tab-lojas&error=1');
+    }
+});
+
+// Admin: Deletar Filial
+app.post('/admin/filiais/delete/:id', async (req, res) => {
+    try {
+        await pool.execute('DELETE FROM filiais WHERE id=?', [req.params.id]);
+        res.redirect('/admin/conteudo?tab=tab-lojas&success=1');
+    } catch (e) {
+        res.redirect('/admin/conteudo?tab=tab-lojas&error=1');
+    }
 });
 
 app.use((err, req, res, next) => {

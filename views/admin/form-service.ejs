@@ -20,8 +20,8 @@
                     <div style="max-width: 1000px; margin: 0 auto; background: white; padding: 40px; border-radius: 30px; border: 1px solid #f0f0f0; box-shadow: 0 15px 40px rgba(0,0,0,0.02);">
                         <header style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <h2 style="font-size: 2rem; color: #0A1128; margin: 0;"><%= service ? 'Refinar' : 'Arquitetar' %> Solução <em>Estratégica</em></h2>
-                                <p style="color: #888; font-size: 0.9rem; margin-top: 5px;">Expanda o portfólio de autoridade da Sistema com precisão tática.</p>
+                                <h2 style="font-size: 2rem; color: #0A1128; margin: 0;"><%= service ? 'Editar' : 'Cadastrar' %> <em>Produto</em></h2>
+                                <p style="color: #888; font-size: 0.9rem; margin-top: 5px;">Use de preferência uma imagem PNG ou WebP com fundo transparente.</p>
                             </div>
                             <a href="/admin/servicos" style="text-decoration: none; color: #666; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 5px;">
                                 <i class="ri-arrow-left-line"></i> VOLTAR
@@ -31,7 +31,7 @@
                         <form action="<%= service ? '/admin/servicos/editar/' + service.id : '/admin/servicos' %>" method="POST" enctype="multipart/form-data">
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
                                 <div class="form-group">
-                                    <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Título da Solução</label>
+                                    <label style="display: block; font-weight: 800; font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase;">Nome do produto</label>
                                     <input type="text" name="titulo" placeholder="Ex: Diagnóstico Cultural 360°" required onkeyup="generateSlug(this.value)" value="<%= service ? service.titulo : '' %>" style="width: 100%; padding: 15px; border: 1px solid #eee; border-radius: 12px; font-size: 1rem;">
                                 </div>
                                 <div class="form-group">
@@ -53,6 +53,13 @@
                                         <p style="font-size: 0.7rem; color: #aaa; margin-top: 5px;">Mídia Atual: <%= service.imagem %></p>
                                     <% } %>
                                 </div>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:25px;padding:22px;background:#f8fafc;border-radius:18px">
+                                <div class="form-group"><label style="display:block;font-weight:800;font-size:.75rem;color:#666;margin-bottom:10px">PREÇO ANTERIOR</label><input type="number" name="preco_de" step="0.01" min="0" value="<%= service && service.preco_de ? service.preco_de : '' %>" style="width:100%;padding:15px;border:1px solid #eee;border-radius:12px"></div>
+                                <div class="form-group"><label style="display:block;font-weight:800;font-size:.75rem;color:#666;margin-bottom:10px">PREÇO DA OFERTA *</label><input type="number" name="preco_por" step="0.01" min="0" value="<%= service && service.preco_por ? service.preco_por : '' %>" required style="width:100%;padding:15px;border:1px solid #eee;border-radius:12px"></div>
+                                <div class="form-group"><label style="display:block;font-weight:800;font-size:.75rem;color:#666;margin-bottom:10px">UNIDADE</label><input type="text" name="unidade" placeholder="cada / caixa" value="<%= service ? service.unidade || '' : '' %>" style="width:100%;padding:15px;border:1px solid #eee;border-radius:12px"></div>
+                                <div class="form-group"><label style="display:block;font-weight:800;font-size:.75rem;color:#666;margin-bottom:10px">SELO</label><input type="text" name="selo" placeholder="Oferta / 20% OFF" value="<%= service ? service.selo || '' : '' %>" style="width:100%;padding:15px;border:1px solid #eee;border-radius:12px"></div>
                             </div>
 
                             <div class="form-group" style="margin-bottom: 25px;">

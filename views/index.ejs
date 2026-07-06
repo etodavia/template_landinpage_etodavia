@@ -949,6 +949,9 @@
     function useMyLocation(){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(p=>{localStorage.setItem('drogariasDestaqueLocation',JSON.stringify({latitude:p.coords.latitude,longitude:p.coords.longitude}));closeLocationModal()})}
     if(!localStorage.getItem('drogariasDestaqueCep')&&!localStorage.getItem('drogariasDestaqueLocation'))setTimeout(openLocationModal,700);
     <% } %>
+    </script>
+    
+    <script>
     if(document.querySelector('.promoBannerSwiper'))new Swiper('.promoBannerSwiper',{loop:<%= locals.banners && banners.length > 1 ? 'true' : 'false' %>,autoplay:{delay:4500,disableOnInteraction:false},pagination:{el:'.promo-banner-pagination',clickable:true}});
     </script>
 

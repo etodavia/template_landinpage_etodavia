@@ -2329,5 +2329,83 @@
     </script>
 
     <!-- LISTA DE SUGESTÕES DE ÍCONES (REMOVIDA DAQUI) -->
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Adiciona botão de remover "X" em todas as imagens de preview
+            document.querySelectorAll('input[type="file"]').forEach(input => {
+                const formGroup = input.closest('.form-group');
+                if (!formGroup) return;
+                
+                const img = formGroup.querySelector('img');
+                if (img && !img.closest('.remove-img-wrapper')) {
+                    // Descobre o nome do campo real no banco
+                    let fieldName = input.name;
+                    if (fieldName.endsWith('_file')) {
+                        fieldName = fieldName.replace('_file', '');
+                    }
+                    
+                    // Cria o wrapper
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'remove-img-wrapper';
+                    wrapper.style.position = 'relative';
+                    wrapper.style.display = 'inline-block';
+                    wrapper.style.marginBottom = '10px';
+                    
+                    img.parentNode.insertBefore(wrapper, img);
+                    wrapper.appendChild(img);
+                    
+                    // Cria o botão X
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.innerHTML = '<i class="ri-close-line"></i>';
+                    btn.style.position = 'absolute';
+                    btn.style.top = '-10px';
+                    btn.style.right = '-10px';
+                    btn.style.background = '#ef4444';
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                    btn.style.borderRadius = '50%';
+                    btn.style.width = '24px';
+                    btn.style.height = '24px';
+                    btn.style.cursor = 'pointer';
+                    btn.style.display = 'flex';
+                    btn.style.alignItems = 'center';
+                    btn.style.justifyContent = 'center';
+                    btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+                    btn.title = 'Remover imagem atual';
+                    
+                    btn.onclick = function() {
+                        if (confirm('Tem certeza que deseja remover esta imagem? Você precisará clicar em "Salvar Alterações" no topo da tela para confirmar essa exclusão.')) {
+                            wrapper.style.display = 'none';
+                            const form = input.closest('form');
+                            
+                            // Cria campo hidden para remover o valor no banco (enviando string vazia)
+                            let hiddenValue = form.querySelector('input[type="hidden"][name="' + fieldName + '"]');
+                            if (!hiddenValue) {
+                                hiddenValue = document.createElement('input');
+                                hiddenValue.type = 'hidden';
+                                hiddenValue.name = fieldName;
+                                form.appendChild(hiddenValue);
+                            }
+                            hiddenValue.value = '';
+                            
+                            // Cria campo hidden de "remove" também, para alguns casos no server.js
+                            let hiddenRemove = form.querySelector('input[type="hidden"][name="' + fieldName + '_remove"]');
+                            if (!hiddenRemove) {
+                                hiddenRemove = document.createElement('input');
+                                hiddenRemove.type = 'hidden';
+                                hiddenRemove.name = fieldName + '_remove';
+                                form.appendChild(hiddenRemove);
+                            }
+                            hiddenRemove.value = '1';
+                        }
+                    };
+                    
+                    wrapper.appendChild(btn);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

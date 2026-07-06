@@ -96,6 +96,11 @@
                     <i class="ri-layout-masonry-fill"></i> <span class="nav-text">Editor Global</span>
                 </a>
             </li>
+            <li>
+                <a href="/admin/midia" class="<%= (locals.title.includes('Banco de Imagens')) ? 'active' : '' %>">
+                    <i class="ri-image-edit-fill"></i> <span class="nav-text">Banco de Imagens</span>
+                </a>
+            </li>
             <% } %>
 
             <% if (hasPerm('servicos')) { %>

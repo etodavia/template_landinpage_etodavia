@@ -1527,6 +1527,56 @@ app.post('/admin/servicos/delete/:id', async (req, res) => {
     } catch (e) { res.redirect('/admin/servicos?error=1'); }
 });
 
+// --- Banco de Imagens (Mídia) ---
+app.get('/admin/midia', async (req, res) => {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        const dir = path.join(__dirname, 'public', 'uploads');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        
+        const files = fs.readdirSync(dir).map(file => {
+            const stats = fs.statSync(path.join(dir, file));
+            return {
+                name: file,
+                url: '/uploads/' + file,
+                size: (stats.size / 1024).toFixed(1) + ' KB',
+                mtime: stats.mtime
+            };
+        }).filter(f => f.name.match(/\.(jpg|jpeg|png|webp|gif|svg)$/i))
+          .sort((a, b) => b.mtime - a.mtime);
+
+        res.render('admin/midia', { title: 'Banco de Imagens', files });
+    } catch (e) {
+        console.error(e);
+        res.redirect('/admin/dashboard?error=1');
+    }
+});
+
+app.post('/admin/midia/upload', upload.single('imagem_file'), (req, res) => {
+    res.redirect('/admin/midia?success=1');
+});
+
+app.post('/admin/midia/delete', express.urlencoded({ extended: true }), (req, res) => {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+        const { filename } = req.body;
+        if (!filename || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+            return res.redirect('/admin/midia?error=1');
+        }
+        
+        const filepath = path.join(__dirname, 'public', 'uploads', filename);
+        if (fs.existsSync(filepath)) {
+            fs.unlinkSync(filepath);
+        }
+        res.redirect('/admin/midia?success=1');
+    } catch (e) {
+        res.redirect('/admin/midia?error=1');
+    }
+});
+
+
 // app.get('/contato', (req, res) => res.render('contato', { title: 'Contato | Sua Empresa' }));
 app.get('/politica-de-privacidade', (req, res) => {
     const siteName = res.locals.settings?.site_name || 'Sua Empresa';

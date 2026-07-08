@@ -335,7 +335,7 @@
                                                 </p>
                                             <% } %>
                                             <% const slideBtnText = slide.button_text || homeHeroButtonText; %>
-                                            <% if (slideBtnText && slideBtnText.trim()) { %>
+                                            <% if (slideBtnText && slideBtnText.trim() && slideBtnText.trim().toLowerCase() !== 'ocultar') { %>
                                             <div class="hero-button-adjustable" style="display: flex; justify-content: center; margin-top: 10px;">
                                                 <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
                                                     <a href="javascript:void(0)" onclick="if(typeof openLocationModal === 'function') openLocationModal()" class="btn-pill-large" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">
@@ -365,7 +365,7 @@
                                                 </p>
                                             <% } %>
                                             <% const slideBtnText = slide.button_text || homeHeroButtonText; %>
-                                            <% if (slideBtnText && slideBtnText.trim()) { %>
+                                            <% if (slideBtnText && slideBtnText.trim() && slideBtnText.trim().toLowerCase() !== 'ocultar') { %>
                                             <div class="hero-button-adjustable" style="display: flex; justify-content: flex-start;">
                                                 <% if (typeof filiais !== 'undefined' && filiais.length > 0) { %>
                                                     <a href="javascript:void(0)" onclick="if(typeof openLocationModal === 'function') openLocationModal()" class="btn-pill-large" style="width: auto !important; min-width: 200px; padding: 18px 30px; <%= settings.color_hero_button ? 'background:'+settings.color_hero_button+'; color: white;' : '' %>">

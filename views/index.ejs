@@ -38,7 +38,7 @@
         const heroText = (value, fallback) => (value === null || typeof value === 'undefined') ? fallback : String(value);
         const homeHeroTitle = heroText(settings.home_hero_title, 'Lidere Negócios com <em>Confiança</em>.');
         const homeHeroDescription = heroText(settings.home_hero_description, 'Consultoria estratégica especializada em impulsionar o capital humano e elevar a performance operacional.');
-        const homeHeroButtonText = (settings.home_hero_button_text && settings.home_hero_button_text.trim().toLowerCase() === 'ocultar') ? '' : heroText(settings.home_hero_button_text, 'Agendar Consultoria');
+        const homeHeroButtonText = (settings.home_hero_button_text && settings.home_hero_button_text.trim().toLowerCase() === 'ocultar') ? '' : heroText(settings.home_hero_button_text, '');
 
         const defaultSections = [
             { id: 'home', active: true },
